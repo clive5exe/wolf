@@ -129,7 +129,7 @@ class TestMarkup:
         assert plain(key("c", "ycle")) == "[c]ycle"
 
     def test_visible_len_ignores_style_tags(self) -> None:
-        assert visible_len("[#F0B45C]abc[/]") == 3
+        assert visible_len("[#FF2247]abc[/]") == 3
 
     def test_escape_protects_literal_brackets(self) -> None:
         assert plain(escape("[watching]")) == "[watching]"

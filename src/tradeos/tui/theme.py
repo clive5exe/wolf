@@ -27,7 +27,7 @@ class Ink:
     FAINT: Final = "#4A4A4A"  # leaders, rules, inactive scaffolding
 
     # semantic
-    INFRARED: Final = "#EA553B"  # the wolf: brand, targets, key hints
+    INFRARED: Final = "#FF2247"  # the wolf: brand, targets, key hints
     GREEN: Final = "#7ED491"  # money up / passed / fresh
     RED: Final = "#F08C8C"  # money down / vetoed / halted
     CYAN: Final = "#83D2E4"  # data, history, sparklines
@@ -37,7 +37,7 @@ class Ink:
     AMBER: Final = INFRARED
 
     # badge fills (dark text on a colour block)
-    ON_AMBER: Final = "#140603"
+    ON_AMBER: Final = "#1A0307"
     ON_RED: Final = "#2A0D0D"
 
 

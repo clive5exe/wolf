@@ -24,8 +24,8 @@
     --muted: #8a8a8a;
     --faint: #5a5a5a;
 
-    --infrared: #ea553b;
-    --amber: #ea553b; /* alias while the app palette catches up */
+    --infrared: #ff2247;
+    --amber: #ff2247; /* alias while the app palette catches up */
     --green: #7ed491;
     --red: #f08c8c;
     --cyan: #83d2e4;
@@ -51,7 +51,7 @@ body {
 }
 
 ::selection {
-    background: rgba(234, 85, 59, 0.28);
+    background: rgba(255, 34, 71, 0.28);
 }
 
 a {
@@ -132,7 +132,7 @@ nav {
     position: relative;
     overflow: hidden;
 }
-/* Faint amber wash behind the wordmark — the only ornament on the page. */
+/* Faint infrared wash behind the wordmark — the only ornament on the page. */
 .hero::before {
     content: "";
     position: absolute;
@@ -141,7 +141,7 @@ nav {
     transform: translateX(-50%);
     width: 1100px;
     height: 620px;
-    background: radial-gradient(ellipse at center, rgba(234, 85, 59, 0.09), transparent 68%);
+    background: radial-gradient(ellipse at center, rgba(255, 34, 71, 0.10), transparent 68%);
     pointer-events: none;
 }
 .hero-content {
@@ -180,7 +180,7 @@ nav {
     line-height: 1.05;
     letter-spacing: 0.01em;
     margin-bottom: 34px;
-    text-shadow: 0 0 60px rgba(234, 85, 59, 0.4);
+    text-shadow: 0 0 60px rgba(255, 34, 71, 0.38);
     font-variation-settings: "BLED" 0, "SCAN" 0;
 }
 
@@ -238,7 +238,7 @@ nav {
     color: #0a0a0a;
     font-weight: 700;
 }
-.btn-primary:hover { background: #f2694f; }
+.btn-primary:hover { background: #ff4463; }
 .btn-outline {
     border-color: var(--border);
     color: var(--fg);
