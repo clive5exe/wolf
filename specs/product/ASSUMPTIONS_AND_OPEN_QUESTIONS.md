@@ -24,15 +24,19 @@ product decision, a legal question, or an external unknown.
 | A13 | Benchmark for beta/Sharpe deferred until a licensed benchmark series exists; stats that need it ship "unavailable" rather than approximated | portfolio/stats.py |
 | A14 | MIT license | LICENSE |
 
-## 2. Open questions — need HUMAN/product decision
+## 2. Open questions — ANSWERED 2026-08-05 (by the project owner)
 
-| # | Question | Why it matters | Default until answered |
-|---|---|---|---|
-| Q1 | Is the target user's Claude plan Pro or Max? Programmatic (`-p`) usage reportedly draws a **separate monthly programmatic-credit pool** (third-party source; not confirmed officially). Heavy scheduled cycles could exhaust it. | Cost honesty; cycle scheduling defaults | Conservative defaults: cycles on-demand + a few scheduled/day; cost recorded per event; README avoids "free" claims |
-| Q2 | Robinhood Agentic account: is the user willing to open one (counts toward the 10-account max; desktop onboarding; beta)? | Gates the read-only Robinhood path in v0.1 and everything in v0.2/0.3 | v0.1 works fully without it (manual/CSV positions + paper) |
-| Q3 | Sharing portfolio data with an AI provider: Robinhood explicitly warns data leaves their security environment once an agent reads it. What redaction level should prompts apply to holdings by default (exact quantities vs percentages)? | Privacy stance, prompt design | Default: percentages + omit account ids/values unless user opts into absolute values |
-| Q4 | Telegram (v0.2 comms) requires a bot token — acceptable cloud dependency? | Comms roadmap | macOS-only until answered |
-| Q5 | Public repo from day one, or after v0.1 hardening? | Security review pacing | Treat as public-quality now; publish decision is human's |
+| # | Question | Decision |
+|---|---|---|
+| Q1 | Claude plan tier (programmatic-credit budget)? | **Max.** Measured ~$0.67/structured call → budget allows scheduled AI-synthesis cycles, but cost stays recorded per event and surfaced in doctor/status. |
+| Q2 | Open a Robinhood Agentic account? | **Yes.** T-024 unblocked for fixture-driven development now; live connect happens once the owner completes Robinhood's desktop onboarding. |
+| Q3 | Prompt redaction level for holdings? | **Pending** (owner requested a plainer explanation). Safe default stands: percentages only, no dollar amounts, no account identifiers in any prompt. |
+| Q4 | Telegram as v0.2 comms channel? | **Yes.** Bot token in Keychain; adapter task lands in v0.2. |
+| Q5 | Public repo timing? | **After v0.1 hardening.** Additionally: no AI-authorship attribution in repo history or docs (commit trailers removed; policy recorded below). The Claude Code *provider integration* is product functionality and stays. |
+
+Repo policy from Q5: commits in this repository carry no AI co-authorship
+trailers. References to Claude/Anthropic remain only where they are factual
+product content (the provider adapter, provider docs, research citations).
 
 ## 3. Open questions — external/technical unknowns (tracked, non-blocking)
 

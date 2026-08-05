@@ -1,0 +1,550 @@
+<title>W◉LF — Terminal UI Direction</title>
+<style>
+  :root{
+    --bg:#EFEDE6; --ink:#23252B; --muted:#6E6A5E; --line:#D8D4C8;
+    --accent:#B87C1E; --accent-bright:#E8A33D;
+    --t-bg:#0E1219; --t-chrome:#161C26; --t-ink:#C7D0DC; --t-dim:#57616F;
+    --t-faint:#39424E; --t-green:#7ED491; --t-red:#F08C8C; --t-cyan:#83D2E4;
+    --t-amber:#F0B45C; --t-sel:#1D2634;
+    --mono:ui-monospace,'SF Mono',Menlo,Monaco,'Cascadia Mono',monospace;
+    --sans:'Avenir Next',Avenir,'Helvetica Neue',sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0C0F15; --ink:#D9DEE8; --muted:#8C93A3; --line:#232A36; --accent:#E8A33D; }
+  }
+  :root[data-theme="dark"]{ --bg:#0C0F15; --ink:#D9DEE8; --muted:#8C93A3; --line:#232A36; --accent:#E8A33D; }
+  :root[data-theme="light"]{ --bg:#EFEDE6; --ink:#23252B; --muted:#6E6A5E; --line:#D8D4C8; --accent:#B87C1E; }
+
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);
+       margin:0;padding:0 20px 96px;line-height:1.55}
+  .wrap{max-width:1060px;margin:0 auto}
+
+  /* ---------- page typography ---------- */
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;
+           text-transform:uppercase;color:var(--accent)}
+  h1{font-family:var(--mono);font-weight:800;font-size:clamp(34px,6vw,56px);
+     letter-spacing:-.01em;margin:.2em 0 .1em;text-wrap:balance}
+  h2{font-family:var(--mono);font-size:20px;letter-spacing:.06em;margin:0 0 4px}
+  .sec{margin-top:84px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);
+            padding-bottom:10px;margin-bottom:26px}
+  .sec-head .n{font-family:var(--mono);color:var(--muted);font-size:13px}
+  p.lede{font-size:18px;max-width:62ch;color:var(--ink)}
+  p.note, .annot p{color:var(--muted);font-size:14.5px;max-width:60ch;margin:.4em 0}
+  .annot h3{font-family:var(--mono);font-size:13px;letter-spacing:.14em;
+            text-transform:uppercase;margin:1.4em 0 .3em;color:var(--accent)}
+  .k{font-family:var(--mono);background:var(--line);border-radius:3px;
+     padding:0 5px;font-size:.9em;color:var(--ink)}
+
+  /* ---------- screen + annotation layout ---------- */
+  .duo{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:28px;align-items:start}
+  @media (max-width:900px){.duo{grid-template-columns:1fr}}
+
+  /* ---------- terminal window ---------- */
+  .term{background:var(--t-bg);border:1px solid #000;border-radius:8px;
+        box-shadow:0 18px 44px rgba(0,0,0,.38), 0 2px 8px rgba(0,0,0,.28);
+        overflow:hidden}
+  .tbar{background:var(--t-chrome);display:flex;align-items:center;gap:8px;
+        padding:8px 12px;font-family:var(--mono);font-size:11.5px;color:var(--t-dim)}
+  .dot{width:10px;height:10px;border-radius:50%;background:#3A424E}
+  .tbar .title{margin-left:8px;letter-spacing:.08em}
+  .replay{margin-left:auto;background:none;border:1px solid var(--t-faint);
+          color:var(--t-dim);font-family:var(--mono);font-size:11px;border-radius:4px;
+          padding:2px 9px;cursor:pointer}
+  .replay:hover,.replay:focus-visible{color:var(--t-amber);border-color:var(--t-amber);outline:none}
+  .screen{margin:0;padding:18px 20px 20px;font-family:var(--mono);
+          font-size:13px;line-height:1.62;color:var(--t-ink);overflow-x:auto;
+          font-variant-numeric:tabular-nums;white-space:pre}
+
+  /* terminal ink roles */
+  .g{color:var(--t-green)} .r{color:var(--t-red)} .c{color:var(--t-cyan)}
+  .a{color:var(--t-amber)} .d{color:var(--t-dim)} .f{color:var(--t-faint)}
+  .b{font-weight:700;color:#EAF0F8}
+  .badge{background:var(--t-amber);color:#161207;font-weight:700;padding:0 6px;border-radius:3px}
+  .badge.red{background:var(--t-red);color:#2A0D0D}
+  .sel{background:var(--t-sel);display:inline-block;width:100%}
+
+  /* ---------- animations (opt-in via .play on the .term) ---------- */
+  .cursor{display:inline-block;width:.62em;height:1.05em;vertical-align:-0.18em;
+          background:var(--t-amber)}
+  .play .cursor{animation:blink 1.06s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  .pulse{color:var(--t-green)}
+  .play .pulse{animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.25}}
+  .play .pulse-r{animation:pulse 1.1s ease-in-out infinite;color:var(--t-red)}
+  .pulse-r{color:var(--t-red)}
+
+  .spin::after{content:"⠋";color:var(--t-amber)}
+  .play .spin::after{animation:spin .8s steps(10) infinite}
+  @keyframes spin{
+    0%{content:"⠋"}10%{content:"⠙"}20%{content:"⠹"}30%{content:"⠸"}40%{content:"⠼"}
+    50%{content:"⠴"}60%{content:"⠦"}70%{content:"⠧"}80%{content:"⠇"}90%{content:"⠏"}}
+
+  .rise{opacity:1}
+  .play .rise{opacity:0;transform:translateY(4px);
+              animation:rise .42s cubic-bezier(.2,.7,.2,1) forwards;
+              animation-delay:calc(var(--i,0)*70ms)}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  .tick{opacity:1}
+  .play .tick{opacity:0;animation:tickin .3s ease-out forwards;
+              animation-delay:calc(.3s + var(--i,0)*28ms)}
+  @keyframes tickin{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+
+  .type{display:inline-block;overflow:hidden;vertical-align:bottom;max-width:100%}
+  .play .type{width:0;animation:type 1.9s steps(46) forwards;animation-delay:.5s;
+              white-space:nowrap}
+  @keyframes type{to{width:46ch}}
+
+  .flash{color:var(--t-green)}
+  .play .flash{animation:flash .38s ease-out 2}
+  @keyframes flash{50%{background:rgba(126,212,145,.22)}}
+
+  .shimmer{background:linear-gradient(90deg,var(--t-dim) 40%,var(--t-cyan) 50%,var(--t-dim) 60%);
+           background-size:200% 100%;-webkit-background-clip:text;background-clip:text;
+           color:transparent}
+  .play .shimmer{animation:shim 3.4s linear infinite}
+  @keyframes shim{to{background-position:-200% 0}}
+
+  .killframe{border:1px solid var(--t-red)}
+  .play .killframe{animation:killpulse 1.2s ease-in-out infinite}
+  @keyframes killpulse{50%{box-shadow:0 0 0 3px rgba(240,140,140,.25), 0 18px 44px rgba(0,0,0,.38)}}
+
+  @media (prefers-reduced-motion: reduce){
+    .play .cursor,.play .pulse,.play .pulse-r,.play .spin::after,.play .rise,
+    .play .tick,.play .type,.play .flash,.play .shimmer,.play .killframe{animation:none}
+    .play .rise,.play .tick{opacity:1;transform:none}
+    .play .type{width:auto}
+  }
+
+  /* ---------- hero ---------- */
+  .hero{padding-top:72px}
+  .logotype{font-family:var(--mono);font-weight:800;
+            font-size:clamp(64px,14vw,150px);letter-spacing:-.03em;line-height:1;
+            margin:18px 0 6px;color:var(--ink)}
+  .logotype .eye{color:var(--accent-bright)}
+  .tagline{font-family:var(--mono);font-size:15px;letter-spacing:.14em;color:var(--muted);
+           text-transform:uppercase}
+
+  /* ---------- naming board ---------- */
+  .names{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .name-card{border:1px solid var(--line);border-radius:8px;padding:18px 20px;background:transparent}
+  .name-card.pick{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+  .name-card h3{font-family:var(--mono);font-size:22px;margin:0;letter-spacing:.02em}
+  .name-card .acr{font-family:var(--mono);font-size:12.5px;color:var(--accent);margin:.35em 0 .5em;
+                  letter-spacing:.04em}
+  .name-card p{font-size:14px;color:var(--muted);margin:0}
+  .name-card .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;
+                  text-transform:uppercase;color:var(--accent)}
+
+  /* ---------- flow map ---------- */
+  .flow{font-family:var(--mono);font-size:13px;overflow-x:auto;padding:8px 0}
+  .flow pre{margin:0;line-height:1.7;color:var(--muted);white-space:pre}
+  .flow .node{color:var(--ink);font-weight:700}
+  .flow .hot{color:var(--accent)}
+
+  /* ---------- motion table ---------- */
+  table.motion{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.motion th{font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+                  text-transform:uppercase;text-align:left;color:var(--muted);
+                  border-bottom:1px solid var(--line);padding:8px 12px 8px 0}
+  table.motion td{border-bottom:1px solid var(--line);padding:9px 12px 9px 0;vertical-align:top}
+  table.motion td:first-child{font-family:var(--mono);white-space:nowrap}
+  table.motion td:last-child{color:var(--muted)}
+</style>
+
+<div class="wrap">
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="eyebrow">design direction · terminal ui · working title</div>
+  <div class="logotype">W<span class="eye">◉</span>LF</div>
+  <div class="tagline">Wealth Orchestration, Local-First</div>
+  <p class="lede">Six screens, one motion language, one brand mark. The current TUI shows
+  data; this direction makes the runtime feel like what it is — a patient predator that
+  watches everything, explains everything, and only moves when the numbers say move.
+  Every mockup below uses the <em>real</em> numbers from yesterday's paper session.</p>
+  <p class="note">Animations are live in the mockups — press <span class="k">▶ replay</span> on any window.</p>
+</header>
+
+<!-- ================= NAMING ================= -->
+<section class="sec">
+  <div class="sec-head"><span class="n">00</span><h2>THE NAME</h2></div>
+  <div class="names">
+    <div class="name-card pick">
+      <span class="tag">recommended</span>
+      <h3>WOLF</h3>
+      <div class="acr">Wealth Orchestration, Local-First</div>
+      <p>The acronym is honest — local-first is the actual architecture, not marketing.
+      Gives us a brand mark for free (the amber eye in the O), a binary that feels good to
+      type (<span class="k">wolf tui</span>), and a voice: "wolf is watching", "enter the den".
+      Risk: the word is common — check crates/pypi/homebrew collisions before committing.</p>
+    </div>
+    <div class="name-card">
+      <h3>ARGUS</h3>
+      <div class="acr">no acronym needed — the hundred-eyed watchman</div>
+      <p>Mythologically perfect for a monitor-everything runtime; Argus never sleeps.
+      Slightly cold, and heavily used in dev-tools naming (monitoring dashboards especially).</p>
+    </div>
+    <div class="name-card">
+      <h3>KESTREL</h3>
+      <div class="acr">the falcon that hovers, watches, then strikes precisely</div>
+      <p>Beautiful word, right behavior (hold position → commit decisively). Weak acronym
+      potential; brand mark less obvious than the wolf eye.</p>
+    </div>
+    <div class="name-card">
+      <h3>HELM</h3>
+      <div class="acr">Holdings · Events · Ledger · Markets</div>
+      <p>You steer, it holds course — matches the "advisor, not chatbot" stance. Calmer,
+      more serious. Kubernetes' package manager owns a lot of this word's tech mindshare.</p>
+    </div>
+    <div class="name-card">
+      <h3>DRIFT</h3>
+      <div class="acr">the metric at the heart of the whole engine</div>
+      <p>Cheeky and technical at once — drift is literally what the rebalancer hunts.
+      Downside: "drifting" reads as aimless, the opposite of the product's discipline.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FLOW ================= -->
+<section class="sec">
+  <div class="sec-head"><span class="n">01</span><h2>THE FLOW</h2></div>
+  <div class="duo">
+    <div class="flow"><pre>
+              ┌───────────────┐
+   first run  │  <span class="node">ONBOARDING</span>   │  goals in your words → policy you confirm
+      ┌──────▸│  conversation │
+      │       └───────┬───────┘
+┌─────┴─────┐         ▼
+│   <span class="node">BOOT</span>    │──▸┌───────────────────────────────┐
+│  sequence │   │           <span class="node">DASHBOARD</span>           │◂─── home. always.
+└───────────┘   │   nav · positions · freshness │
+                └───┬─────────┬─────────┬───────┘
+                    │ <span class="hot">c</span>       │ <span class="hot">enter</span>   │ <span class="hot">j</span>
+                    ▼         ▼         ▼
+             ┌──────────┐ ┌─────────┐ ┌─────────┐
+             │  <span class="node">CYCLE</span>   │▸│ <span class="node">VERDICT</span> │ │ <span class="node">JOURNAL</span> │
+             │   live   │ │ + thesis│ │ + replay│
+             └──────────┘ └─────────┘ └─────────┘
+                    <span class="hot">k</span> from anywhere
+                    ▼
+             ┌─────────────┐
+             │ <span class="node">KILL SWITCH</span> │  full-screen takeover, nothing subtle
+             └─────────────┘</pre>
+    </div>
+    <div class="annot">
+      <h3>principles</h3>
+      <p>Dashboard is home; every screen is one keystroke away and one <span class="k">esc</span> back.
+      No menus, no tabs-of-tabs.</p>
+      <p>The decision cycle is watchable <em>as it happens</em> — the pipeline is the product's
+      honesty, so it gets a screen, not a log file.</p>
+      <p>The kill switch is deliberately the ugliest, loudest thing in the app.
+      Safety should not be tasteful.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREEN: BOOT ================= -->
+<section class="sec">
+  <div class="sec-head"><span class="n">02</span><h2>BOOT SEQUENCE</h2></div>
+  <div class="duo">
+    <div class="term">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="title">wolf · den</span>
+        <button class="replay" type="button">▶ replay</button></div>
+      <pre class="screen">
+<span class="rise" style="--i:0"><span class="b">  W<span class="a">◉</span>LF</span> <span class="d">runtime v0.2 · wealth orchestration, local-first</span></span>
+
+<span class="rise" style="--i:2"><span class="a">▸</span> event store <span class="f">.........</span> open · 28 events · replay <span class="g">✓</span></span>
+<span class="rise" style="--i:3"><span class="a">▸</span> policy <span class="f">..............</span> v1 active · <span class="badge">PAPER</span> mode</span>
+<span class="rise" style="--i:4"><span class="a">▸</span> provider <span class="f">............</span> claude code 2.1.222 · <span class="g">authenticated</span></span>
+<span class="rise" style="--i:5"><span class="a">▸</span> market data <span class="f">.........</span> robinhood mcp · <span class="g">connected</span> <span class="d">(read-only)</span></span>
+<span class="rise" style="--i:6"><span class="a">▸</span> risk engine <span class="f">.........</span> 20 rules armed · kill switch <span class="g">clear</span></span>
+<span class="rise" style="--i:7"><span class="a">▸</span> notifications <span class="f">.......</span> macos banners ready</span>
+
+<span class="rise" style="--i:9"><span class="g">all systems nominal</span> <span class="d">—</span> press <span class="b">⏎</span> to enter the den <span class="cursor"></span></span>
+      </pre>
+    </div>
+    <div class="annot">
+      <h3>what animates</h3>
+      <p>Lines land one by one (70&nbsp;ms stagger, 420&nbsp;ms rise) — the doctor checks
+      <em>are</em> the boot sequence, so startup doubles as diagnosis.</p>
+      <p>Any failed check halts the cascade in place with a red line and a fix hint;
+      you never boot past a broken environment.</p>
+      <h3>details</h3>
+      <p>The amber cursor is the brand: it blinks at 1.06&nbsp;s everywhere in the app,
+      always amber, always the "wolf is alive" signal.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREEN: DASHBOARD ================= -->
+<section class="sec">
+  <div class="sec-head"><span class="n">03</span><h2>DASHBOARD — THE DEN</h2></div>
+  <div class="duo">
+    <div class="term">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="title">wolf · den</span>
+        <button class="replay" type="button">▶ replay</button></div>
+      <pre class="screen">
+<span class="d">┌─</span> <span class="b">W<span class="a">◉</span>LF</span> <span class="d">─────────────────────────────</span> <span class="badge">PAPER</span> <span class="d">·</span> <span class="g">risk armed</span> <span class="d">·</span> <span class="pulse">●</span> <span class="d">live · 12:07Z ─┐</span>
+
+  <span class="d">NAV</span> <span class="b">$99,955.45</span>    <span class="d">day</span> <span class="g">▲ +0.00%</span>    <span class="d">max dd</span> 0.0%    <span class="d">cash</span> <span class="a">10.70%</span>
+  <span class="shimmer">▁▁▂▂▃▃▃▄▄▅▅▅▆▆▇▇███████</span>  <span class="f">90-day equity</span>
+
+  <span class="d">SYM     QTY       VALUE    WEIGHT   vs TARGET    DRIFT       7D      uP&amp;L   SRC</span>
+  <span class="b">VTI</span>     140  $39,914.00    39.9%   <span class="f">──</span><span class="a">◆</span><span class="f">┼────</span>   <span class="d">−0.1%</span>   <span class="c">▂▃▃▅▄▆▇</span>   <span class="r">−19.60</span>   <span class="pulse">●</span>
+  <span class="b">AAPL</span>     64  $14,880.00    14.9%   <span class="f">──</span><span class="a">◆</span><span class="f">┼────</span>   <span class="d">−0.1%</span>   <span class="c">▃▄▃▅▆▅▆</span>   <span class="r">−7.68</span>    <span class="pulse">●</span>
+  <span class="b">MSFT</span>     35  $14,637.00    14.6%   <span class="f">─</span><span class="a">◆</span><span class="f">─┼────</span>   <span class="a">−0.4%</span>   <span class="c">▅▄▆▅▇▆█</span>   <span class="r">−7.35</span>    <span class="pulse">●</span>
+  <span class="b">JNJ</span>      61   $9,842.35     9.8%   <span class="f">──</span><span class="a">◆</span><span class="f">┼────</span>   <span class="d">−0.2%</span>   <span class="c">▄▄▃▄▃▄▄</span>   <span class="r">−4.88</span>    <span class="pulse">●</span>
+  <span class="b">XOM</span>      84   $9,987.60    10.0%   <span class="f">───</span><span class="a">◆</span><span class="f">────</span>   <span class="d">−0.0%</span>   <span class="c">▃▄▅▄▅▆▅</span>   <span class="r">−5.04</span>    <span class="pulse">●</span>
+  <span class="d">CASH</span>          $10,694.50    10.7%   <span class="f">───┼</span><span class="a">◆</span><span class="f">───</span>   <span class="g">+0.7%</span>
+
+  <span class="f">◆ current · ┼ target</span>          <span class="d">top-3</span> <span class="a">69.5%</span> <span class="d">· hhi 0.223 · quotes ≤ 0.4s old</span>
+
+  <span class="d">last cycle 12:07:16 —</span> <span class="g">5 fills</span><span class="d">, verdict 20/20 · next in</span> <span class="b">12:41</span>
+
+<span class="d">└</span> <span class="a">[c]</span><span class="d">ycle</span>  <span class="a">[⏎]</span><span class="d">verdict</span>  <span class="a">[j]</span><span class="d">ournal</span>  <span class="a">[p]</span><span class="d">olicy</span>  <span class="a">[k]</span><span class="d">ill</span>  <span class="a">[?]</span>        <span class="d">wolf is watching</span> <span class="pulse">●</span> <span class="d">┘</span>
+      </pre>
+    </div>
+    <div class="annot">
+      <h3>information design</h3>
+      <p>One row answers five questions per holding: how much, how far from plan
+      (the <span style="color:var(--accent)">◆┼</span> gauge shows drift <em>spatially</em>),
+      where it's been (7-day sparkline), what it's costing, and whether the data is fresh.</p>
+      <p>Freshness dots breathe (2.4&nbsp;s pulse) while data is live; a stale source
+      stops pulsing and goes hollow ○ — you notice the <em>absence</em> of motion.</p>
+      <h3>what animates</h3>
+      <p>Equity sparkline carries a slow cyan shimmer — ambient "alive", never distracting.
+      On a fill, the row flashes green once (380&nbsp;ms ×2) and the NAV counts up.</p>
+      <h3>color discipline</h3>
+      <p>Amber = the wolf (brand, targets, keys). Green/red = money only.
+      Cyan = data/history. Nothing else gets color, so everything colored means something.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREEN: CYCLE ================= -->
+<section class="sec">
+  <div class="sec-head"><span class="n">04</span><h2>DECISION CYCLE — LIVE</h2></div>
+  <div class="duo">
+    <div class="term">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="title">wolf · cycle 01KZ8X47</span>
+        <button class="replay" type="button">▶ replay</button></div>
+      <pre class="screen">
+<span class="d">CYCLE</span> <span class="b">01KZ8X47</span> <span class="d">· trigger schedule/15m · policy v1 pinned · 12:07:16Z</span>
+
+  <span class="g">OBSERVE</span> <span class="f">────</span> <span class="g">RETRIEVE</span> <span class="f">────</span> <span class="g">PROPOSE</span> <span class="f">────</span> <span class="a b">THESIS</span> <span class="f">────</span> <span class="d">RISK</span> <span class="f">────</span> <span class="d">EXECUTE</span>
+     <span class="g tick" style="--i:0">✓</span>            <span class="g tick" style="--i:2">✓</span>            <span class="g tick" style="--i:4">✓</span>           <span class="spin"></span>          <span class="f">·</span>          <span class="f">·</span>
+
+  <span class="rise" style="--i:1"><span class="f">12:07:16.102</span>  quotes refreshed <span class="b">5/5</span> · oldest <span class="g">0.4s</span></span>
+  <span class="rise" style="--i:2"><span class="f">12:07:16.180</span>  context package <span class="b">7 items</span> · completeness <span class="g">100%</span> · 0 stale</span>
+  <span class="rise" style="--i:3"><span class="f">12:07:16.221</span>  rebalance@1.0.0 → <span class="b">5 candidates</span> <span class="d">(sells first)</span></span>
+  <span class="rise" style="--i:4"><span class="f">12:07:18.906</span>  <span class="c">thesis</span>  <span class="type">"Broad-market drift is mechanical, not a signal…"</span><span class="cursor"></span></span>
+
+  <span class="rise" style="--i:6"><span class="d">RISK</span>  <span class="f">▸</span> <span class="d">20 rules armed · every rule runs · any veto stops everything</span></span>
+  <span class="rise" style="--i:7"><span class="d">cost so far</span> $0.00 <span class="d">· provider call ≈</span> $0.67 <span class="d">· elapsed</span> <span class="b">2.8s</span></span>
+      </pre>
+    </div>
+    <div class="annot">
+      <h3>why this screen exists</h3>
+      <p>Transparency <em>as theater</em>. The pipeline tracker makes the architecture
+      visible: stages complete left to right, and the model is provably just one box —
+      with deterministic walls on both sides.</p>
+      <h3>what animates</h3>
+      <p>The active stage runs a braille spinner (80&nbsp;ms/frame); completed stages
+      snap to ✓. The thesis streams in with a typewriter reveal (18&nbsp;ms/char) —
+      the one place text "arrives", because it's the one place text is generated.</p>
+      <p>The running cost line is deliberate: AI synthesis shows its price in real time.
+      Deterministic cycles read <span class="k">$0.00</span> and skip the THESIS stage entirely.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREEN: VERDICT ================= -->
+<section class="sec">
+  <div class="sec-head"><span class="n">05</span><h2>VERDICT — THESIS MEETS THE WALL</h2></div>
+  <div class="duo">
+    <div class="term">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="title">wolf · verdict 01KZ8X47 · 1/5</span>
+        <button class="replay" type="button">▶ replay</button></div>
+      <pre class="screen">
+<span class="b">BUY 140 VTI</span> <span class="d">@ ~$285.10 ≈ $39,914 · rebalance@1.0.0 · order 1 of 5</span>
+
+<span class="d">─ thesis</span> <span class="d">· confidence</span> <span class="a">0.72</span> <span class="d">· 7 citations ─────────────────────────</span>
+  <span class="g">bull</span>  core is 0.1% under target after funding; re-anchor at 40%
+  <span class="r">bear</span>  top-3 concentration already 69.5%; slippage compounds
+  <span class="a">void if</span>  VTI recovers &gt;39.5% unaided · vol regime shifts <span class="d">[watching]</span>
+
+<span class="d">─ risk verdict ·</span> <span class="g b">20/20 PASS</span> <span class="d">─────────────────────────────────────</span>
+  <span class="g tick" style="--i:0">✓</span> <span class="d">kill_switch</span>   <span class="g tick" style="--i:1">✓</span> <span class="d">mode</span>        <span class="g tick" style="--i:2">✓</span> <span class="d">asset_type</span>  <span class="g tick" style="--i:3">✓</span> <span class="d">symbol</span>
+  <span class="g tick" style="--i:4">✓</span> <span class="d">order_value</span>   <span class="g tick" style="--i:5">✓</span> <span class="d">position_%</span>  <span class="g tick" style="--i:6">✓</span> <span class="d">sector_%</span>    <span class="g tick" style="--i:7">✓</span> <span class="d">min_cash</span>
+  <span class="g tick" style="--i:8">✓</span> <span class="d">holdings</span>      <span class="g tick" style="--i:9">✓</span> <span class="d">orders/day</span>  <span class="g tick" style="--i:10">✓</span> <span class="d">cooldown</span>    <span class="g tick" style="--i:11">✓</span> <span class="d">daily_loss</span>
+  <span class="g tick" style="--i:12">✓</span> <span class="d">drawdown</span>      <span class="g tick" style="--i:13">✓</span> <span class="d">hours</span>       <span class="g tick" style="--i:14">✓</span> <span class="d">quote_age</span>   <span class="g tick" style="--i:15">✓</span> <span class="d">context</span>
+  <span class="g tick" style="--i:16">✓</span> <span class="d">policy_pin</span>    <span class="g tick" style="--i:17">✓</span> <span class="d">fractional</span>  <span class="g tick" style="--i:18">✓</span> <span class="d">earnings</span>    <span class="a tick" style="--i:19">◇</span> <span class="d">concentr.</span><span class="a">*</span>
+  <span class="f">* advisory, non-blocking: top-3 at 69.5% — recorded, not vetoed</span>
+
+<span class="d">─ paper execution ──────────────────────────────────────────────────</span>
+  <span class="flash"><span class="g b">FILLED</span>  140 @ $285.24 · slippage 5bps ($19.60) · 01KZ8X47M0 <span class="g">✓</span></span>
+
+<span class="d">└</span> <span class="a">[↑↓]</span><span class="d">orders 1-5</span>  <span class="a">[t]</span><span class="d">full thesis</span>  <span class="a">[x]</span><span class="d">context pkg</span>  <span class="a">[esc]</span><span class="d">den</span>
+      </pre>
+    </div>
+    <div class="annot">
+      <h3>the money screen for trust</h3>
+      <p>Thesis on top, wall below, receipt at the bottom — the page reads in the exact
+      order the system works. Nothing is summarized away: all 20 rules, every time.</p>
+      <h3>what animates</h3>
+      <p>The rule grid fills at a 28&nbsp;ms stagger — twenty ticks land in just over half
+      a second, fast enough to feel mechanical, slow enough to register as <em>individual
+      checks</em>. A veto plays the same cascade but stops dead on the red ✗, which stays
+      pulsing. The fill line flashes green twice, then settles.</p>
+      <h3>v0.2 ready</h3>
+      <p>In approval mode this exact screen gains two keys:
+      <span class="k">a</span> approve · <span class="k">r</span> reject. Nothing else changes —
+      trust the user already built here transfers to real decisions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREEN: JOURNAL ================= -->
+<section class="sec">
+  <div class="sec-head"><span class="n">06</span><h2>JOURNAL — THE MEMORY</h2></div>
+  <div class="duo">
+    <div class="term">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="title">wolf · journal</span>
+        <button class="replay" type="button">▶ replay</button></div>
+      <pre class="screen">
+<span class="d">JOURNAL</span> <span class="d">· 12 decisions · replay verified</span> <span class="g">✓ deterministic</span>
+
+  <span class="rise" style="--i:0"><span class="f">08-05 12:07</span>  rebalance   <span class="g">5 fills</span>     20/20   <span class="c">thesis 0.72</span>   <span class="g">● on-track</span></span>
+  <span class="rise" style="--i:1"><span class="sel"><span class="f">08-04 15:30</span>  rebalance   <span class="d">no action</span>   <span class="d">—</span>       <span class="d">drift within threshold</span>    </span></span>
+  <span class="rise" style="--i:2"><span class="f">  └ what we knew:</span> <span class="d">pkg 01KZ2M4A · 7 items · completeness 100% · $0.00</span></span>
+  <span class="rise" style="--i:3"><span class="f">  └ no-action is a decision:</span> <span class="d">recorded, cited, replayable like any fill</span></span>
+  <span class="rise" style="--i:4"><span class="f">08-01 09:31</span>  rebalance   <span class="r">vetoed</span>      <span class="r">19/20</span>   <span class="d">stale_quote 141s&gt;120s</span> <span class="r">✕ blocked</span></span>
+  <span class="rise" style="--i:5"><span class="f">07-29 09:30</span>  rebalance   <span class="g">2 fills</span>     20/20   <span class="c">thesis 0.64</span>   <span class="a">◐ watching</span></span>
+  <span class="rise" style="--i:6"><span class="f">07-25 09:30</span>  rebalance   <span class="g">5 fills</span>     20/20   <span class="c">thesis 0.71</span>   <span class="g">● on-track</span></span>
+
+  <span class="rise" style="--i:8"><span class="d">outcome key:</span> <span class="g">●</span> <span class="d">thesis holding</span> · <span class="a">◐</span> <span class="d">invalidation condition close</span> · <span class="r">✕</span> <span class="d">invalidated</span></span>
+
+<span class="d">└</span> <span class="a">[⏎]</span><span class="d">open</span>  <span class="a">[r]</span><span class="d">eplay day</span>  <span class="a">[/]</span><span class="d">filter</span>  <span class="a">[esc]</span><span class="d">den</span>
+      </pre>
+    </div>
+    <div class="annot">
+      <h3>evaluation as a feature</h3>
+      <p>Every decision row carries its <em>later</em> outcome: did the thesis hold, is an
+      invalidation condition approaching, was it wrong? The system grades itself in public.</p>
+      <p>Vetoes and no-actions sit in the same list as fills, same visual weight —
+      "we didn't trade" is a result, not an absence.</p>
+      <h3>what animates</h3>
+      <p>Rows cascade in on open. <span class="k">r</span> replays a day: the dashboard
+      re-runs the recorded events at 20× with a <span class="k">REPLAY</span> watermark —
+      the audit log as a VCR.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREEN: KILL ================= -->
+<section class="sec">
+  <div class="sec-head"><span class="n">07</span><h2>KILL SWITCH — THE LOUD SCREEN</h2></div>
+  <div class="duo">
+    <div class="term killframe">
+      <div class="tbar"><span class="dot" style="background:var(--t-red)"></span><span class="dot"></span><span class="dot"></span>
+        <span class="title" style="color:var(--t-red)">wolf · HALTED</span>
+        <button class="replay" type="button">▶ replay</button></div>
+      <pre class="screen">
+
+            <span class="r b">██████████████████████████████████████</span>
+            <span class="r b">██                                  ██</span>
+            <span class="r b">██</span>         <span class="b">TRADING  HALTED</span>          <span class="r b">██</span>
+            <span class="r b">██                                  ██</span>
+            <span class="r b">██████████████████████████████████████</span>
+
+       <span class="pulse-r">●</span> <span class="d">kill switch engaged · 12:41:03Z · by</span> <span class="b">operator</span>
+
+       <span class="d">execution refused at</span> <span class="b">4 layers</span> <span class="d">— scheduler · cycle · engine · broker</span>
+       <span class="d">event</span> <span class="f">01KZ9A22K1</span> <span class="d">appended · notification sent</span>
+
+       <span class="d">nothing trades until a human types:</span>
+       <span class="a b">wolf unkill</span> <span class="d">— or —</span> <span class="a">[u]</span> <span class="d">here, twice, deliberately</span>
+
+<span class="d">└</span> <span class="a">[j]</span><span class="d">ournal — see what led here</span>   <span class="a">[u]</span><span class="d">nkill (hold)</span>
+      </pre>
+    </div>
+    <div class="annot">
+      <h3>anti-design, on purpose</h3>
+      <p>No sparklines, no shimmer, no charm. Red frame pulsing at 1.2&nbsp;s, everything
+      else stripped. The screen should feel like a tripped breaker.</p>
+      <p>Disengaging is deliberately annoying: press-and-hold or a typed command —
+      never a single accidental key. Both paths are logged with who and when.</p>
+      <h3>reachability</h3>
+      <p><span class="k">k</span> from any screen. If the runtime trips it automatically
+      (stale-data storm, provider failure loop, rule breach), the reason is the headline.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MOTION LANGUAGE ================= -->
+<section class="sec">
+  <div class="sec-head"><span class="n">08</span><h2>MOTION LANGUAGE</h2></div>
+  <p class="note" style="max-width:66ch">One vocabulary, used everywhere. Motion always
+  <em>means</em> something — alive, working, arriving, confirmed, or dead. Decorative-only
+  animation is banned; everything below maps to a system state and respects
+  <span class="k">prefers-reduced-motion</span> (Textual: honor a <span class="k">wolf --calm</span> flag).</p>
+  <table class="motion">
+    <tr><th>pattern</th><th>meaning</th><th>spec</th><th>where</th></tr>
+    <tr><td>amber cursor blink</td><td>the runtime is alive</td><td>1.06 s · steps(1)</td><td>every screen, one cursor max</td></tr>
+    <tr><td>freshness pulse ●</td><td>data source live &amp; fresh</td><td>2.4 s ease-in-out · stale = hollow ○, motionless</td><td>dashboard rows, header</td></tr>
+    <tr><td>braille spinner ⠋⠙⠹</td><td>a stage is working</td><td>80 ms/frame · always adjacent to its label</td><td>cycle tracker, connector probes</td></tr>
+    <tr><td>staggered rise</td><td>records arriving</td><td>70 ms stagger · 420 ms · cubic-bezier(.2,.7,.2,1)</td><td>boot, journal, log lines</td></tr>
+    <tr><td>tick cascade ✓</td><td>rules verified one by one</td><td>28 ms stagger · veto stops cascade, ✗ pulses</td><td>verdict grid</td></tr>
+    <tr><td>typewriter</td><td>model text being generated</td><td>18 ms/char · only for LLM output, never system text</td><td>thesis lines</td></tr>
+    <tr><td>green flash ×2</td><td>money moved (paper or real)</td><td>380 ms ease-out, twice, then settle</td><td>fill rows, NAV</td></tr>
+    <tr><td>sparkline shimmer</td><td>ambient "market is breathing"</td><td>3.4 s linear loop · cyan sweep · dashboard only</td><td>equity strip</td></tr>
+    <tr><td>red frame pulse</td><td>halted</td><td>1.2 s ease-in-out · overrides all other motion</td><td>kill screen</td></tr>
+    <tr><td>NAV count-up</td><td>value changed</td><td>600 ms · tabular-nums, no layout shift</td><td>header stats</td></tr>
+  </table>
+  <p class="note" style="margin-top:18px">Implementation notes for Textual: sparklines via
+  <span class="k">Sparkline</span> widget; pulses/spinners via <span class="k">set_interval</span>
+  frame swaps; tick cascade via staggered <span class="k">call_later</span>; count-up via
+  timer-driven <span class="k">Static.update</span>. All timings above become constants in
+  <span class="k">tui/motion.py</span> so the whole app moves to one beat.</p>
+</section>
+
+<!-- ================= NEXT ================= -->
+<section class="sec">
+  <div class="sec-head"><span class="n">09</span><h2>SHIP PLAN</h2></div>
+  <p class="note" style="max-width:66ch">If this direction is approved: 1) rename decision
+  (WOLF pending collision check), 2) task packet <b>T-031 "TUI visual system"</b> — tokens,
+  motion constants, dashboard rebuild, 3) <b>T-032</b> cycle + verdict screens,
+  4) <b>T-033</b> journal + kill takeover. Each lands with Pilot tests; the boot sequence
+  replaces the current plain doctor output. Estimated three builder cycles.</p>
+</section>
+
+</div>
+
+<script>
+  (function(){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('play'); io.unobserve(e.target); }
+      });
+    },{threshold:.35});
+    document.querySelectorAll('.term').forEach(function(t){ io.observe(t); });
+    document.querySelectorAll('.replay').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var term = btn.closest('.term');
+        term.classList.remove('play');
+        void term.offsetWidth;
+        term.classList.add('play');
+      });
+    });
+  })();
+</script>
