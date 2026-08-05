@@ -131,7 +131,7 @@ class TestSchedulerAgainstTheRuntime:
         assert scheduler.tick() is not None
 
     def test_an_engaged_kill_switch_prevents_any_cycle(self) -> None:
-        """The cycle would veto anyway; the scheduler must not even start one."""
+        """The cycle would veto anyway. The scheduler must not even start one."""
         runtime = self._runtime()
         runtime.engage_kill_switch("testing")
         before = len(runtime.journal())
@@ -205,7 +205,7 @@ class TestCadence:
             now=OPEN + timedelta(seconds=1), last_run=OPEN, kill_engaged=False
         )
         assert not decision.should_run
-        # 1s until due — waiting the full 5s poll would make a 2s interval a 5s one.
+        # 1s until due. Waiting the full 5s poll would make a 2s interval a 5s one.
         assert decision.wait_s == pytest.approx(1.0)
 
     def test_a_long_wait_is_capped_by_the_poll(self) -> None:

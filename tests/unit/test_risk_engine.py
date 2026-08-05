@@ -26,7 +26,7 @@ def test_approved_action_yields_validated_order() -> None:
         proposal.proposal_id, 0, proposal.actions[0]
     )
     assert order.verdict.approved
-    # every configured rule appears in the verdict — no short-circuiting
+    # every configured rule appears in the verdict. No short-circuiting
     rule_ids = {r.rule_id for r in order.verdict.results}
     assert {"kill_switch", "max_position_pct", "stale_quote", "duplicate_order"} <= rule_ids
 
@@ -47,7 +47,7 @@ def test_vetoed_action_yields_no_order_and_full_results() -> None:
 
 
 def test_cumulative_simulation_sell_funds_buy() -> None:
-    # cash 100; sell 10 AAPL @200 frees 2000 → buy 5 MSFT @400 = 2000 fits only
+    # cash 100. Sell 10 AAPL @200 frees 2000 → buy 5 MSFT @400 = 2000 fits only
     # if the sell was applied to working state first.
     snapshot = make_snapshot(
         D("100"),
@@ -70,7 +70,7 @@ def test_cumulative_simulation_sell_funds_buy() -> None:
 
 
 def test_vetoed_sell_does_not_fund_later_buy() -> None:
-    # Same shape, but the sell is vetoed (denylist) — the buy must then fail min_cash.
+    # Same shape, but the sell is vetoed (denylist): the buy must then fail min_cash.
     snapshot = make_snapshot(
         D("100"),
         holdings={"AAPL": (D("10"), D("150"))},

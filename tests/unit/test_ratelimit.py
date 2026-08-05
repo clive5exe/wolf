@@ -62,7 +62,7 @@ class TestSpacing:
     ) -> None:
         """The property a server actually measures: the gap between one request
         and the next. Dividing count by elapsed time counts both endpoints and
-        so always reads fractionally high — it is the wrong metric, not a
+        so always reads fractionally high. It is the wrong metric, not a
         violation."""
         rl = limiter(clock, rate=rate)
         stamps: list[float] = []

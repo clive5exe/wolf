@@ -81,7 +81,7 @@ def test_validated_order_cannot_exist_unapproved() -> None:
 
 
 def test_tampered_order_caught_at_broker_boundary() -> None:
-    """model_construct bypasses validation (simulated tampering) — the
+    """model_construct bypasses validation (simulated tampering): the
     adapter boundary must still refuse it."""
     failed = RiskCheckResult(
         rule_id="kill_switch",

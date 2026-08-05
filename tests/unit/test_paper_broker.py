@@ -20,11 +20,11 @@ PRICES = {"AAPL": D("200"), "MSFT": D("400")}
 
 
 def validated_order(side: OrderSide, symbol: str, qty: Decimal) -> ValidatedOrder:
-    """Orders can only be minted by the risk engine — tests included.
+    """Orders can only be minted by the risk engine. Tests included.
 
     The minting snapshot is deliberately richer than the broker's actual
     state so the broker's independent guards (insufficient cash/holdings)
-    can be exercised — the real-world "state changed between validation
+    can be exercised. The real-world "state changed between validation
     and execution" case.
     """
     snapshot = make_snapshot(

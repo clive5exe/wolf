@@ -86,7 +86,7 @@ class TestDataDir:
 
 class TestSecretStore:
     def test_names_are_validated_and_namespaced(self) -> None:
-        # Prefix intentionally still "tradeos." — it addresses existing keystore items.
+        # Prefix intentionally still "tradeos.". It addresses existing keystore items.
         assert validate_name("robinhood") == "tradeos.robinhood"
         for bad in ("", "has space", "has/slash"):
             with pytest.raises(SecretStoreError):

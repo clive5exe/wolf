@@ -1,8 +1,8 @@
 """MCP tool boundary (T-024, S2).
 
-Robinhood's server exposes 53 tools; 19 place orders, cancel them, exercise
+Robinhood's server exposes 53 tools. 19 place orders, cancel them, exercise
 options, or mutate broker-side state. The registry must make every one of them
-unreachable, and must refuse names it does not recognise — a server can add
+unreachable, and must refuse names it does not recognise. A server can add
 tools without telling us.
 
 These tests are written against the real advertised tool list, captured from a
@@ -89,7 +89,7 @@ ADVERTISED = frozenset(
 
 
 class TestModeGatesExecution:
-    """Placing orders is the destination, not a hazard — but only from the mode
+    """Placing orders is the destination, not a hazard. But only from the mode
     where a human said so."""
 
     @pytest.mark.parametrize("mode", [None, "read_only", "paper", "garbage"])
@@ -102,7 +102,7 @@ class TestModeGatesExecution:
         assert ensure_callable("place_equity_order", mode=mode) == "place_equity_order"
 
     def test_an_unrecognised_mode_narrows_rather_than_widens(self) -> None:
-        """Mode arrives from stored policy; a corrupt value must fail closed."""
+        """Mode arrives from stored policy. A corrupt value must fail closed."""
         assert "place_equity_order" not in allowed_for_mode("APPROVAL_maybe?")
         assert "place_equity_order" not in allowed_for_mode("")
 
@@ -117,7 +117,7 @@ class TestNoTradeToolIsReachable:
     @pytest.mark.parametrize("name", sorted(TRADE_CLASS - set(EXECUTION_TOOLS)))
     def test_order_tools_wolf_never_uses_are_refused_in_every_mode(self, name: str) -> None:
         """Options, exercise, and order-preview endpoints have no role in any
-        mode — unreachable regardless of how far up the ladder you go."""
+        mode. Unreachable regardless of how far up the ladder you go."""
         for mode in (None, "read_only", "paper", "approval", "autopilot"):
             with pytest.raises(ToolPermissionError):
                 ensure_callable(name, mode=mode)
@@ -160,7 +160,7 @@ class TestAgainstTheRealServerSurface:
         tool whose risk nobody has judged."""
         unclassified = {name for name in ADVERTISED if tool_class(name) is None}
         # Read-only tools we deliberately do not use yet (options, scanners,
-        # fundamentals) are expected to be unclassified — but they must also be
+        # fundamentals) are expected to be unclassified. But they must also be
         # unreachable, which the next test asserts.
         assert not unclassified & TRADE_CLASS
         assert not unclassified & STATE_WRITE_CLASS
@@ -174,7 +174,7 @@ class TestAgainstTheRealServerSurface:
                 ensure_callable(name)  # no mode context => read-only
 
     def test_the_reachable_surface_is_small(self) -> None:
-        """53 tools advertised; single digits reachable. Least privilege is a
+        """53 tools advertised. Single digits reachable. Least privilege is a
         number you can look at, not a claim."""
         audit = audit_server_tools(ADVERTISED)
         assert len(audit["reachable"]) <= 8

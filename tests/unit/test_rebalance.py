@@ -1,4 +1,4 @@
-"""Rebalance strategy math — hand-computed Decimal expectations."""
+"""Rebalance strategy math. Hand-computed Decimal expectations."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def run(strategy: TargetAllocationRebalance, policy, snapshot):
 
 
 def test_all_cash_generates_expected_buys() -> None:
-    # 10_000 total. Targets: AAPL 30% → 3000/200 = 15 shares; MSFT 20% → 2000/400 = 5.
+    # 10_000 total. Targets: AAPL 30% → 3000/200 = 15 shares. MSFT 20% → 2000/400 = 5.
     policy = make_policy()
     snapshot = make_snapshot(D("10000"), prices={"AAPL": D("200"), "MSFT": D("400")})
     proposal = run(TargetAllocationRebalance(), policy, snapshot)
@@ -91,7 +91,7 @@ def test_min_trade_value_guard() -> None:
     policy = make_policy(
         target_allocations=(TargetAllocation(symbol="AAPL", weight=Decimal("0.30")),),
     )
-    # total 1000; AAPL 11 sh @25 = 275 → 27.5% vs target 30% (drift 2.5% > 2%);
+    # total 1000. AAPL 11 sh @25 = 275 → 27.5% vs target 30% (drift 2.5% > 2%).
     # gap 25 → one whole share worth 25, below the $50 minimum → skipped.
     snapshot = make_snapshot(
         D("725"),

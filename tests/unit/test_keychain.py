@@ -1,4 +1,4 @@
-"""Keychain wrapper: argv shape, error mapping — subprocess fully mocked."""
+"""Keychain wrapper: argv shape, error mapping. Subprocess fully mocked."""
 
 from __future__ import annotations
 

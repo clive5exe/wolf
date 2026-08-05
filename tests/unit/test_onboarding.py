@@ -2,7 +2,7 @@
 
 The safety-critical property: INVESTMENT_POLICY_SPEC says nothing
 model-generated may widen a limit. These tests hold the guardrails to that,
-including the case that matters most — a model that suggests something reckless
+including the case that matters most. A model that suggests something reckless
 and a user who would click through.
 """
 
@@ -47,7 +47,7 @@ class TestGuardrails:
         assert adjustments[0].suggested == Decimal("0.90")
 
     def test_a_clamp_is_reported_never_applied_silently(self) -> None:
-        """Quietly ignoring a suggestion is its own dishonesty — the user
+        """Quietly ignoring a suggestion is its own dishonesty. The user
         should see that the model wanted something wider."""
         proposal, adjustments = apply_guardrails(
             PolicyProposal(goals_text="x"), PolicyDraft(max_sector_pct=Decimal("0.95"))
@@ -58,7 +58,7 @@ class TestGuardrails:
         assert "blows up" in described  # the reason travels with it
 
     def test_a_conservative_suggestion_is_accepted_unchanged(self) -> None:
-        """Guardrails cap risk; they do not force it upward."""
+        """Guardrails cap risk. They do not force it upward."""
         proposal, adjustments = apply_guardrails(
             PolicyProposal(goals_text="careful"), PolicyDraft(max_position_pct=Decimal("0.05"))
         )
@@ -92,7 +92,7 @@ class TestLimitsBeyondModelReach:
         draftable = set(PolicyDraft.model_fields)
         overlap = draftable & NOT_DRAFTABLE
         assert not overlap, (
-            f"PolicyDraft gained {sorted(overlap)} — a model can now influence limits "
+            f"PolicyDraft gained {sorted(overlap)}, a model can now influence limits "
             "that were deliberately reserved for the human."
         )
 
@@ -227,4 +227,4 @@ class TestWithoutAProvider:
         )
         proposal = service.propose("steady growth")
         assert not proposal.drafted_by_model
-        assert proposal.validation_errors()  # defaults have no targets yet — user adds them
+        assert proposal.validation_errors()  # defaults have no targets yet. User adds them

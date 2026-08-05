@@ -1,6 +1,6 @@
 """A provider prompt is the only thing that leaves the machine (ASSUMPTIONS Q3).
 
-Level A: relative quantities only — no dollar amounts, no share counts, no
+Level A: relative quantities only. No dollar amounts, no share counts, no
 account identifiers. These tests build real prompts from real state and assert
 the rule holds, so a future change to the assembler, a strategy's phrasing, or
 the prompt template cannot quietly widen what is sent.
@@ -28,7 +28,7 @@ _NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?\s*%?")
 _CURRENCY = re.compile(r"[$£€¥]|\b(?:usd|dollars?|cents?)\b", re.IGNORECASE)
 #: ULIDs and ISO timestamps are opaque identifiers, not quantities.
 _OPAQUE = re.compile(r"\b[0-9A-HJKMNP-TV-Z]{26}\b|\d{4}-\d{2}-\d{2}T[\d:.+\-]+")
-#: Bracketed integers are structural markers in our own template — candidate
+#: Bracketed integers are structural markers in our own template. Candidate
 #: indices the model selects by, and the literal "confidence in [0,1]".
 _TEMPLATE_MARKERS = re.compile(r"\[[\d,]+\]")
 
@@ -92,7 +92,7 @@ class TestNoAbsolutesLeaveTheMachine:
         assert not _CURRENCY.search(prompt)
 
     def test_a_funded_portfolio_prompt_carries_no_absolutes(self, runtime: TradeOSRuntime) -> None:
-        """After trading, cash and share counts are large and varied — the case
+        """After trading, cash and share counts are large and varied. The case
         the old assembler leaked ($10,694.50 cash, 140 shares of VTI)."""
         runtime.ensure_sample_policy()
         runtime.run_cycle(trigger="fund-it")
@@ -111,7 +111,7 @@ class TestNoAbsolutesLeaveTheMachine:
 
 
 class TestProjectionRefusesAbsolutes:
-    """The types are the enforcement; the scrubber is only the first line."""
+    """The types are the enforcement. The scrubber is only the first line."""
 
     def test_a_share_count_in_prose_is_refused(self) -> None:
         with pytest.raises(ValidationError, match="absolute quantity"):
@@ -158,7 +158,7 @@ class TestLabelsAreNotMistakenForAmounts:
 
     `schedule/15m` and `cli-demo-1` contain digits that are part of a *name*,
     not a measurement. Scanning them as quantities raised on every scheduled
-    AI cycle — the guard taking down the thing it was guarding.
+    AI cycle. The guard taking down the thing it was guarding.
     """
 
     @pytest.mark.parametrize(

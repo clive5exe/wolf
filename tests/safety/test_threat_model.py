@@ -3,7 +3,7 @@
 A threat model that is only prose decays: mitigations get refactored away and
 the document keeps asserting they exist. One class per threat row makes the
 mapping greppable, and :class:`TestTheMappingIsComplete` fails if a new threat
-is documented without a corresponding class — so the document cannot get ahead
+is documented without a corresponding class. So the document cannot get ahead
 of the code again.
 
 Threats are stated in the class docstrings in the model's own words. Where an
@@ -11,7 +11,7 @@ existing suite already covers a threat, the class here asserts the *property*
 directly rather than re-testing the same code path, so a refactor that moves
 the mitigation still trips exactly one obvious failure.
 
-T8–T11 are out of scope for v0.1: autopilot is structurally impossible until
+T8, T11 are out of scope for v0.1: autopilot is structurally impossible until
 v0.3, and T10 (dev-agent supply chain) is a process control enforced by review
 and hooks rather than by a runtime assertion.
 """
@@ -53,15 +53,15 @@ def runtime() -> TradeOSRuntime:
 
 
 class TestT1ModelCannotBreachALimit:
-    """T1 — LLM proposes/argues a limit-violating trade.
+    """T1. LLM proposes/argues a limit-violating trade.
 
-    Providers can only return ``StructuredThesis`` data, never orders; broker
-    adapters accept only ``ValidatedOrder``; the risk engine holds absolute veto.
+    Providers can only return ``StructuredThesis`` data, never orders. Broker
+    adapters accept only ``ValidatedOrder``. The risk engine holds absolute veto.
     """
 
     def test_a_thesis_cannot_express_an_order_at_all(self) -> None:
-        """The schema has no field for quantity, price, or symbol to trade —
-        the model selects among candidates the strategy already sized."""
+        """The schema has no field for quantity, price, or symbol to trade.
+        The model selects among candidates the strategy already sized."""
         fields = set(StructuredThesis.model_fields)
         for forbidden in ("quantity", "price", "symbol", "side", "order", "amount"):
             assert forbidden not in fields, f"StructuredThesis exposes {forbidden!r}"
@@ -86,9 +86,9 @@ class TestT1ModelCannotBreachALimit:
 
 
 class TestT2PromptInjection:
-    """T2 — Prompt injection via ingested content.
+    """T2. Prompt injection via ingested content.
 
-    Injection can waste a thesis; it cannot breach a limit. Enforced by the
+    Injection can waste a thesis. It cannot breach a limit. Enforced by the
     data frame, citation integrity, and decisively by the T1 chain.
     """
 
@@ -130,7 +130,7 @@ class TestT2PromptInjection:
         assert prompt.index("untrusted") < prompt.index("IGNORE ALL")
 
     def test_a_thesis_citing_unknown_evidence_is_discarded_not_trimmed(self) -> None:
-        """Fabricated citations invalidate the whole thesis — keeping the
+        """Fabricated citations invalidate the whole thesis. Keeping the
         'good parts' would launder invented evidence into a decision."""
         source = (Path(__file__).resolve().parents[2] / "src/tradeos/runtime/cycle.py").read_text()
         assert "unsupported_citation" in source
@@ -138,8 +138,8 @@ class TestT2PromptInjection:
 
 
 class TestT3CredentialTheftFromDisk:
-    """T3 — Credential theft from disk. Secrets live only in an OS keystore;
-    logs and event payloads pass a redaction filter."""
+    """T3. Credential theft from disk. Secrets live only in an OS keystore.
+    Logs and event payloads pass a redaction filter."""
 
     @pytest.mark.parametrize(
         "secret",
@@ -169,7 +169,7 @@ class TestT3CredentialTheftFromDisk:
 
 
 class TestT4DuplicateOrReplayedOrders:
-    """T4 — Duplicate / replayed order submission."""
+    """T4. Duplicate / replayed order submission."""
 
     def test_client_order_id_is_deterministic(self, runtime: TradeOSRuntime) -> None:
         """Same proposal and action always derive the same id, so a retry
@@ -212,7 +212,7 @@ class TestT4DuplicateOrReplayedOrders:
 
 
 class TestT5StaleDataTrading:
-    """T5 — Acting on old quotes or context after a data outage.
+    """T5. Acting on old quotes or context after a data outage.
     Rules fail closed on missing or aged data."""
 
     def test_stale_rules_are_armed(self, runtime: TradeOSRuntime) -> None:
@@ -244,7 +244,7 @@ class TestT5StaleDataTrading:
 
 
 class TestT6EventLogTampering:
-    """T6 — Event-log tampering or loss. Append-only is enforced by the
+    """T6. Event-log tampering or loss. Append-only is enforced by the
     database, not by convention in application code."""
 
     def _store(self, tmp_path: Path) -> SQLiteEventStore:
@@ -274,9 +274,9 @@ class TestT6EventLogTampering:
 
 
 class TestT7MaliciousDataSource:
-    """T7 — Malicious or compromised MCP server / data source.
+    """T7. Malicious or compromised MCP server / data source.
 
-    A source supplies content; it never supplies its own trustworthiness.
+    A source supplies content. It never supplies its own trustworthiness.
     """
 
     def test_model_generated_content_is_capped_below_trusted(self) -> None:
@@ -328,11 +328,11 @@ class TestT7MaliciousDataSource:
 class TestTheMappingIsComplete:
     """The document must not get ahead of the code again."""
 
-    #: Not runtime-assertable in v0.1 — recorded so the exemption is explicit.
+    #: Not runtime-assertable in v0.1. Recorded so the exemption is explicit.
     OUT_OF_SCOPE: ClassVar[dict[str, str]] = {
         "T8": "autopilot is structurally impossible before v0.3",
         "T9": "approvals are TUI/CLI-only; no approval path exists in v0.1",
-        "T10": "process control — enforced by review, hooks, and CI",
+        "T10": "process control, enforced by review, hooks, and CI",
         "T11": "budget/quota surfaced in doctor; no runtime invariant to assert",
     }
 

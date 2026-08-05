@@ -1,7 +1,7 @@
 """THREAT_MODEL T2: hostile ingested content cannot alter deterministic decisions.
 
 The deterministic pipeline (strategy sizing + risk verdicts) must be provably
-independent of context payload *text* — injection can waste a thesis, never
+independent of context payload *text*. Injection can waste a thesis, never
 move money.
 """
 

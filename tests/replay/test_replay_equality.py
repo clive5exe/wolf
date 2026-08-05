@@ -43,7 +43,7 @@ def test_replay_reproduces_identical_paper_state(tmp_path: Path) -> None:
         event_store=store,
         quote_source=StaticQuoteSource(DEMO_PRICES),
         clock=Clock(),
-        initial_cash=D("1"),  # must be ignored — history wins
+        initial_cash=D("1"),  # must be ignored. History wins
     )
     assert derived_state_hashable(rebuilt) == live_hash
 

@@ -125,7 +125,7 @@ class TestNumberFormatting:
 
 class TestMarkup:
     def test_key_hints_survive_the_markup_parser(self) -> None:
-        """Unescaped ``[c]`` is eaten as a style tag — the footer would go blank."""
+        """Unescaped ``[c]`` is eaten as a style tag. The footer would go blank."""
         assert plain(key("c", "ycle")) == "[c]ycle"
 
     def test_visible_len_ignores_style_tags(self) -> None:

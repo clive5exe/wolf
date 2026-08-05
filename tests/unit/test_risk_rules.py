@@ -1,6 +1,6 @@
 """Per-rule pass/veto/fail-closed tests (RISK_POLICY_SPEC acceptance §7.1).
 
-Exact Decimal arithmetic throughout — no float comparisons.
+Exact Decimal arithmetic throughout. No float comparisons.
 """
 
 from __future__ import annotations
@@ -101,7 +101,7 @@ def test_max_order_value_fails_closed_without_quote() -> None:
 
 
 def test_max_position_pct_veto() -> None:
-    # portfolio: 10k cash + 10*200 AAPL = 12k total; cap 35% → 4200 max AAPL value.
+    # portfolio: 10k cash + 10*200 AAPL = 12k total. Cap 35% → 4200 max AAPL value.
     # buying 12 more → 22*200 = 4400 → 36.67% → veto
     ctx = make_ctx(make_policy(), base_snapshot())
     assert not rules.max_position_pct(make_action(BUY, "AAPL", D("12")), 0, ctx)[0]
@@ -110,7 +110,7 @@ def test_max_position_pct_veto() -> None:
 
 
 def test_max_sector_pct_veto() -> None:
-    # TECHNOLOGY currently 2000/12000; cap 20%: buying 2 more AAPL → 2400/12000 = 20% pass;
+    # TECHNOLOGY currently 2000/12000. Cap 20%: buying 2 more AAPL → 2400/12000 = 20% pass.
     # 3 more → 2600/12000 ≈ 21.7% veto
     policy = make_policy(max_sector_pct=D("0.20"))
     ctx = make_ctx(policy, base_snapshot())
@@ -119,7 +119,7 @@ def test_max_sector_pct_veto() -> None:
 
 
 def test_min_cash_veto() -> None:
-    # total 12000, min cash 2% → 240. Cash 10000; buy 49*200=9800 → 200 left → veto
+    # total 12000, min cash 2% → 240. Cash 10000. Buy 49*200=9800 → 200 left → veto
     ctx = make_ctx(make_policy(), base_snapshot())
     assert not rules.min_cash(make_action(BUY, "AAPL", D("49")), 0, ctx)[0]
     # 48*200=9600 → 400 left (3.3%) → pass

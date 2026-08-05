@@ -2,7 +2,7 @@
 """Regenerate the README screenshots in ``docs/screens/``.
 
 These are captures of the real application driven against a live in-memory
-runtime — not mockups. Every figure on screen is one the code actually
+runtime. Not mockups. Every figure on screen is one the code actually
 produced, which is the only kind of screenshot a project making claims about
 honesty has any business publishing.
 
@@ -23,7 +23,7 @@ OUT = pathlib.Path(__file__).resolve().parent.parent / "docs" / "screens"
 #: One terminal size for every capture. Uniform output matters downstream: the
 #: site presents these in a slideshow, and mixed aspect ratios there mean either
 #: letterboxing or the frame resizing between slides. 30 rows is set by the
-#: tallest screen (boot's splash plus ten checks); the shorter ones simply have
+#: tallest screen (boot's splash plus ten checks). The shorter ones simply have
 #: empty terminal below, which is what a real terminal looks like anyway.
 SIZE = (100, 30)
 
@@ -48,7 +48,7 @@ async def capture(name: str, screen: str, cycles: int, engage_kill: bool) -> Non
 
     app = WolfApp(runtime, calm=True, start_screen=screen)
     async with app.run_test(size=SIZE) as pilot:
-        # The cycle screen runs a real decision on a worker; give it time to finish.
+        # The cycle screen runs a real decision on a worker. Give it time to finish.
         for _ in range(30 if screen == "cycle" else 2):
             await pilot.pause()
         svg = app.export_screenshot(title=f"wolf · {name}")

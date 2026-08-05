@@ -1,4 +1,4 @@
-"""EDGAR connector — fixtures only, never the network.
+"""EDGAR connector. Fixtures only, never the network.
 
 The properties that matter here are about honesty of provenance rather than
 parsing convenience: a filing must carry its own acceptance time, and a payload
@@ -99,7 +99,7 @@ class TestFetching:
     def test_the_user_agent_is_on_every_request(
         self, connector: EdgarConnector, transport: FakeTransport
     ) -> None:
-        """SEC refuses unidentified clients; a request without this is how the
+        """SEC refuses unidentified clients. A request without this is how the
         whole project gets blocked at once."""
         connector.recent_filings("AAPL")
         assert transport.calls
@@ -150,7 +150,7 @@ class TestFetching:
 class TestProvenance:
     def test_event_time_is_the_filings_own_acceptance_time(self, connector: EdgarConnector) -> None:
         """Stamping ingestion time would make an old filing look fresh to every
-        staleness rule downstream — THREAT_MODEL T5, introduced by the source."""
+        staleness rule downstream. THREAT_MODEL T5, introduced by the source."""
         filings = connector.recent_filings("AAPL")
         items = connector.to_context_items(filings, now=datetime(2026, 8, 5, tzinfo=UTC))
 
@@ -214,7 +214,7 @@ class TestFailuresAreQuarantined:
         assert list(store.iter_events(event_types=(EventType.INGEST_ERROR,)))
 
     def test_mismatched_parallel_arrays_abort_rather_than_mispair(self) -> None:
-        """EDGAR returns columns as parallel arrays; unequal lengths would pair
+        """EDGAR returns columns as parallel arrays. Unequal lengths would pair
         a form with another filing's timestamp."""
         broken = json.loads(fixture("submissions_aapl.json"))
         broken["filings"]["recent"]["form"] = ["10-K"]  # now shorter than the rest

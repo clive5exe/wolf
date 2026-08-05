@@ -55,7 +55,7 @@ def test_no_shell_true_or_eval() -> None:
 
 
 def test_domain_and_risk_never_read_wall_clock() -> None:
-    """Rules/strategies receive time via injection; direct clock reads are
+    """Rules/strategies receive time via injection. Direct clock reads are
     confined to domain/common.py (utc_now) and domain/clock.py."""
     files = [
         p

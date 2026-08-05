@@ -1,7 +1,7 @@
 """Screen tests via Textual Pilot (headless).
 
 Screens run in ``calm`` mode here: animation is disabled, and every screen must
-still show its complete final state. That is the contract — motion is always
+still show its complete final state. That is the contract. Motion is always
 redundant with a glyph or a number, never the only carrier of information.
 """
 
@@ -96,7 +96,7 @@ class TestDenScreen:
 
     @pytest.mark.asyncio
     async def test_cash_shows_a_floor_not_a_drift(self, runtime: TradeOSRuntime) -> None:
-        """min_cash_pct is a floor; rendering it as drift would invert its meaning."""
+        """min_cash_pct is a floor. Rendering it as drift would invert its meaning."""
         runtime.run_cycle(trigger="test")
         app = WolfApp(runtime, calm=True, start_screen="den")
         async with app.run_test(size=(96, 40)) as pilot:
@@ -145,7 +145,7 @@ class TestVerdictScreen:
 
     @pytest.mark.asyncio
     async def test_a_veto_still_lists_every_rule(self, runtime: TradeOSRuntime) -> None:
-        """A veto must not truncate the audit trail — the engine ran all of them."""
+        """A veto must not truncate the audit trail. The engine ran all of them."""
         runtime.engage_kill_switch("testing the veto path")
         runtime.run_cycle(trigger="vetoed")
         app = WolfApp(runtime, calm=True, start_screen="verdict")
@@ -159,7 +159,7 @@ class TestVerdictScreen:
 
     @pytest.mark.asyncio
     async def test_a_vetoed_order_is_not_shown_as_priced(self, runtime: TradeOSRuntime) -> None:
-        """It never reached a broker; a price would imply an attempted fill."""
+        """It never reached a broker. A price would imply an attempted fill."""
         runtime.engage_kill_switch("testing")
         runtime.run_cycle(trigger="vetoed")
         app = WolfApp(runtime, calm=True, start_screen="verdict")
@@ -293,7 +293,7 @@ class TestCycleScreen:
 class TestScreensDoNotShadowTextualInternals:
     """Regression guard for a bug class that silently breaks rendering.
 
-    Defining ``_render`` stopped every screen painting; assigning
+    Defining ``_render`` stopped every screen painting. Assigning
     ``self._running`` stopped them mounting at all. Neither raised, so only a
     structural check catches them.
     """
@@ -312,7 +312,7 @@ class TestScreensDoNotShadowTextualInternals:
 
     @staticmethod
     def _metaclass_injected() -> set[str]:
-        """Names Textual's metaclass adds to every subclass — not our doing."""
+        """Names Textual's metaclass adds to every subclass. Not our doing."""
 
         class _Control(Screen[None]):
             pass
@@ -328,7 +328,7 @@ class TestScreensDoNotShadowTextualInternals:
             if name.startswith(("action_", "on_", "key_")):
                 continue
             assert not hasattr(Screen, name), (
-                f"{screen_cls.__name__}.{name} shadows Textual's Screen.{name} — "
+                f"{screen_cls.__name__}.{name} shadows Textual's Screen.{name}, "
                 "rename it (this breaks rendering silently)"
             )
 
@@ -346,7 +346,7 @@ class TestScreensDoNotShadowTextualInternals:
                 continue
             assert node.attr not in baseline, (
                 f"{screen_cls.__name__}.__init__ assigns self.{node.attr}, which is "
-                "Textual internal state — rename the attribute"
+                "Textual internal state, rename the attribute"
             )
 
 
@@ -380,7 +380,7 @@ class TestInterfaceDiscipline:
 
 class TestResponsiveLayout:
     """Chrome is drawn into fixed-width strings, so width bugs show up as
-    wrapped rows rather than exceptions — only a measured test catches them."""
+    wrapped rows rather than exceptions. Only a measured test catches them."""
 
     WIDTHS: ClassVar[list[int]] = [66, 72, 80, 96, 120, 160]
 

@@ -43,7 +43,7 @@ class TestBuildJournal:
         assert {f.symbol for f in record.fills} == {"VTI", "AAPL", "MSFT", "JNJ", "XOM"}
 
     def test_fills_attach_to_their_cycle_despite_correlating_by_proposal(self) -> None:
-        """Order events carry the proposal id; the reducer must bridge the two."""
+        """Order events carry the proposal id. The reducer must bridge the two."""
         runtime = _runtime()
         runtime.run_cycle(trigger="first")
         record = runtime.journal()[0]
@@ -78,7 +78,7 @@ class TestBuildJournal:
         assert len(runtime.journal(2)) == 2
 
     def test_every_rule_result_is_preserved(self) -> None:
-        """The verdict screen promises 'all rules, every time' — the data must back it."""
+        """The verdict screen promises 'all rules, every time'. The data must back it."""
         runtime = _runtime()
         runtime.run_cycle(trigger="test")
         verdict = runtime.journal()[0].verdicts[0]
