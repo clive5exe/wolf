@@ -44,6 +44,7 @@ State legend: ☐ ready · ◐ in progress · ☑ done (this scaffold session) �
 | T-031 | TUI visual system (palette, motion, glyphs) + boot cascade & den dashboard | S0 | ☑ |
 | T-032 | Cycle pipeline screen + verdict screen (thesis → full rule wall → receipt) | S1 | ☑ |
 | T-033 | Journal screen + kill-switch takeover (two-press disengage) | S1 | ☑ |
+| T-034 | Scheduler: interval + market-hours cycle triggers (`wolf watch`) | S1 | ☑ |
 
 ## M5 — Intelligence & evaluation
 | ID | Task | Class | State |

@@ -86,8 +86,15 @@ class DecisionCycle:
                 at=d.clock.now(),
             )
 
+        # Stamped with the cycle's own clock rather than letting the store
+        # default to wall time. The scheduler reads this event back to decide
+        # when the next run is due, so a clock injected for replay or testing
+        # has to reach the log — otherwise the two disagree about "now".
         d.events.append(
-            EventType.CYCLE_TRIGGERED, {"trigger": trigger}, correlation_id=correlation_id
+            EventType.CYCLE_TRIGGERED,
+            {"trigger": trigger},
+            occurred_at=now,
+            correlation_id=correlation_id,
         )
 
         policy = d.policy_service.active_policy()

@@ -58,6 +58,7 @@ opposite stance:
 | Target-allocation rebalance strategy (explicit Decimal math) | |
 | Versioned investment policy with mode ladder + kill switch | |
 | Six-screen terminal UI: boot diagnosis, den, live cycle, verdict, journal, kill | |
+| Scheduled cycles (`wolf watch`) with market-hours gating and kill-switch awareness | |
 | Typer CLI (`wolf`); notifications via Notification Center or libnotify | |
 | 200 tests incl. safety/contract/replay suites; mypy clean; CI | |
 
@@ -75,6 +76,7 @@ wolf portfolio                  # allocations, drift, concentration
 wolf events                     # the audit trail
 wolf tui                        # enter the den — the full terminal interface
 wolf tui --calm                 # same, with animation disabled
+wolf watch --interval 15m       # run cycles on a schedule until you stop it
 ```
 
 \* Requires a logged-in Claude Code CLI. Note: headless (`claude -p`) calls

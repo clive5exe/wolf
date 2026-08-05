@@ -11,6 +11,7 @@ from rich.console import Console
 from rich.table import Table
 
 import tradeos
+from tradeos.notifications.factory import default_notifier
 from tradeos.runtime.diagnostics import CheckStatus
 from tradeos.runtime.facade import RuntimeConfig, TradeOSRuntime
 
@@ -32,11 +33,9 @@ _STATUS_GLYPH = {
 
 
 def _runtime(*, notify: bool = False) -> TradeOSRuntime:
-    notifier = None
-    if notify:
-        from tradeos.notifications.macos import MacNotifier  # macOS-only import
-
-        notifier = MacNotifier()
+    # Platform-appropriate notifier, or a null one where none exists — the
+    # runtime must never fail to start because a desktop lacks a banner daemon.
+    notifier = default_notifier() if notify else None
     return TradeOSRuntime(RuntimeConfig(notifier=notifier))
 
 
@@ -72,7 +71,7 @@ def doctor(
 @app.command()
 def demo(
     cycles: int = typer.Option(1, help="Number of paper decision cycles to run"),
-    notify: bool = typer.Option(False, "--notify", help="Send real macOS notifications"),
+    notify: bool = typer.Option(False, "--notify", help="Send desktop notifications"),
 ) -> None:
     """Run paper decision cycle(s) with the sample policy and demo quotes."""
     runtime = _runtime(notify=notify)
@@ -166,6 +165,66 @@ def tui(
         calm=calm,
         start_screen="den" if skip_boot else "boot",
     ).run()
+
+
+@app.command()
+def watch(
+    interval: str = typer.Option("15m", help="Cycle interval, e.g. 30s, 15m, 1h"),
+    any_hours: bool = typer.Option(
+        False, "--any-hours", help="Run outside regular market hours too (paper demos)"
+    ),
+    notify: bool = typer.Option(False, "--notify", help="Send desktop notifications"),
+) -> None:
+    """Run decision cycles on a schedule until interrupted.
+
+    The scheduler only decides *when* to ask for a cycle — every rule, the mode
+    gate, and the kill switch apply exactly as they do for a manual run.
+    """
+    from tradeos.runtime.schedule import ScheduleConfig, Scheduler
+
+    runtime = _runtime(notify=notify)
+    if runtime.active_policy() is None:
+        console.print("[yellow]no active policy — run `wolf policy-init-sample` first[/]")
+        raise typer.Exit(code=1)
+
+    config = ScheduleConfig(
+        interval_s=_parse_interval(interval),
+        market_hours_only=not any_hours,
+    )
+    scheduler = Scheduler(
+        runtime,
+        config,
+        on_event=lambda message: console.print(f"[dim]{message}[/]"),
+    )
+    console.print(
+        f"[bold]watching[/] every {interval}"
+        f"{'' if any_hours else ' during regular market hours'} · ctrl-c to stop"
+    )
+    try:
+        scheduler.run_forever()
+    except KeyboardInterrupt:
+        scheduler.stop()
+        console.print("\n[dim]stopped[/]")
+
+
+_INTERVAL_UNITS = {"s": 1, "m": 60, "h": 3600}
+
+
+def _parse_interval(text: str) -> int:
+    """``30s`` / ``15m`` / ``1h`` → seconds."""
+    raw = text.strip().lower()
+    unit = raw[-1:]
+    if unit in _INTERVAL_UNITS:
+        raw, multiplier = raw[:-1], _INTERVAL_UNITS[unit]
+    else:
+        multiplier = 1
+    try:
+        value = int(raw)
+    except ValueError as exc:
+        raise typer.BadParameter(f"could not read {text!r} as an interval") from exc
+    if value <= 0:
+        raise typer.BadParameter("interval must be positive")
+    return value * multiplier
 
 
 def _print_portfolio(runtime: TradeOSRuntime) -> None:

@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 
@@ -74,12 +75,15 @@ class RuntimeConfig:
     notifier: Notifier | None = None
     quote_source: QuoteSource | None = None
     initial_cash: Decimal = Decimal("100000")
+    #: Injectable so replay and scheduling tests are deterministic. Everything
+    #: in the runtime reads time through this one clock.
+    clock: Clock | None = None
 
 
 class TradeOSRuntime:
     def __init__(self, config: RuntimeConfig | None = None) -> None:
         cfg = config or RuntimeConfig()
-        self._clock = Clock()
+        self._clock = cfg.clock or Clock()
         self.events: EventStore
         if cfg.in_memory:
             self.events = InMemoryEventStore()
@@ -215,6 +219,21 @@ class TradeOSRuntime:
             if record.correlation_id == correlation_id:
                 return record
         return None
+
+    @property
+    def clock(self) -> Clock:
+        """The runtime's clock. Schedulers share it so their notion of "now"
+        cannot drift from the timestamps being written to the event log."""
+        return self._clock
+
+    def last_cycle_at(self) -> datetime | None:
+        """When a cycle last ran, read back from the log.
+
+        Derived rather than stored so a restarted scheduler resumes correctly
+        with no extra state that could drift out of sync with history.
+        """
+        event = self.events.last_event(EventType.CYCLE_TRIGGERED)
+        return event.occurred_at if event is not None else None
 
     def latest_cycle(self) -> CycleRecord | None:
         records = self.journal(1)
