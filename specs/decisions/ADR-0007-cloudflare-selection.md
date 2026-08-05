@@ -30,3 +30,50 @@ any of it.
   failure mode and local fallback.
 - We consciously skip Vectorize/DO until evidence demands them — architecture
   stays explainable.
+
+---
+
+## Amendment — 2026-08-05: superseded except for genuine multi-party work
+
+**Status: superseded by ADR-0002's placement rule**, except for community
+aggregates and live-sharing coordination.
+
+ADR-0002 now reads: *anything a user can run on their own system should happen
+on their system*, and moving work off the machine requires it to be impossible
+for one user alone — not merely cheaper or more convenient centrally.
+
+Re-reading the primitive table above against that test, almost none of it
+survives. Ingestion, normalisation, filings archives, symbol metadata, and
+scheduled fetching are all things one machine does perfectly well. The
+justification recorded here — amortising one ingestion across a community — is
+an argument about aggregate efficiency, which the rule explicitly rejects.
+
+Scheduled ingestion, the strongest remaining case, was answered by `wolf watch`
+(T-034) running on any always-on machine. That is strictly better: no account,
+no third party, no shared failure domain, and the event log never leaves.
+
+### Free-tier figures above are stale
+
+This ADR asked for re-verification before building. Checked 2026-08-05 against
+Cloudflare's docs:
+
+| Recorded here | Actual |
+|---|---|
+| D1 500 MB free | **5 GB** — off by 10× |
+| Cron Triggers 5/account free | **appears to require the paid plan** (~$5/mo) |
+| Workers 100k req/day | confirmed; **overage fails closed, it does not bill** |
+
+The Cron Triggers change is the significant one: it was the primitive the whole
+tier was most useful for. That it is no longer free, while a homelab does the
+same job for nothing, is a second independent reason not to build this.
+
+### What would revive it
+
+Only community aggregates — a sentiment figure across many users' inputs cannot
+be computed by one of them. If that ships, it needs its own ADR, because the
+privacy question is different in kind: a shared instance learns every querying
+user's watchlist, and that has to be designed for up front rather than
+retrofitted.
+
+The `cloudflare/` scaffold directories hold no files and are untracked; nothing
+in `src/` or `tests/` references any of this.
