@@ -12,6 +12,7 @@ from pydantic import BaseModel, ConfigDict
 
 from tradeos.brokers.base import BrokerAdapter
 from tradeos.context.assembler import ContextAssembler
+from tradeos.context.project import project_context
 from tradeos.domain.clock import Clock
 from tradeos.domain.common import new_ulid
 from tradeos.domain.context import MarketContextPackage
@@ -196,9 +197,7 @@ class DecisionCycle:
             thesis = None
         else:
             stage(CycleStage.THESIS, StageState.RUNNING, f"{d.provider.name} synthesising")
-            thesis = self._synthesize(
-                proposal, package, policy_summary=self._policy_summary(policy)
-            )
+            thesis = self._synthesize(proposal, package, snapshot=snapshot, policy=policy, now=now)
         if thesis is not None:
             d.events.append(
                 EventType.THESIS_GENERATED,
@@ -281,12 +280,28 @@ class DecisionCycle:
     # -- helpers --------------------------------------------------------------
 
     def _synthesize(
-        self, proposal: TradeProposal, package: MarketContextPackage, *, policy_summary: str
+        self,
+        proposal: TradeProposal,
+        package: MarketContextPackage,
+        *,
+        snapshot: PortfolioSnapshot,
+        policy: InvestmentPolicy,
+        now: datetime,
     ) -> StructuredThesis | None:
         d = self._d
         if d.provider is None:
             return None
-        prompt = build_thesis_prompt(package, list(proposal.actions), policy_summary)
+        # Absolutes stop here: the provider receives the relative-only
+        # projection, whose type cannot express an amount or a share count.
+        context = project_context(
+            package,
+            snapshot=snapshot,
+            targets={t.symbol: t.weight for t in policy.target_allocations},
+            candidates=proposal.actions,
+            policy_summary=self._policy_summary(policy),
+            now=now,
+        )
+        prompt = build_thesis_prompt(context)
         result = d.provider.query_structured(prompt=prompt, schema=StructuredThesis)
         if not result.ok or result.value is None:
             return None  # provider error already recorded by the adapter

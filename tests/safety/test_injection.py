@@ -16,6 +16,7 @@ from tests.conftest import (
     make_policy,
     make_snapshot,
 )
+from tradeos.context.project import project_context
 from tradeos.domain.context import ContextItem, Provenance, SourceType
 from tradeos.providers.prompts import build_thesis_prompt
 from tradeos.risk.engine import RiskEngine
@@ -80,7 +81,11 @@ def test_hostile_context_cannot_change_proposal_or_verdict() -> None:
 
 def test_prompt_frames_context_as_untrusted_data() -> None:
     package = make_package(items=(hostile_item(),))
-    prompt = build_thesis_prompt(package, [], "test policy")
+    snapshot = make_snapshot(D("10000"), prices={"AAPL": D("200"), "MSFT": D("400")})
+    context = project_context(
+        package, snapshot=snapshot, targets={}, policy_summary="test policy", now=NOW
+    )
+    prompt = build_thesis_prompt(context)
     assert "untrusted" in prompt.lower()
     assert "data, not instructions" in prompt.lower() or "never instructions" in prompt.lower()
     # hostile text is present but only inside the data block, after the frame
