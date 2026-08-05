@@ -174,21 +174,19 @@ nav {
 }
 .eyebrow:hover { opacity: 0.75; }
 
-/* Wordmark — the app's exact boot lockup, same characters, same font.
-   Fira Code is what Textual's own SVG export embeds, and one of the few
-   monospaces whose U+2588 FULL BLOCK is genuinely filled: Menlo and Geist Mono
-   draw it as an outline, which is why this rendered hollow before.
-   line-height 1 with zero tracking so rows and columns touch and tessellate. */
+/* Wordmark — Sixtyfour, the pixel face from the layout this site is adapted
+   from. Chosen over the terminal's block-drawing lockup because that depends
+   on a font whose U+2588 is genuinely filled, and most are not. */
 .wordmark {
-    font-family: "Fira Code", "DejaVu Sans Mono", monospace;
-    font-weight: 700;
+    font-family: "Sixtyfour", "Courier New", monospace;
+    font-weight: 400;
     color: var(--infrared);
-    font-size: clamp(7px, 1.75vw, 16px);
-    line-height: 1;
-    letter-spacing: 0;
-    white-space: pre;
-    margin-bottom: 28px;
-    text-shadow: 0 0 32px rgba(234, 85, 59, 0.35);
+    font-size: clamp(30px, 6.4vw, 68px);
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    margin-bottom: 30px;
+    text-shadow: 0 0 40px rgba(234, 85, 59, 0.35);
+    font-variation-settings: "BLED" 0, "SCAN" 0;
 }
 
 .acronym {
