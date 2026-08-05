@@ -16,7 +16,7 @@ from textual.widgets import Static
 
 from tradeos.runtime.diagnostics import CheckStatus, DoctorCheck
 from tradeos.tui.base import WolfScreen
-from tradeos.tui.theme import DISCLAIMER, TAGLINE, WORDMARK, Ink
+from tradeos.tui.theme import ACRONYM, DISCLAIMER, TAGLINE, WORDMARK_BLOCK, Ink
 
 _GLYPH = {
     CheckStatus.OK: f"[{Ink.GREEN}]✓[/]",
@@ -43,10 +43,7 @@ class BootScreen(WolfScreen):
 
     def compose(self) -> ComposeResult:
         with Vertical(id="boot"):
-            yield Static(
-                f"  {WORDMARK} [{Ink.DIM}]runtime · {TAGLINE}[/]",
-                id="boot-brand",
-            )
+            yield Static(self._splash(), id="boot-brand")
             yield Static("", id="boot-checks")
             yield Static("", id="boot-status")
             yield Static(f"  [{Ink.FAINT}]{DISCLAIMER}[/]", id="boot-disclaimer")
@@ -61,6 +58,17 @@ class BootScreen(WolfScreen):
         self.set_interval(self.motion.rise_stagger, self._advance)
         self.set_interval(self.motion.cursor_blink, self._blink)
         self._paint()
+
+    @staticmethod
+    def _splash() -> str:
+        """The one brand moment, above the checks — never gating them.
+
+        A splash is ornament in an app whose rule is that decoration must mean
+        something, so it earns its place by staying out of the way: it renders
+        instantly, delays nothing, and the diagnosis begins underneath it.
+        """
+        block = "\n".join(f"    [{Ink.BRIGHT}]{line}[/]" for line in WORDMARK_BLOCK.splitlines())
+        return f"\n{block}\n\n    [{Ink.AMBER}]{ACRONYM}[/]\n    [{Ink.DIM}]{TAGLINE}[/]\n"
 
     # -- cascade ---------------------------------------------------------------
 

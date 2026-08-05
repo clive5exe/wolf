@@ -1,4 +1,4 @@
-"""TradeOS — local-first AI portfolio-management runtime.
+"""TradeOS — self-hosted AI portfolio-management runtime.
 
 Experimental software. Not investment advice.
 """

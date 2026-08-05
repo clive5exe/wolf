@@ -37,10 +37,30 @@ class Ink:
     ON_RED: Final = "#2A0D0D"
 
 
-#: Brand mark. The amber eye is the one piece of colour that is purely identity.
+#: Inline brand mark, for headers where there is no room for the full lockup.
 WORDMARK: Final = f"[{Ink.BRIGHT}]W[/][{Ink.AMBER}]◉[/][{Ink.BRIGHT}]LF[/]"
 WORDMARK_PLAIN: Final = "W◉LF"
-TAGLINE: Final = "wealth orchestration, local-first"
+
+#: Splash lockup. Block lettering rather than art: a hand-drawn wolf reads as
+#: hobbyist next to an interface whose whole argument is precision.
+WORDMARK_BLOCK: Final = r"""██╗    ██╗ ██████╗ ██╗     ███████╗
+██║    ██║██╔═══██╗██║     ██╔════╝
+██║ █╗ ██║██║   ██║██║     █████╗
+██║███╗██║██║   ██║██║     ██╔══╝
+╚███╔███╔╝╚██████╔╝███████╗██║
+ ╚══╝╚══╝  ╚═════╝ ╚══════╝╚═╝"""
+
+#: The expansion. A joke, and simultaneously the most accurate four-word
+#: description of the architecture: it monitors continuously, and the component
+#: with veto power is deterministic code that cannot be argued with.
+ACRONYM: Final = "watches obsessively, lacks feelings"
+
+#: Deliberately *not* "local-first". That phrase is accurate about where state
+#: lives (ADR-0002) but overclaims as a tagline — prompts, quotes, filings, and
+#: the broker all cross the network, and a reader would be right to call it out.
+#: This says the thing that is true and checkable instead: the model may advise,
+#: but deterministic local code holds the veto (ADR-0008).
+TAGLINE: Final = "the model advises · your machine decides"
 
 #: Legal stance, shown wherever the product introduces itself.
 DISCLAIMER: Final = "experimental · paper trading · not investment advice"

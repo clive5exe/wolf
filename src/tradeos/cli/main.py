@@ -16,7 +16,10 @@ from tradeos.runtime.facade import RuntimeConfig, TradeOSRuntime
 
 app = typer.Typer(
     name="wolf",
-    help="WOLF — wealth orchestration, local-first. Experimental — not investment advice.",
+    help=(
+        "WOLF — watches obsessively, lacks feelings. The model advises; "
+        "deterministic code decides. Experimental — not investment advice."
+    ),
     no_args_is_help=True,
 )
 console = Console()
@@ -42,7 +45,7 @@ def version() -> None:
     """Print the WOLF version."""
     console.print(
         f"[bold]W[/][#F0B45C]◉[/][bold]LF[/] {tradeos.__version__} — "
-        "wealth orchestration, local-first\n"
+        "watches obsessively, lacks feelings\n"
         "experimental · paper trading · not investment advice"
     )
 

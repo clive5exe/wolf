@@ -1,7 +1,7 @@
 # W◉LF
 
-**Wealth orchestration, local-first.**
-An open-source AI portfolio-management runtime for macOS.
+**Watches obsessively, lacks feelings.**
+An open-source AI portfolio-management runtime for macOS. The model advises; deterministic code decides.
 
 WOLF orchestrates AI tools you already have (Claude Code under your
 existing subscription first; Codex CLI, Ollama, and API providers later), MCP
@@ -30,6 +30,7 @@ opposite stance:
 - **Stale data is a stop sign.** Nothing enters a decision without an event
   time, ingestion time, TTL, and credibility score. "Insufficient or stale
   data; no action" is a successful outcome, not an error.
+- **No service behind it.** There is no account to create with us, no backend, and no telemetry. Your history lives in a SQLite file you own. WOLF *does* talk to the network — your AI provider, your broker, SEC EDGAR — but always through your own credentials, and it sends the model proportions rather than amounts.
 - **Bring your own AI.** Subscription-backed local clients via their
   documented interfaces only — no browser scraping, no cookie theft, no
   private endpoints, no mandatory API bill.
