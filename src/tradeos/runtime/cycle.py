@@ -423,7 +423,7 @@ class DecisionCycle:
             + ("; ".join(outcome.fills[:3]) if outcome.fills else "no fills")
             + f" [cycle {outcome.correlation_id[:8]}]"
         )
-        sent = d.notifier.notify("TradeOS paper cycle", body)
+        sent = d.notifier.notify("WOLF · paper cycle", body)
         d.events.append(
             EventType.NOTIFICATION_SENT,
             {"channel": d.notifier.name, "ok": sent, "body": body},

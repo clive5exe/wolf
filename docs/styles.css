@@ -43,8 +43,8 @@ body {
     font-family: var(--font-sans);
     background: var(--bg);
     color: var(--fg);
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 16px;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -90,12 +90,14 @@ nav {
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 50;
-    height: 56px;
+    height: 66px;
     background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-soft);
 }
+/* Centred rather than logo-left: the wordmark is already the hero, so a second
+   one in the bar is repetition rather than navigation. */
 .nav-inner {
     max-width: 1100px;
     margin: 0 auto;
@@ -103,37 +105,32 @@ nav {
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 30px;
 }
-.nav-logo {
+.nav-inner a {
     font-family: var(--font-mono);
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--bright);
-    text-decoration: none;
-}
-.nav-logo .eye { color: var(--amber); }
-.nav-links {
-    display: flex;
-    gap: 22px;
-    align-items: center;
-}
-.nav-links a {
-    font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 14px;
     color: var(--muted);
     text-decoration: none;
     transition: color 0.15s;
 }
-.nav-links a:hover { color: var(--bright); }
-@media (max-width: 640px) {
-    .nav-links a.hide-sm { display: none; }
+.nav-inner a:hover { color: var(--bright); }
+.nav-icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--muted);
+}
+.nav-icon:hover { color: var(--infrared); }
+.nav-icon svg { display: block; }
+@media (max-width: 620px) {
+    .nav-inner { gap: 18px; }
+    .nav-inner a { font-size: 12.5px; }
 }
 
 /* ─── HERO ─── */
 .hero {
-    padding: 120px 0 0;
+    padding: 132px 0 0;
     position: relative;
     overflow: hidden;
 }
@@ -165,7 +162,7 @@ nav {
     align-items: center;
     gap: 6px;
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 14px;
     color: var(--amber);
     text-decoration: none;
     letter-spacing: 0.04em;
@@ -191,14 +188,14 @@ nav {
 
 .acronym {
     font-family: var(--font-mono);
-    font-size: clamp(13px, 2vw, 17px);
+    font-size: clamp(15px, 2.2vw, 20px);
     color: var(--amber);
     letter-spacing: 0.05em;
     margin-bottom: 10px;
 }
 .hero-headline {
     font-family: var(--font-mono);
-    font-size: 22px;
+    font-size: 27px;
     font-weight: 700;
     color: var(--bright);
     line-height: 1.35;
@@ -208,12 +205,13 @@ nav {
 }
 .hero-sub {
     font-family: var(--font-mono);
-    font-size: 13.5px;
+    font-size: 15.5px;
     color: var(--muted);
-    line-height: 1.75;
-    max-width: 580px;
+    line-height: 1.8;
+    max-width: 680px;
     margin: 0 auto 30px;
 }
+.hero-sub-2 { margin-top: -14px; }
 .hero-ctas {
     display: flex;
     gap: 10px;
@@ -226,9 +224,9 @@ nav {
 .btn {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 14.5px;
     font-weight: 500;
     padding: 9px 16px;
     border-radius: 6px;
@@ -259,7 +257,7 @@ nav {
 }
 .install-label {
     font-family: var(--font-mono);
-    font-size: 10.5px;
+    font-size: 12px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--amber);
@@ -294,9 +292,9 @@ nav {
     letter-spacing: 0.08em;
 }
 .terminal-body {
-    padding: 18px 18px 16px;
+    padding: 20px 20px 18px;
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.75;
     /* The block is authored line by line; without this the shell prompts and
        the comment collapse into one wrapped paragraph. */
@@ -304,7 +302,7 @@ nav {
     overflow-x: auto;
 }
 @media (max-width: 720px) {
-    .terminal-body { font-size: 11px; }
+    .terminal-body { font-size: 12px; }
 }
 .comment { color: var(--faint); }
 .prompt { color: var(--amber); user-select: none; }
@@ -326,7 +324,7 @@ nav {
 .copy:hover { color: var(--amber); border-color: var(--amber); }
 .install-note {
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 13.5px;
     color: var(--faint);
     margin-top: 12px;
     line-height: 1.7;
@@ -362,7 +360,7 @@ nav {
 .section-badge {
     display: inline-block;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 11.5px;
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -376,7 +374,7 @@ nav {
 }
 .section-title {
     font-family: var(--font-mono);
-    font-size: 19px;
+    font-size: 23px;
     font-weight: 700;
     color: var(--bright);
     text-align: center;
@@ -385,11 +383,11 @@ nav {
 }
 .section-sub {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 15px;
     color: var(--muted);
-    line-height: 1.75;
+    line-height: 1.8;
     text-align: center;
-    max-width: 600px;
+    max-width: 660px;
     margin: 0 auto 34px;
 }
 
@@ -405,7 +403,7 @@ nav {
 }
 .show-tab {
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 13.5px;
     color: var(--muted);
     background: none;
     border: 1px solid transparent;
@@ -487,22 +485,22 @@ nav {
 
 .show-caption {
     text-align: center;
-    max-width: 640px;
+    max-width: 720px;
     margin: 20px auto 0;
     /* Reserved height: without it, a shorter description pulls the page up as
        slides change, which reads as a glitch rather than a transition. */
-    min-height: 96px;
+    min-height: 108px;
 }
 .show-name {
     font-family: var(--font-mono);
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--bright);
     margin-bottom: 8px;
 }
 .show-desc {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 15px;
     color: var(--muted);
     line-height: 1.7;
 }
@@ -525,20 +523,20 @@ nav {
 }
 .step-num {
     font-family: var(--font-mono);
-    font-size: 14px;
+    font-size: 16px;
     color: var(--amber);
     padding-top: 1px;
 }
 .step-title {
     font-family: var(--font-mono);
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--bright);
     margin-bottom: 4px;
 }
 .step-desc {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 15px;
     color: var(--muted);
     line-height: 1.7;
 }
@@ -567,14 +565,14 @@ nav {
 }
 .card-title {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--bright);
     margin-bottom: 7px;
 }
 .card-body {
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 14px;
     color: var(--muted);
     line-height: 1.7;
 }
@@ -592,14 +590,14 @@ nav {
 .plain-mark { font-family: var(--font-mono); font-size: 13px; }
 .plain-q {
     font-family: var(--font-mono);
-    font-size: 13.5px;
+    font-size: 15.5px;
     font-weight: 700;
     color: var(--bright);
     margin-bottom: 6px;
 }
 .plain-a {
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 14px;
     color: var(--muted);
     line-height: 1.75;
 }
@@ -611,7 +609,7 @@ nav {
 }
 .final-headline {
     font-family: var(--font-mono);
-    font-size: 21px;
+    font-size: 25px;
     font-weight: 700;
     color: var(--bright);
     margin-bottom: 12px;
@@ -619,7 +617,7 @@ nav {
 }
 .final-sub {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 15px;
     color: var(--muted);
     margin-bottom: 28px;
     line-height: 1.7;
@@ -642,14 +640,14 @@ footer {
 }
 .footer-note {
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: 13px;
     color: var(--faint);
     line-height: 1.7;
 }
 .footer-links { display: flex; gap: 18px; }
 .footer-links a {
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: 13px;
     color: var(--faint);
     text-decoration: none;
     transition: color 0.15s;
@@ -658,7 +656,7 @@ footer {
 
 .disclaimer {
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: 13px;
     color: var(--faint);
     text-align: center;
     line-height: 1.75;

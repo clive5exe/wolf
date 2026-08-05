@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>WOLF — Docs</title>
+        <meta name="description" content="Documentation for WOLF: install, policy setup, how a decision is made, the risk engine, the event log, and the safety model." />
+        <meta name="theme-color" content="#000000" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;700&family=Sixtyfour&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="../styles.css" />
+        <link rel="stylesheet" href="./docs.css" />
+    </head>
+    <body class="docs-body">
+        <nav>
+            <div class="nav-inner">
+                <a href="../">Home</a>
+                <a href="./">Docs</a>
+                <a href="https://github.com/clive5exe/wolf/blob/main/ARCHITECTURE.md">Architecture</a>
+                <a href="https://github.com/clive5exe/wolf" class="nav-icon" aria-label="GitHub">
+                    <svg viewBox="0 0 16 16" width="19" height="19" aria-hidden="true">
+                        <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+                    </svg>
+                </a>
+            </div>
+        </nav>
+
+        <div class="docs-shell">
+            <aside class="docs-side">
+                <div class="side-group">
+                    <div class="side-label">Start</div>
+                    <a href="#install">Install</a>
+                    <a href="#setup">Create a policy</a>
+                    <a href="#first-cycle">Run a cycle</a>
+                    <a href="#watch">Run on a schedule</a>
+                </div>
+                <div class="side-group">
+                    <div class="side-label">Concepts</div>
+                    <a href="#cycle">The decision cycle</a>
+                    <a href="#risk">The risk engine</a>
+                    <a href="#context">Context &amp; freshness</a>
+                    <a href="#log">The event log</a>
+                    <a href="#modes">The mode ladder</a>
+                </div>
+                <div class="side-group">
+                    <div class="side-label">Reference</div>
+                    <a href="#cli">CLI commands</a>
+                    <a href="#keys">Keyboard</a>
+                    <a href="#policy">Policy fields</a>
+                    <a href="#paths">Files &amp; paths</a>
+                </div>
+                <div class="side-group">
+                    <div class="side-label">Safety</div>
+                    <a href="#kill">Kill switch</a>
+                    <a href="#secrets">Secrets</a>
+                    <a href="#prompts">What the model sees</a>
+                    <a href="#threats">Threat model</a>
+                </div>
+                <div class="side-group">
+                    <div class="side-label">Decisions</div>
+                    <a href="#adrs">All ADRs</a>
+                </div>
+            </aside>
+
+            <main class="docs-main">
+                <header class="docs-head">
+                    <div class="docs-eyebrow">Documentation</div>
+                    <h1>WOLF</h1>
+                    <p class="docs-lede">
+                        An AI portfolio runtime. The model advises; deterministic code decides.
+                        This covers installing it, giving it a policy, and understanding what
+                        happens on every cycle.
+                    </p>
+                    <div class="docs-callout warn">
+                        <strong>v0.1 is paper trading only.</strong> There is no real-money
+                        execution path in this build — not disabled, absent. Experimental
+                        research software, not investment advice.
+                    </div>
+                </header>
+
+                <section id="install">
+                    <h2>Install</h2>
+                    <p>macOS and Linux. Needs Python 3.12+ and git.</p>
+                    <pre class="code"><span class="c"># prints what it will do before doing it</span>
+curl -fsSL https://raw.githubusercontent.com/clive5exe/wolf/main/install.sh | sh</pre>
+                    <p>
+                        It clones into <code>~/.wolf</code>, creates an isolated virtualenv, and
+                        links <code>wolf</code> into <code>~/.local/bin</code>. No sudo, nothing
+                        system-wide, no account. Swap <code>| sh</code> for <code>| less</code>
+                        to read it first. Set <code>WOLF_HOME</code> to relocate, or
+                        <code>WOLF_REF</code> to pin a tag.
+                    </p>
+                    <p>Check the environment at any time:</p>
+                    <pre class="code">wolf doctor</pre>
+                    <p>
+                        It reports platform, Python, event store, provider, policy, risk rules,
+                        kill switch, secret store, and notifications — each with a fix hint
+                        rather than a stack trace.
+                    </p>
+                </section>
+
+                <section id="setup">
+                    <h2>Create a policy</h2>
+                    <pre class="code">wolf setup</pre>
+                    <p>
+                        Describe what the portfolio is for in plain words. A model drafts a
+                        starting point, and you confirm every enforceable field before anything
+                        activates. Three things hold here:
+                    </p>
+                    <ul class="docs-list">
+                        <li>
+                            <strong>The draft cannot decide.</strong> Its schema has no field for
+                            trading mode or autopilot, so it cannot express "trade for real" or
+                            "trade unattended".
+                        </li>
+                        <li>
+                            <strong>A draft can narrow a limit, never widen one.</strong> A model
+                            suggesting a 90% position cap is held at 25% — and the clamp is shown
+                            to you, because quietly discarding a suggestion is its own dishonesty.
+                            You can still type something wider yourself.
+                        </li>
+                        <li>
+                            <strong>Loss limits are beyond its reach entirely.</strong> Daily
+                            loss, drawdown, order rate, and staleness thresholds cannot be
+                            suggested at all — only set by you or left at defaults.
+                        </li>
+                    </ul>
+                    <p>Setup always produces <code>paper</code> mode. Moving up is separate and deliberate.</p>
+                </section>
+
+                <section id="first-cycle">
+                    <h2>Run a cycle</h2>
+                    <pre class="code">wolf tui        <span class="c"># enter the den</span>
+wolf demo --cycles 2   <span class="c"># run cycles from the CLI</span></pre>
+                    <p>
+                        In the TUI, <kbd>c</kbd> runs a decision cycle and shows it happening
+                        stage by stage. <kbd>⏎</kbd> opens the verdict for the last decision —
+                        thesis, every risk rule, and the execution receipt.
+                    </p>
+                </section>
+
+                <section id="watch">
+                    <h2>Run on a schedule</h2>
+                    <pre class="code">wolf watch --interval 15m</pre>
+                    <p>
+                        Runs cycles on an interval, gated to regular market hours by default
+                        (<code>--any-hours</code> to override). The scheduler only decides
+                        <em>when</em> to ask for a cycle — every rule, the mode gate, and the kill
+                        switch apply exactly as they do for a manual run.
+                    </p>
+                    <p>On an always-on machine, as a service:</p>
+                    <pre class="code"><span class="c"># /etc/systemd/system/wolf.service</span>
+[Service]
+ExecStart=%h/.wolf/.venv/bin/wolf watch --interval 15m
+Restart=always</pre>
+                </section>
+
+                <section id="cycle">
+                    <h2>The decision cycle</h2>
+                    <p>Every decision runs the same six stages, and each is recorded.</p>
+                    <ol class="docs-steps">
+                        <li><strong>Observe</strong> — read account and quotes.</li>
+                        <li><strong>Retrieve</strong> — assemble a context package; every item carries a source, event time, TTL, and credibility.</li>
+                        <li><strong>Propose</strong> — the strategy computes candidates in explicit Decimal arithmetic.</li>
+                        <li><strong>Thesis</strong> — optional. A model returns a structured argument with citations, or nothing. Skipped entirely on deterministic cycles, which cost $0.00.</li>
+                        <li><strong>Risk</strong> — every rule runs on every action. Any blocking failure vetoes.</li>
+                        <li><strong>Execute</strong> — paper fills in v0.1, through the same path live execution will use.</li>
+                    </ol>
+                    <p>
+                        Stopping early with a reason is a success, not a failure. "Insufficient or
+                        stale data, no action" is a recorded, replayable outcome with the same
+                        standing as a fill.
+                    </p>
+                </section>
+
+                <section id="risk">
+                    <h2>The risk engine</h2>
+                    <p>
+                        Twenty-one deterministic checks, run on every proposed action, every time.
+                        The engine is pure — no I/O, no clock reads — so a verdict is a function
+                        of its inputs and replays identically.
+                    </p>
+                    <div class="rule-grid">
+                        <span>kill_switch</span><span>mode_permits_orders</span><span>asset_type_permitted</span>
+                        <span>symbol_allowed</span><span>max_order_value</span><span>max_position_pct</span>
+                        <span>max_sector_pct</span><span>min_cash</span><span>sufficient_holdings</span>
+                        <span>max_orders_per_day</span><span>symbol_cooldown</span><span>max_daily_loss</span>
+                        <span>max_drawdown</span><span>trading_hours</span><span>stale_quote</span>
+                        <span>stale_context</span><span>policy_changed</span><span>fractional_permitted</span>
+                        <span>earnings_blackout</span><span>concentration_advisory</span><span>duplicate_order</span>
+                    </div>
+                    <p>
+                        Twenty are configured policy rules; the twenty-first is a per-proposal
+                        idempotency check that only exists once a proposal does.
+                        <code>concentration_advisory</code> is non-blocking — it records without
+                        vetoing, and the verdict screen marks it <code>◇</code> rather than hiding it.
+                    </p>
+                    <div class="docs-callout">
+                        Only the risk engine can construct a <code>ValidatedOrder</code>, and
+                        broker adapters accept nothing else. That boundary is enforced
+                        mechanically by the safety suite, not by convention.
+                    </div>
+                </section>
+
+                <section id="context">
+                    <h2>Context &amp; freshness</h2>
+                    <p>
+                        Nothing enters a decision without an event time, an ingestion time, and a
+                        TTL. Freshness is computed from age and TTL at read time — never stored —
+                        so a persisted item cannot lie about being fresh.
+                    </p>
+                    <table class="docs-table">
+                        <tr><th>Glyph</th><th>State</th><th>Meaning</th></tr>
+                        <tr><td><span class="ok">●</span></td><td>fresh</td><td>age ≤ half its TTL</td></tr>
+                        <tr><td><span class="warn-i">◐</span></td><td>aging</td><td>past half TTL, still usable</td></tr>
+                        <tr><td><span class="bad">○</span></td><td>stale</td><td>past TTL — not decision-bearing</td></tr>
+                        <tr><td><span class="bad">✕</span></td><td>absent</td><td>no data at all</td></tr>
+                    </table>
+                    <p>
+                        On screen, live sources pulse and stale ones stop moving, so you notice
+                        the <em>absence</em> of motion.
+                    </p>
+                </section>
+
+                <section id="log">
+                    <h2>The event log</h2>
+                    <p>
+                        Everything is event-sourced into append-only SQLite. The database refuses
+                        <code>UPDATE</code> and <code>DELETE</code> outright — enforced by
+                        triggers, not by application code being careful.
+                    </p>
+                    <pre class="code">wolf events --limit 20</pre>
+                    <p>
+                        Event ids are ULIDs, so lexicographic order is creation order and
+                        reordering rows cannot reorder history. Replay reproduces state
+                        byte-identically, which is the release gate.
+                    </p>
+                </section>
+
+                <section id="modes">
+                    <h2>The mode ladder</h2>
+                    <table class="docs-table">
+                        <tr><th>Mode</th><th>Does</th><th>Status</th></tr>
+                        <tr><td><code>read_only</code></td><td>Intelligence only, never proposes orders</td><td class="ok">shipped</td></tr>
+                        <tr><td><code>paper</code></td><td>Simulated fills through the real pipeline</td><td class="ok">shipped</td></tr>
+                        <tr><td><code>approval</code></td><td>Real orders, each confirmed by you</td><td class="warn-i">next</td></tr>
+                        <tr><td><code>autopilot</code></td><td>Bounded envelope, dedicated account</td><td class="warn-i">planned</td></tr>
+                    </table>
+                    <p>
+                        No mode may be skipped on the way up; any number may be skipped on the way
+                        down. Transitions are policy-version changes, recorded as events.
+                    </p>
+                </section>
+
+                <section id="cli">
+                    <h2>CLI commands</h2>
+                    <table class="docs-table">
+                        <tr><th>Command</th><th>What it does</th></tr>
+                        <tr><td><code>wolf setup</code></td><td>Create your policy — goals, then confirm every field</td></tr>
+                        <tr><td><code>wolf tui</code></td><td>Enter the den. <code>--calm</code> disables animation</td></tr>
+                        <tr><td><code>wolf watch</code></td><td>Run cycles on a schedule until stopped</td></tr>
+                        <tr><td><code>wolf demo</code></td><td>Run paper cycles from the CLI</td></tr>
+                        <tr><td><code>wolf doctor</code></td><td>Environment checks with fix hints</td></tr>
+                        <tr><td><code>wolf portfolio</code></td><td>Allocations, drift, concentration</td></tr>
+                        <tr><td><code>wolf events</code></td><td>Tail the audit log</td></tr>
+                        <tr><td><code>wolf policy-show</code></td><td>The active policy as enforced JSON</td></tr>
+                        <tr><td><code>wolf kill "reason"</code></td><td>Halt everything immediately</td></tr>
+                        <tr><td><code>wolf unkill</code></td><td>Re-arm execution, deliberately</td></tr>
+                    </table>
+                </section>
+
+                <section id="keys">
+                    <h2>Keyboard</h2>
+                    <table class="docs-table">
+                        <tr><th>Key</th><th>Does</th></tr>
+                        <tr><td><kbd>c</kbd></td><td>Run a decision cycle</td></tr>
+                        <tr><td><kbd>⏎</kbd></td><td>Open the verdict for the last decision</td></tr>
+                        <tr><td><kbd>j</kbd></td><td>Journal</td></tr>
+                        <tr><td><kbd>p</kbd></td><td>Policy summary</td></tr>
+                        <tr><td><kbd>k</kbd></td><td>Kill switch — works from any screen</td></tr>
+                        <tr><td><kbd>esc</kbd></td><td>Back to the den</td></tr>
+                        <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Move between orders or journal rows</td></tr>
+                    </table>
+                </section>
+
+                <section id="policy">
+                    <h2>Policy fields</h2>
+                    <p>These are enforced by the risk engine — the numbers it reads, not your intent.</p>
+                    <table class="docs-table">
+                        <tr><th>Field</th><th>Default</th><th>Enforced by</th></tr>
+                        <tr><td><code>target_allocations</code></td><td>—</td><td>rebalance strategy</td></tr>
+                        <tr><td><code>max_position_pct</code></td><td>10%</td><td><code>max_position_pct</code></td></tr>
+                        <tr><td><code>max_sector_pct</code></td><td>30%</td><td><code>max_sector_pct</code></td></tr>
+                        <tr><td><code>min_cash_pct</code></td><td>2%</td><td><code>min_cash</code></td></tr>
+                        <tr><td><code>max_order_value_usd</code></td><td>$1,000</td><td><code>max_order_value</code></td></tr>
+                        <tr><td><code>max_orders_per_day</code></td><td>5</td><td><code>max_orders_per_day</code></td></tr>
+                        <tr><td><code>max_daily_loss_pct</code></td><td>2%</td><td><code>max_daily_loss</code></td></tr>
+                        <tr><td><code>max_drawdown_pct</code></td><td>15%</td><td><code>max_drawdown</code></td></tr>
+                        <tr><td><code>cooldown_minutes_per_symbol</code></td><td>240</td><td><code>symbol_cooldown</code></td></tr>
+                        <tr><td><code>stale_quote_max_age_s</code></td><td>120</td><td><code>stale_quote</code></td></tr>
+                    </table>
+                </section>
+
+                <section id="paths">
+                    <h2>Files &amp; paths</h2>
+                    <table class="docs-table">
+                        <tr><th>Platform</th><th>Data directory</th></tr>
+                        <tr><td>macOS</td><td><code>~/Library/Application Support/WOLF</code></td></tr>
+                        <tr><td>Linux</td><td><code>$XDG_DATA_HOME/wolf</code> (default <code>~/.local/share/wolf</code>)</td></tr>
+                    </table>
+                    <p>
+                        Override with <code>WOLF_DATA_DIR</code>. An existing pre-rename directory
+                        is adopted in place rather than migrated, so no upgrade can orphan an
+                        audit log. The database is <code>tradeos.db</code> — deliberately not
+                        renamed with the product, because that filename addresses state that
+                        already exists on disk.
+                    </p>
+                </section>
+
+                <section id="kill">
+                    <h2>Kill switch</h2>
+                    <p>
+                        Checked at four layers: scheduler, cycle, risk engine, and broker. Engage
+                        it with <kbd>k</kbd> from any screen, or <code>wolf kill "reason"</code>.
+                    </p>
+                    <p>
+                        Disengaging is deliberately awkward — two separate presses in the TUI, or
+                        a typed <code>wolf unkill</code>. Never one accidental key. Both paths are
+                        recorded with who and when, and the state survives restarts because it is
+                        derived from the event log rather than held in memory.
+                    </p>
+                </section>
+
+                <section id="secrets">
+                    <h2>Secrets</h2>
+                    <p>
+                        Credentials live only in an OS credential store — macOS Keychain or
+                        libsecret on Linux. <strong>There is deliberately no file fallback.</strong>
+                        If no keystore is available, WOLF refuses rather than writing credentials
+                        to disk, because a silent downgrade would leave a machine unprotected with
+                        nothing on screen to say so.
+                    </p>
+                    <p>
+                        On a headless host with no session keyring, inject them via systemd
+                        <code>LoadCredential=</code> rather than a dotfile.
+                    </p>
+                </section>
+
+                <section id="prompts">
+                    <h2>What the model sees</h2>
+                    <p>
+                        A provider prompt is the one thing that leaves your machine, so it carries
+                        <strong>proportions, never amounts</strong>: "VTI is 39.9% of the portfolio
+                        against a 40% target", never <code>$39,914</code> or <code>140 shares</code>.
+                    </p>
+                    <p>
+                        This is not primarily a privacy setting. Every use of an absolute figure is
+                        arithmetic, and arithmetic belongs to the strategy and the risk engine — a
+                        component supplying judgement has no need of the units. It is enforced by
+                        type: the outbound projection has no field capable of holding an amount, so
+                        it cannot rot the way a filter would.
+                    </p>
+                    <p>
+                        Third-party content is exempt. A headline reading "Q3 profit up $2.1B" is
+                        public information about someone else and reveals nothing about your
+                        portfolio.
+                    </p>
+                </section>
+
+                <section id="threats">
+                    <h2>Threat model</h2>
+                    <p>
+                        Every documented threat maps to an executable test, and a meta-test fails
+                        if a threat is added to the document without one — so the model cannot get
+                        ahead of the code.
+                    </p>
+                    <table class="docs-table">
+                        <tr><th>Threat</th><th>Mitigation</th></tr>
+                        <tr><td>T1 — model argues a limit-violating trade</td><td>Deterministic veto; thesis schema cannot express an order</td></tr>
+                        <tr><td>T2 — prompt injection via ingested content</td><td>Untrusted-data frame, citation integrity, and the T1 chain</td></tr>
+                        <tr><td>T3 — credential theft from disk</td><td>OS keystore only, no file fallback, redacted logs</td></tr>
+                        <tr><td>T4 — duplicate or replayed orders</td><td>Content-addressed order ids, TTL, idempotent executor</td></tr>
+                        <tr><td>T5 — stale-data trading</td><td>Mandatory TTLs, blocking staleness rules, fail closed</td></tr>
+                        <tr><td>T6 — event-log tampering</td><td>SQLite triggers refuse UPDATE and DELETE; ULID ordering</td></tr>
+                        <tr><td>T7 — malicious data source</td><td>Allowlisted tools; a source cannot raise its own credibility</td></tr>
+                    </table>
+                    <p>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/THREAT_MODEL.md">Full threat model →</a>
+                    </p>
+                </section>
+
+                <section id="adrs">
+                    <h2>Architecture decisions</h2>
+                    <p>Every significant decision is recorded, including the ones that were later corrected.</p>
+                    <div class="adr-list">
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0001-python-textual-typer.md"><b>0001</b> Python, Textual, Typer</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0002-local-first.md"><b>0002</b> Where computation runs</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0003-provider-interface.md"><b>0003</b> Provider interface</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0004-broker-interface.md"><b>0004</b> Broker interface</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0005-event-sourcing.md"><b>0005</b> Event sourcing</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0006-sqlite-storage.md"><b>0006</b> SQLite storage</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0007-cloudflare-selection.md"><b>0007</b> Optional shared tier</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0008-deterministic-risk-separation.md"><b>0008</b> Deterministic risk separation</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0009-paper-first-execution.md"><b>0009</b> Paper-first execution</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0010-secrets-handling.md"><b>0010</b> Secrets handling</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0011-model-output-validation.md"><b>0011</b> Model-output validation</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0012-product-name.md"><b>0012</b> Product name</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/specs/decisions/ADR-0013-data-acquisition-and-placement.md"><b>0013</b> Data acquisition &amp; placement</a>
+                    </div>
+                </section>
+
+                <footer class="docs-foot">
+                    <p>
+                        WOLF is experimental research software for paper trading. Not investment
+                        advice. It does not predict markets and ships with no real-money execution
+                        path. Markets carry risk; your decisions are your own.
+                    </p>
+                    <p class="docs-foot-links">
+                        <a href="../">Home</a>
+                        <a href="https://github.com/clive5exe/wolf">GitHub</a>
+                        <a href="https://github.com/clive5exe/wolf/blob/main/SECURITY.md">Security</a>
+                    </p>
+                </footer>
+            </main>
+        </div>
+
+        <script>
+            // Highlight the section currently in view.
+            const links = [...document.querySelectorAll(".docs-side a")];
+            const map = new Map(links.map((a) => [a.getAttribute("href").slice(1), a]));
+            new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((e) => {
+                        if (!e.isIntersecting) return;
+                        links.forEach((a) => a.classList.remove("is-on"));
+                        map.get(e.target.id)?.classList.add("is-on");
+                    });
+                },
+                { rootMargin: "-80px 0px -70% 0px" }
+            ).observe && document.querySelectorAll("section[id]").forEach((s) =>
+                new IntersectionObserver(
+                    (entries) =>
+                        entries.forEach((e) => {
+                            if (!e.isIntersecting) return;
+                            links.forEach((a) => a.classList.remove("is-on"));
+                            map.get(e.target.id)?.classList.add("is-on");
+                        }),
+                    { rootMargin: "-80px 0px -70% 0px" }
+                ).observe(s)
+            );
+        </script>
+    </body>
+</html>
