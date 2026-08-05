@@ -1,29 +1,27 @@
 # What WOLF is
 
-**WOLF trades for you.** A model makes the decisions. The app exists to give it
-the things a model cannot reach on its own: a broker, market data, filings,
-fundamentals, insider activity, and a memory of everything it has already done.
-Specialised agents handle the parts they are each good at. Deterministic code
-holds the veto so none of it can hurt you.
+**WOLF trades for you, and the point is to make money.** It is for retail
+investors, not for a paper about market structure.
+
+A model makes the decisions. The app exists to give it the things a model
+cannot reach on its own: a broker, market data, filings, fundamentals, insider
+activity, and a memory of everything it has already done. Specialised agents
+handle the parts they are each good at. Deterministic code holds the veto so
+none of it can hurt you.
 
 That is the whole product. Every decision in this repository is downstream of
 it, and anything that does not serve it is scope.
 
 ## What this is not
 
-**Not a strategy in search of an edge.** WOLF is not an attempt to find a
-statistical anomaly that survived thirty years of quant funds. Momentum,
-mean-reversion and the rest are *tools the model may reach for*, not the
-product. Time spent proving one of them beats the market is time spent on the
-wrong problem.
+**Not one hardcoded strategy.** WOLF is absolutely hunting for an edge. What it
+is not is a single rule set picked in advance and defended forever. Momentum,
+mean-reversion, insider following and the rest are *instruments the model
+reaches for*, and the hunt is continuous rather than settled at design time.
+Encoding one strategy and calling it the product is the mistake.
 
 **Not a dashboard.** A dashboard shows you numbers and leaves the work to you.
 WOLF does the work and shows you the reasoning.
-
-**Not a backtesting framework.** Backtests validate a fixed rule set. There
-isn't one here. What replaces it is the event log: every decision, its
-evidence, its verdict and its outcome, replayable, so the system is judged on
-its actual record rather than on a simulation of a strategy it does not run.
 
 ## Why it can work
 
@@ -35,8 +33,10 @@ The information is public, free, and almost entirely unprocessed by individual
 investors. Institutions solve this by hiring people. A model collapses that
 cost to near zero, and *that* is the asymmetry worth chasing.
 
-We are not betting the model can predict markets. We are betting it can read
-more of what is already public than any human competitor bothers to.
+This is a real edge and it is worth money. We are not betting the model can
+predict markets, because nobody can. We are betting it can read more of what is
+already public than any other retail participant bothers to, and that acting on
+that consistently beats acting on a headline and a hunch.
 
 ## Why it is survivable
 
@@ -52,6 +52,27 @@ make it safe here, and they are already built:
    decision is diagnosable rather than deniable.
 
 The safety work is done. What is missing is giving the model the keys.
+
+## How we know it works
+
+Backtesting is not optional. Letting a model trade real money without ever
+checking what it would have done is not a plan.
+
+It costs money, because judgment cannot be replayed for free: every historical
+decision is a real model call. That is a budget constraint, not a reason to
+skip it. Three things are testable:
+
+1. **Reconstruct what was knowable on a date, then ask.** Point-in-time data is
+   already built: stand on 2023-06-01 and the fundamentals layer returns FY2022,
+   never FY2024. Feed the model only that, take its decision, compare to what
+   happened.
+2. **Replay the deterministic half for free.** Risk, sizing and execution
+   already replay byte-identically at zero cost.
+3. **Judge the live record.** Every thesis carries an invalidation condition.
+   Months of logged decisions say whether they held, which no simulation can.
+
+This is why delisted companies still matter. Offer the model a 2008 universe
+with Lehman quietly removed and it looks like a genius for not buying it.
 
 ## The build, in order
 
