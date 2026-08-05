@@ -253,9 +253,14 @@ class LoopbackReceiver:
         class Handler(http.server.BaseHTTPRequestHandler):
             def do_GET(self) -> None:
                 query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
-                result.code = (query.get("code") or [None])[0]
-                result.state = (query.get("state") or [None])[0]
-                result.error = (query.get("error") or [None])[0]
+
+                def first(name: str) -> str | None:
+                    values = query.get(name) or []
+                    return values[0] if values else None
+
+                result.code = first("code")
+                result.state = first("state")
+                result.error = first("error")
                 body = (
                     b"<body style='background:#000;color:#F5F5F5;font-family:monospace;"
                     b"display:flex;align-items:center;justify-content:center;height:100vh'>"
