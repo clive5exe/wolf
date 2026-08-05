@@ -168,6 +168,20 @@ def tui(
 
 
 @app.command()
+def setup(
+    calm: bool = typer.Option(False, "--calm", help="Disable animation"),
+) -> None:
+    """Create your investment policy — goals in your words, then you confirm."""
+    from tradeos.tui.app import WolfApp
+
+    runtime = _runtime()
+    if runtime.active_policy() is not None:
+        console.print("[yellow]a policy already exists[/] — `wolf policy-show` to see it")
+        raise typer.Exit(code=1)
+    WolfApp(runtime, calm=calm, start_screen="setup").run()
+
+
+@app.command()
 def watch(
     interval: str = typer.Option("15m", help="Cycle interval, e.g. 30s, 15m, 1h"),
     any_hours: bool = typer.Option(

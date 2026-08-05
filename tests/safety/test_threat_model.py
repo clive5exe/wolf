@@ -144,11 +144,11 @@ class TestT3CredentialTheftFromDisk:
     @pytest.mark.parametrize(
         "secret",
         [
-            "AKIAIOSFODNN7EXAMPLE",
-            "sk-abcdefghijklmnopqrstuvwxyz",
-            "rh-api-abcd1234",
-            'api_key: "supersecretvalue"',
-            "account 123456789",
+            "AKIAIOSFODNN7EXAMPLE",  # safety-scan-allow
+            "sk-abcdefghijklmnopqrstuvwxyz",  # safety-scan-allow
+            "rh-api-abcd1234",  # safety-scan-allow
+            'api_key: "supersecretvalue"',  # safety-scan-allow
+            "account 123456789",  # safety-scan-allow
         ],
     )
     def test_secret_shapes_are_redacted(self, secret: str) -> None:

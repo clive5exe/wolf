@@ -40,7 +40,8 @@ State legend: ☐ ready · ◐ in progress · ☑ done (this scaffold session) �
 | T-019 | CLI: `demo`, `events list`, `policy show/init-sample`, `kill` | S0 | ☑ |
 | T-020 | TUI shell: dashboard (positions, drift, activity feed, mode badge) | S0 | ☑ |
 | T-021 | macOS notifier (osascript) with message contract | S0 | ☑ |
-| T-022 | Onboarding flow: NL goals → PolicyDraft (provider) → confirm form → active policy | S1 | ☐ |
+| T-022 | Onboarding flow: NL goals → PolicyDraft (provider) → confirm form → active policy | S1 | ☑ |
+| T-035 | `install.sh` one-liner installer handing off to `wolf setup` | S0 | ☑ |
 | T-031 | TUI visual system (palette, motion, glyphs) + boot cascade & den dashboard | S0 | ☑ |
 | T-032 | Cycle pipeline screen + verdict screen (thesis → full rule wall → receipt) | S1 | ☑ |
 | T-033 | Journal screen + kill-switch takeover (two-press disengage) | S1 | ☑ |

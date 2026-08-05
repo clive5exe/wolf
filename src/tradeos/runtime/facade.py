@@ -39,6 +39,7 @@ from tradeos.runtime.journal import (
     max_drawdown,
 )
 from tradeos.runtime.killswitch import KillSwitch
+from tradeos.runtime.onboarding import OnboardingService
 from tradeos.runtime.policy_service import PolicyService
 from tradeos.runtime.progress import CycleProgress
 from tradeos.runtime.views import DashboardView, HoldingView, KillSwitchState
@@ -185,6 +186,14 @@ class TradeOSRuntime:
         if isinstance(self.events, SQLiteEventStore):
             return self.events.tail(limit)
         return list(self.events.iter_events())[-limit:]
+
+    def onboarding(self, *, use_provider: bool = True) -> OnboardingService:
+        """Policy setup. The provider only drafts; nothing activates unconfirmed."""
+        return OnboardingService(
+            self.policy_service,
+            self._clock,
+            provider=self.provider if use_provider else None,
+        )
 
     def kill_state(self) -> KillSwitchState:
         """Kill-switch status with its provenance, read back from the event log."""

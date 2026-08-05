@@ -59,13 +59,24 @@ opposite stance:
 | Versioned investment policy with mode ladder + kill switch | |
 | Six-screen terminal UI: boot diagnosis, den, live cycle, verdict, journal, kill | |
 | Scheduled cycles (`wolf watch`) with market-hours gating and kill-switch awareness | |
+| Policy onboarding (`wolf setup`): your goals drafted into a policy you confirm | |
 | Typer CLI (`wolf`); notifications via Notification Center or libnotify | |
 | 200 tests incl. safety/contract/replay suites; mypy clean; CI | |
 
 ## Quickstart
 
 ```bash
-git clone <repo> wolf && cd wolf
+curl -fsSL https://raw.githubusercontent.com/clive5exe/wolf/main/install.sh | sh
+wolf setup                      # your goals -> a draft policy -> you confirm every limit
+```
+
+Read it first if you'd rather (`| less` instead of `| sh`) — it prints what it
+will do before doing it, touches two paths, and needs no sudo.
+
+<details><summary>From source instead</summary>
+
+```bash
+git clone https://github.com/clive5exe/wolf.git && cd wolf
 ./scripts/dev_setup.sh          # venv, editable install, git hooks
 source .venv/bin/activate
 
@@ -78,6 +89,8 @@ wolf tui                        # enter the den — the full terminal interface
 wolf tui --calm                 # same, with animation disabled
 wolf watch --interval 15m       # run cycles on a schedule until you stop it
 ```
+
+</details>
 
 \* Requires a logged-in Claude Code CLI. Note: headless (`claude -p`) calls
 may draw from your plan's *programmatic* usage allowance and report a real

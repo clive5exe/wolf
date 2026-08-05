@@ -23,6 +23,7 @@ from tradeos.tui.screens.cycle import CycleScreen
 from tradeos.tui.screens.den import DenScreen
 from tradeos.tui.screens.journal import JournalScreen
 from tradeos.tui.screens.kill import KillScreen
+from tradeos.tui.screens.setup import SetupScreen
 from tradeos.tui.screens.verdict import VerdictScreen
 from tradeos.tui.theme import DISCLAIMER, Ink
 
@@ -51,6 +52,7 @@ class WolfApp(App[None]):
         "verdict": VerdictScreen,
         "journal": JournalScreen,
         "kill": KillScreen,
+        "setup": SetupScreen,
     }
 
     #: The kill switch is reachable from every screen without exception.
@@ -73,7 +75,12 @@ class WolfApp(App[None]):
         self._start_screen = start_screen
 
     def on_mount(self) -> None:
-        self.push_screen(self._start_screen)
+        # A fresh install has no policy, so the den would only be able to tell
+        # you to go and make one. Send people to setup instead of to a dead end.
+        start = self._start_screen
+        if start in {"boot", "den"} and self.runtime.active_policy() is None:
+            start = "setup"
+        self.push_screen(start)
 
     def action_kill_switch(self) -> None:
         """``k`` from anywhere. Never a toggle — engaging and disengaging differ.
