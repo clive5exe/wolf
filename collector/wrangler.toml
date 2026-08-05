@@ -1,0 +1,13 @@
+name = "wolf-collector"
+main = "src/index.js"
+compatibility_date = "2026-08-05"
+
+# 02:30 UTC. Late enough that the SEC has published the previous business day's
+# index, early enough that a failure leaves most of a day to notice it.
+[triggers]
+crons = ["30 2 * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "wolf-collector"
+database_id = "PUT_YOUR_D1_ID_HERE"
