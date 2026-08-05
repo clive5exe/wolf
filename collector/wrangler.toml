@@ -10,4 +10,4 @@ crons = ["30 2 * * *"]
 [[d1_databases]]
 binding = "DB"
 database_name = "wolf-collector"
-database_id = "PUT_YOUR_D1_ID_HERE"
+database_id = "6d2d5009-6ef2-44a8-b85e-ebb327cb45e8"

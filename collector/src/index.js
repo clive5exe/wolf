@@ -160,6 +160,18 @@ export default {
    * that writes here is the cron, so a leaked URL cannot corrupt the record.
    */
   async fetch(request, env) {
+    try {
+      return await route(request, env);
+    } catch (err) {
+      // Cloudflare's default is an opaque error page. A collector that cannot
+      // say why it failed is a collector nobody can fix.
+      console.error("request failed:", err.stack || err.message);
+      return Response.json({ error: String(err.message || err) }, { status: 500 });
+    }
+  },
+};
+
+async function route(request, env) {
     const url = new URL(request.url);
 
     if (url.pathname === "/health") {
@@ -181,7 +193,9 @@ export default {
       if (where.length) sql += ` WHERE ${where.join(" AND ")}`;
       sql += " ORDER BY filed DESC, accession DESC LIMIT ?";
       args.push(limit);
-      const { results } = await env.DB.prepare(sql).bind(...args).all();
+      const { results } = await env.DB.prepare(sql)
+        .bind(...args)
+        .all();
       return Response.json({ count: results.length, filings: results });
     }
 
@@ -201,5 +215,4 @@ export default {
         "  GET  /health\n  GET  /filings?form=4&cik=0000320193&limit=100\n",
       { headers: { "content-type": "text/plain" } },
     );
-  },
-};
+  }
