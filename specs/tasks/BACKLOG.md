@@ -36,8 +36,9 @@ State legend: ☐ ready · ◐ in progress · ☑ done (this scaffold session) �
 ## M4. Interfaces & experience
 | ID | Task | Class | State |
 |---|---|---|---|
-| T-018 | `tradeos doctor` with fix hints (provider states, store, notifier) | S0 | ☑ |
+| T-018 | `wolf doctor` with fix hints (provider states, store, notifier) | S0 | ☑ |
 | T-019 | CLI: `demo`, `events list`, `policy show/init-sample`, `kill` | S0 | ☑ |
+| T-036 | Landing page, docs site and installer hosting at wolf.clive5.com | S0 | ☑ |
 | T-020 | TUI shell: dashboard (positions, drift, activity feed, mode badge) | S0 | ☑ |
 | T-021 | macOS notifier (osascript) with message contract | S0 | ☑ |
 | T-022 | Onboarding flow: NL goals → PolicyDraft (provider) → confirm form → active policy | S1 | ☑ |
@@ -51,7 +52,7 @@ State legend: ☐ ready · ◐ in progress · ☑ done (this scaffold session) �
 | ID | Task | Class | State |
 |---|---|---|---|
 | T-023 | SEC EDGAR connector: submissions+companyfacts, rate limiter, raw events | S1 | ◐ (submissions + CIK map + limiter done. Companyfacts/XBRL pending) |
-| T-024 | Robinhood Agentic MCP read-only adapter + tool-probe + allowlist registry | **S2** | ☐ unblocked (Q2 answered yes 2026-08-05). Fixture-driven dev now, live connect after owner completes RH onboarding |
+| T-024 | Robinhood Agentic MCP read-only adapter + tool-probe + allowlist registry | **S2** | ◐ (allowlist registry + tool probe done. OAuth client and adapter pending yes 2026-08-05). Fixture-driven dev now, live connect after owner completes RH onboarding |
 | T-025 | Sentiment interface + deterministic aggregation (+ optional Bluesky connector, flag-off) | S1 | ☐ |
 | T-026 | Portfolio statistics module with documented formulas | S1 | ◐ (core stats done. Sharpe/Sortino/beta pending benchmark decision A13) |
 | T-027 | Golden scenarios (6) + replay hash-equality gate | S1 | ◐ (replay equality done. Goldens 5/6) |
@@ -59,10 +60,17 @@ State legend: ☐ ready · ◐ in progress · ☑ done (this scaffold session) �
 | T-029 | Provider structured-output live smoke doc (manual, logged-in machine) | S0 | ☐ |
 | T-030 | Threat-model regression suite completion (T1, T7 rows each mapped to a test) | **S2** | ☑ |
 
-Next five (priority order): **T-022, T-023, T-026 finish, T-027 finish, T-028.**
+Next five (priority order): **T-037, T-024 finish, T-023 finish, T-026 finish, T-028.**
 T-028's journal reducer landed with T-033 (`runtime/journal.py`). What remains is
 per-cycle evaluation metrics and outcome grading (did the thesis hold?).
-T-024 stays blocked on the human answering ASSUMPTIONS Q2.
+T-024 is no longer blocked: Q2 is answered and Robinhood's discovery document
+advertises `registration_endpoint`, so dynamic client registration is available.
+
+T-037 is the open design question, not yet a packet. WOLF has exactly one
+strategy today, target-allocation rebalancing, and the model only narrates the
+trade it already produced. Running signal strategies and model-proposed
+candidates alongside it needs the cycle to accept more than one `Strategy` and
+needs a rule for which dollars each may touch. That decision is with the owner.
 
 ## Milestone acceptance
 - M-gates are the PRODUCT.md §7 criteria mapped: M1→cr.5,7 · M2→cr.2 · M3→cr.3,4 · M4→cr.1,8 · M5→cr.3,5,6.

@@ -7,8 +7,17 @@ with more autonomy until the previous mode's evidence bar is met.
 
 Everything in PRODUCT.md §7. Highlights: BYO-AI (Claude Code), policy
 onboarding, deterministic risk engine, rebalance strategy, paper engine,
-event sourcing + replay, TUI/CLI, doctor, macOS notifications, full test
-pipeline. **No real-money execution of any kind.**
+event sourcing + replay, TUI/CLI, doctor, desktop notifications on macOS and
+Linux, scheduled unattended cycles (`wolf watch`), and a full test pipeline.
+**No real-money execution of any kind.**
+
+Unattended operation already works here: `wolf watch` runs the whole cycle on
+a timer with no human present. What the mode ladder gates is real money, not
+absence of a human, so paper trading on a schedule needs no mode change.
+
+One strategy ships in v0.1: target-allocation rebalancing. The model argues
+about the trade the strategy produced. It does not pick candidates. Widening
+that is the open design question recorded as T-037 in the backlog.
 
 ## v0.2 Human-approved execution (mode 2)
 
