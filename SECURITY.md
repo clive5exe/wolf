@@ -1,8 +1,8 @@
 # Security Policy
 
-TradeOS handles brokerage credentials, portfolio data, and (in later versions)
+WOLF handles brokerage credentials, portfolio data, and (in later versions)
 order execution. Security failures here are financial failures. Read
-[THREAT_MODEL.md](THREAT_MODEL.md) for the full analysis; this file states the
+[THREAT_MODEL.md](THREAT_MODEL.md) for the full analysis. This file states the
 operational policy.
 
 ## Hard rules (enforced in code review and CI)
@@ -11,7 +11,7 @@ operational policy.
    or session material in files, environment checked into git, SQLite, logs,
    or model prompts. `scripts/safety_check.sh` scans for violations on every
    commit.
-2. **No credential scraping.** TradeOS never reads browser sessions, lifts
+2. **No credential scraping.** WOLF never reads browser sessions, lifts
    cookies, or calls private/undocumented broker endpoints. Subscription AI
    providers are used only through their officially installed clients and
    documented interfaces.
@@ -38,5 +38,5 @@ whether real brokerage credentials or funds could be affected.
 ## Scope notes
 
 - Paper trading and the fake broker involve no real credentials or funds.
-- The Robinhood integration is read-only in v0.1; execution paths ship disabled.
-- TradeOS is experimental software and **not investment advice**; see README.
+- The Robinhood integration is read-only in v0.1. Execution paths ship disabled.
+- WOLF is experimental software and **not investment advice**. See README.

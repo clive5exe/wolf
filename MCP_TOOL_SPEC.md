@@ -2,15 +2,15 @@
 
 **Status:** v0.1 · **Implements:** `src/tradeos/{mcp,tools}/`
 
-## 1. Role of MCP in TradeOS
+## 1. Role of MCP in WOLF
 
 MCP servers are **capability endpoints** (broker access, market data), not
-decision makers. TradeOS is an MCP *client*. Two very different consumers:
+decision makers. WOLF is an MCP *client*. Two very different consumers:
 
 1. **The runtime core** calls MCP tools directly (deterministic code paths,
    e.g. `robinhood.get_positions`). This is the primary path.
 2. **AI providers** may be given a *restricted, read-only* tool subset for
-   research tasks (v0.2+; v0.1 providers get NO tools — context is assembled
+   research tasks (v0.2+. V0.1 providers get NO tools. Context is assembled
    by the core and handed to them as data).
 
 ## 2. Registry and configuration
@@ -29,10 +29,10 @@ timeout_s = 20
 Rules:
 - **Allowlist-only.** A tool not listed is not callable, period.
 - `broker_trade` class tools cannot be listed while the active policy mode is
-  read_only/paper (config validation cross-checks policy; also re-checked at
+  read_only/paper (config validation cross-checks policy. Also re-checked at
   call time).
-- Servers are spawned as subprocesses with clean env (no ambient secrets);
-  credentials are injected per-server from Keychain by name, never inherited.
+- Servers are spawned as subprocesses with clean env (no ambient secrets).
+  Credentials are injected per-server from Keychain by name, never inherited.
 - Every tool call and response → `tool.call`/`tool.result` events (payloads
   redacted per telemetry rules).
 
@@ -50,26 +50,26 @@ class ToolResult(BaseModel):
 
 Responses feeding domain logic are validated into domain models at the
 adapter (`brokers/robinhood.py` maps MCP payloads → `AccountState`,
-`Position`, `Quote`); raw payloads are stored as raw ingestion events for
+`Position`, `Quote`). Raw payloads are stored as raw ingestion events for
 audit. Schema drift from a server ⇒ adapter raises, cycle aborts, alert
-raised — never best-effort parsing of account data.
+raised. Never best-effort parsing of account data.
 
 ## 4. Failure behavior
 
 | Failure | Handling |
 |---|---|
 | Server won't spawn / handshake timeout | registry marks DOWN, doctor shows fix hint, dependent cycles abort pre-proposal |
-| Tool timeout | one retry for idempotent reads; never retry writes; record event |
+| Tool timeout | one retry for idempotent reads. Never retry writes. Record event |
 | Malformed response | adapter ValidationError → abort + alert (fail closed) |
-| Unlisted tool requested | `ToolPermissionError`, recorded — this is a bug or an attack |
-| Server version/tool-list drift | tool list re-probed at startup; diff logged + surfaced |
+| Unlisted tool requested | `ToolPermissionError`, recorded. This is a bug or an attack |
+| Server version/tool-list drift | tool list re-probed at startup. Diff logged + surfaced |
 
 ## 5. Robinhood MCP adapter (v0.1: read-only)
 
 Targets the **official Agentic Trading MCP** (hosted at
-`agent.robinhood.com/mcp/trading`, OAuth-style in-app approval; see
+`agent.robinhood.com/mcp/trading`, OAuth-style in-app approval. See
 RESEARCH_NOTES §2). The adapter implements `BrokerAdapter`'s read methods
-only (`get_account`, `get_positions`, `get_quote(s)`, `get_orders`); its
+only (`get_account`, `get_positions`, `get_quote(s)`, `get_orders`). Its
 `submit_order` raises `BrokerCapabilityError` in v0.1 regardless of
 configuration, and the server's trading tools are never allowlisted in 0.1.
 Exact tool names/schemas are unpublished → the adapter probes the tool list

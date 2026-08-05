@@ -1,4 +1,4 @@
-# Market Context Specification — the Time-Aware Intelligence Engine
+# Market Context Specification: the Time-Aware Intelligence Engine
 
 **Status:** v0.1 · **Implements:** `src/tradeos/{ingestion,context,retrieval,sentiment}/`, models in `domain/context.py`
 
@@ -8,15 +8,15 @@ This is not "RAG over finance documents." Every piece of information that can
 influence a decision is a **timestamped, sourced, expiring asset**. The system
 must always be able to answer: *what did we know, from where, how old was it,
 and was it still valid when we acted?* Data with unknown provenance or expired
-freshness cannot enter a live decision — the `stale_context` risk rule
+freshness cannot enter a live decision. The `stale_context` risk rule
 enforces this downstream.
 
 ## 2. Source classes
 
 | Class | Examples | Typical TTL |
 |---|---|---|
-| A. Live state | broker account, quotes, spreads, market status, breaking news, econ releases, earnings events, social sentiment, order events | seconds–hours |
-| B. Durable knowledge | SEC filings, transcripts, company profiles/sectors, macro series, user strategy docs, journal, prior decisions, historical snapshots | days–quarters |
+| A. Live state | broker account, quotes, spreads, market status, breaking news, econ releases, earnings events, social sentiment, order events | seconds, hours |
+| B. Durable knowledge | SEC filings, transcripts, company profiles/sectors, macro series, user strategy docs, journal, prior decisions, historical snapshots | days, quarters |
 | C. Derived intelligence | sentiment direction/velocity, source diversity, credibility, price confirmation, relative volume, trend state, concentration, correlation, exposures, vol/drawdown, event risk, completeness, freshness | recomputed per cycle |
 
 ## 3. `ContextItem` schema (every item, no exceptions)
@@ -54,8 +54,8 @@ class ContextItem(BaseModel):
     def freshness(self, now: datetime) -> Freshness   # pure function of age/ttl
 ```
 
-Freshness is **computed, never stored** — a stored freshness would itself go
-stale. `event_time` vs `ingested_at` are both mandatory; connectors that
+Freshness is **computed, never stored**: a stored freshness would itself go
+stale. `event_time` vs `ingested_at` are both mandatory. Connectors that
 cannot supply a real `event_time` must say so explicitly by setting
 `event_time = ingested_at` AND `payload["event_time_is_ingestion_proxy"] = true`.
 
@@ -93,16 +93,16 @@ class MarketContextPackage(BaseModel):
     items: list[ContextItem]
     completeness: Decimal            # fraction of required kinds present & non-expired
     missing: list[str]               # required kinds absent or expired
-    citations: list[str]             # item_ids — what a thesis may reference
+    citations: list[str]             # item_ids: what a thesis may reference
 ```
 
 Rules:
 - A package with `completeness < 1.0` may still be produced (transparency),
   but the decision cycle records `context.incomplete` and the `stale_context`
   risk rule vetoes order-producing paths.
-- Providers receive the package rendered with per-item ids, sources, and ages;
+- Providers receive the package rendered with per-item ids, sources, and ages.
   `StructuredThesis.supporting_item_ids` must be a subset of `citations`
-  (validated — unknown ids are a validation failure, recorded as an
+  (validated. Unknown ids are a validation failure, recorded as an
   unsupported-claim signal for evaluation).
 - Model-generated content re-entering context is tagged
   `provenance=MODEL_GENERATED`, `credibility ≤ 0.3`, and is barred from being
@@ -119,10 +119,10 @@ Rules:
 | Single social post | 0.15 | never decision-bearing alone |
 | Model-generated | ≤ 0.3 | theses, summaries |
 
-Scores are per-source constants in v0.1; per-item adjustment (author history,
+Scores are per-source constants in v0.1. Per-item adjustment (author history,
 bot likelihood) is v0.2+.
 
-## 7. Sentiment (design; one connector max in v0.1, only if legally viable)
+## 7. Sentiment (design: one connector max in v0.1, only if legally viable)
 
 Normalization: post → `{tickers, event_time, sentiment ∈ [-1,1], confidence,
 engagement, author_cred?, duplicate_or_bot_likelihood, topic}`. Aggregation is
@@ -137,19 +137,19 @@ bearing. A single post can never form a tradable signal.
 
 `fetch → raw event (stored verbatim) → normalize → entity/ticker resolution →
 dedupe (content_hash) → credibility stamp → TTL stamp → context store`.
-Each stage appends events; failures quarantine the item, never silently drop.
+Each stage appends events. Failures quarantine the item, never silently drop.
 
 ## 9. Failure cases
 
-- Connector down → last-known items age out naturally; cycles see `missing`.
+- Connector down → last-known items age out naturally. Cycles see `missing`.
 - Clock disagreement (event_time > now + 5 min) → item quarantined.
 - Unresolvable ticker → item kept with `entities=[]`, excluded from retrieval.
-- Duplicate storm → dedupe by content_hash; duplicate count recorded.
+- Duplicate storm → dedupe by content_hash. Duplicate count recorded.
 
 ## 10. v0.1 acceptance criteria
 
-1. `ContextItem`/`MarketContextPackage` implemented with computed freshness;
-   property tests over age/ttl boundaries.
+1. `ContextItem`/`MarketContextPackage` implemented with computed freshness.
+   Property tests over age/ttl boundaries.
 2. Paper/fake quote source + broker positions connector produce packages with
    correct completeness math.
 3. An expired required item vetoes an order path (integration test with the

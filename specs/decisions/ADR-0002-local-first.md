@@ -10,26 +10,26 @@ offline-ish (degrades explicitly), and no mandatory account with us.
 ## Decision
 All state (events, policies, portfolio, journal) lives in local SQLite under
 `~/Library/Application Support/TradeOS/`. Secrets live in the macOS Keychain.
-The Cloudflare backend (ADR-0007) is an optional enrichment tier — shared
-ingestion and community aggregates — never required for core operation; every
+The Cloudflare backend (ADR-0007) is an optional enrichment tier. Shared
+ingestion and community aggregates. Never required for core operation. Every
 cloud-fed feature has a local fallback or explicit absence.
 
 ## Consequences
-- Privacy and auditability by construction; replay works offline.
+- Privacy and auditability by construction. Replay works offline.
 - Multi-device sync is deliberately out of scope until a threat-model review.
 - Community features must be designed opt-in + aggregate-only later.
 - We accept the cost: each user runs their own ingestion for personal sources.
 
 ---
 
-## Amendment — 2026-08-05: state the rule as a default, not a preference
+## Amendment. 2026-08-05: state the rule as a default, not a preference
 
 Owner's articulation: **"Anything a user can run on their own system should
 happen on their system."**
 
 This is sharper than "local-first" and replaces it as the operative rule. It is
 a statement about *where computation is placed*, which can be checked against
-any proposed feature, rather than a claim about data movement — which is what
+any proposed feature, rather than a claim about data movement. Which is what
 made "local-first" an overclaim when used publicly (see ADR-0012).
 
 ### The rule
@@ -38,7 +38,7 @@ Placement is not an optimisation decision. The default is the user's machine,
 and moving work off it requires a reason that survives this question:
 
 > Is there something about this work that makes it *impossible* for a single
-> user to do alone — not merely slower, cheaper, or more convenient elsewhere?
+> user to do alone. Not merely slower, cheaper, or more convenient elsewhere?
 
 "It would reduce load on a third party", "it would save the user CPU", and "it
 would be easier to operate centrally" are all rejected by this test. They are
@@ -48,7 +48,7 @@ arguments about our convenience, not about capability.
 
 Only genuine multi-party work:
 
-- **Community aggregates** — a sentiment figure across many users' inputs
+- **Community aggregates**: a sentiment figure across many users' inputs
   cannot, by definition, be computed by one of them.
 - **Coordination between users**, if live sharing ever ships.
 
@@ -59,8 +59,8 @@ Only genuine multi-party work:
   fetching all run fine on one machine, so under this rule they run there.
   EDGAR (T-023) and sentiment sources (T-025) are local connectors, not client
   calls to a service we operate.
-- **Scheduling is local.** `wolf watch` on an always-on machine — a homelab, a
-  Raspberry Pi, a laptop that stays open — replaces Cloud Cron entirely.
+- **Scheduling is local.** `wolf watch` on an always-on machine. A homelab, a
+  Raspberry Pi, a laptop that stays open. Replaces Cloud Cron entirely.
 - **The installer never phones home.** Onboarding happens on the machine being
   installed to, not on a server.
 - **No hosted instance is on the roadmap.** If one is ever run, it serves
@@ -69,12 +69,12 @@ Only genuine multi-party work:
 ### The one standing exception, and why it is temporary
 
 The AI provider. A user cannot run Claude on their own hardware, so the
-provider call leaves the machine — which is precisely why the outbound
+provider call leaves the machine. Which is precisely why the outbound
 projection carries proportions rather than amounts (Q3, ADR-0012), and why
 PROVIDER_SPEC plans an Ollama adapter. Local inference is this rule applied to
 the last component that currently violates it.
 
-### Correction — same day: the rule is about *whose* machine, not *no cloud*
+### Correction. Same day: the rule is about *whose* machine, not *no cloud*
 
 The amendment above misread the owner's principle and drew too strong a
 conclusion from it. Recording the correction rather than editing the text,
@@ -82,7 +82,7 @@ because the distinction is the useful part.
 
 "Anything a user can run on their own system should happen on their system"
 means **each user's own work belongs on that user's machine**. It rules out
-centralising per-user workload onto someone else's box — including, especially,
+centralising per-user workload onto someone else's box. Including, especially,
 the maintainer's. It does not rule out hosting things that are genuinely shared.
 
 The operative pair of questions is therefore:
@@ -97,10 +97,10 @@ abuse absorption, and one person's router becomes everyone's single point of
 failure. A homelab is an excellent place to run *your own* WOLF. It is the
 wrong place to run *everyone's*.
 
-This leaves ADR-0007 live rather than superseded — see its own correction.
+This leaves ADR-0007 live rather than superseded. See its own correction.
 
 ### See also
 
 ADR-0013 turns this rule into a decision procedure. The placement of any new
-data source is determined by which class it falls into — account, market, or
-public reference — rather than by re-arguing the principle each time.
+data source is determined by which class it falls into. Account, market, or
+public reference. Rather than by re-arguing the principle each time.

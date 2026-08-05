@@ -6,8 +6,8 @@
 
 The **Investment Policy Profile** is the single deterministic source of truth
 for what the system is allowed to want. Natural language goes in during
-onboarding; an LLM may *draft* the structured policy; the user confirms it
-field by field; only the confirmed struct is enforced. Models can never read a
+onboarding. An LLM may *draft* the structured policy. The user confirms it
+field by field. Only the confirmed struct is enforced. Models can never read a
 policy field permissively, relax it, or invent one. The policy is versioned:
 every change produces a new immutable version and a `policy.updated` event.
 
@@ -86,17 +86,17 @@ class InvestmentPolicy(BaseModel):
 
 - `sum(target weights) + target_cash_weight <= 1`.
 - `min_cash_pct <= target_cash_weight` warning (not error).
-- `max_position_pct >= max(target weights)` — a target may not exceed the cap.
-- allowlist and denylist disjoint; symbols uppercase, `^[A-Z][A-Z0-9.\-]{0,9}$`.
+- `max_position_pct >= max(target weights)`: a target may not exceed the cap.
+- allowlist and denylist disjoint. Symbols uppercase, `^[A-Z][A-Z0-9.\-]{0,9}$`.
 - `mode` transitions only via `PolicyService.change_mode()` which enforces the
   ladder (no skipping to autopilot) and emits events.
 - `autopilot` non-None ⇒ `ValidationError` while the feature flag
   `TRADEOS_ENABLE_AUTOPILOT` build constant is False (it is False in all 0.1/0.2
-  releases; flipping it requires the v0.3 safety review checklist).
+  releases. Flipping it requires the v0.3 safety review checklist).
 
 ## 3. Onboarding contract
 
-The provider draft step uses `PolicyDraft` — same fields, all optional, plus
+The provider draft step uses `PolicyDraft`: same fields, all optional, plus
 `interpretation_notes: list[str]` where the model must state every assumption
 it made ("interpreted 'no single position above 5%' as max_position_pct=0.05").
 The TUI renders each populated field with its provenance (`user_stated` /
@@ -118,23 +118,23 @@ referenced by a decision cycle.
 | max_drawdown_pct | 0.15 | |
 | cooldown_minutes_per_symbol | 240 | |
 | stale_quote_max_age_s | 120 (paper) / 15 (live, v0.2+) | |
-| earnings_blackout_days | 0 (off — no calendar source in v0.1) | honest default |
+| earnings_blackout_days | 0 (off. No calendar source in v0.1) | honest default |
 
 ## 5. Failure cases
 
-- **No active policy** → decision cycles refuse to run; TUI shows onboarding.
-- **Draft translation fails validation** → user sees raw errors + form; the
+- **No active policy** → decision cycles refuse to run. TUI shows onboarding.
+- **Draft translation fails validation** → user sees raw errors + form. The
   model is never asked to "fix" limits silently.
-- **Policy edited mid-cycle** → cycles pin the policy version at trigger time;
-  the risk engine re-checks the *pinned* version and additionally aborts if
+- **Policy edited mid-cycle** → cycles pin the policy version at trigger time.
+  The risk engine re-checks the *pinned* version and additionally aborts if
   the active version changed since trigger (`policy_changed` veto).
 
 ## 6. Acceptance criteria
 
 1. Round-trip: NL example from PRODUCT.md J2 → draft → confirm → stored active
-   v1 → event emitted; reload from store is field-identical.
+   v1 → event emitted. Reload from store is field-identical.
 2. All validators above have unit tests (pass + reject cases).
 3. A `PolicyDraft` containing `autopilot.enabled=true` is rejected at
    validation with an explicit message, and a safety test asserts no code path
    can activate autopilot in v0.1.
-4. Mode change emits `mode.changed` event + notification; ladder enforced.
+4. Mode change emits `mode.changed` event + notification. Ladder enforced.

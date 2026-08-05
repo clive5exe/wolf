@@ -12,16 +12,16 @@ All significant state changes append an `Event` (ULID id, type, occurred/
 recorded timestamps, correlation id, causation id, schema version, JSON
 payload) to an append-only SQLite table protected by UPDATE/DELETE-rejecting
 triggers. Derived state (positions, P&L, journal, stats) is rebuilt by
-reducers; replay hash-equality is a release gate (EVALUATION_SPEC §2).
+reducers. Replay hash-equality is a release gate (EVALUATION_SPEC §2).
 Snapshots are a permitted optimization, never the truth.
 
 ## Consequences
-- Audit, replay, and evaluation come nearly free; crash recovery = re-reduce.
+- Audit, replay, and evaluation come nearly free. Crash recovery = re-reduce.
 - Discipline required: payload schema changes need `schema_version` bumps and
-  upcasting functions; goldens catch accidental divergence.
-- Storage growth is acceptable (text events, single user); compaction is a
+  upcasting functions. Goldens catch accidental divergence.
+- Storage growth is acceptable (text events, single user). Compaction is a
   later concern.
 
 ## Alternatives rejected
-- Plain CRUD tables + audit table: audit drifts from truth; replay impossible.
-- Full ES framework: overkill; ~200 lines of store + reducers suffice.
+- Plain CRUD tables + audit table: audit drifts from truth. Replay impossible.
+- Full ES framework: overkill. ~200 lines of store + reducers suffice.

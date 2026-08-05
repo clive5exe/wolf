@@ -4,11 +4,11 @@
 
 ## 1. Purpose
 
-TradeOS must measure its own decision quality with metrics that are
-**independent of raw P&L** (a bad process can get lucky; a good process can
+WOLF must measure its own decision quality with metrics that are
+**independent of raw P&L** (a bad process can get lucky. A good process can
 lose a quarter). Evaluation never mutates behavior automatically: it produces
 data for humans. The system must never "learn" by silently changing risk
-rules — rule changes are policy-version changes made by the user.
+rules. Rule changes are policy-version changes made by the user.
 
 ## 2. Replay engine
 
@@ -16,11 +16,11 @@ rules — rule changes are policy-version changes made by the user.
   version.
 - Guarantee: replaying events through the derived-state reducers reproduces
   byte-identical derived state (positions, P&L, journal). Verified by hashing
-  canonical JSON of derived state; a release gate in `tests/replay/`.
+  canonical JSON of derived state. A release gate in `tests/replay/`.
 - Decision replay (v0.1): re-run the deterministic half of a recorded cycle
   (strategy + sizing + risk) from the recorded `MarketContextPackage` and
-  assert identical proposals and verdicts. Provider calls are NOT re-executed;
-  the recorded `StructuredThesis` is replayed as a fixture.
+  assert identical proposals and verdicts. Provider calls are NOT re-executed.
+  The recorded `StructuredThesis` is replayed as a fixture.
 - Historical market replay (v0.2): synthetic clock + recorded quotes to
   exercise strategies over past windows.
 
@@ -43,19 +43,19 @@ Recorded per decision (event `evaluation.recorded`) and aggregated:
 
 | Metric | Definition | Source |
 |---|---|---|
-| policy_compliance | 1 − (blocking vetoes that *reached* risk from a strategy ÷ proposals) — strategies should learn limits, engine catches them regardless | verdict events |
+| policy_compliance | 1 − (blocking vetoes that *reached* risk from a strategy ÷ proposals): strategies should learn limits, engine catches them regardless | verdict events |
 | context_freshness | mean freshness ratio (age/ttl) of cited items at decision time | packages |
-| citation_quality | cited item ids that exist ÷ claimed; plus fraction of thesis claims with ≥1 citation | thesis validation |
+| citation_quality | cited item ids that exist ÷ claimed. Plus fraction of thesis claims with ≥1 citation | thesis validation |
 | unsupported_claim_rate | thesis validation failures + reviewer-flagged uncited claims ÷ theses | provider events |
 | proposal_fill_gap | |proposed price − simulated/actual fill| in bps | execution events |
 | slippage_model_error | paper-assumed vs later-observed slippage (v0.2 live compare) | fills |
 | decision_latency | trigger → verdict wall time | event timestamps |
-| provider_latency / cost | per query; cost where reported by CLI envelope | provider events |
+| provider_latency / cost | per query. Cost where reported by CLI envelope | provider events |
 | turnover / concentration / drawdown / vol | standard portfolio stats (formulas in `portfolio/stats.py` docstrings) | snapshots |
 | thesis_outcome_alignment | at +7d/+30d: did invalidation conditions trigger? was directional claim consistent with outcome? graded by the Journal agent, stored as data | journal |
 
 Every metric implementation carries a docstring stating formula, window,
-assumptions, and limitations; EVALUATION docs must not present any metric as
+assumptions, and limitations. EVALUATION docs must not present any metric as
 performance advice.
 
 ## 5. Strategy lifecycle (promotion gates)
@@ -64,10 +64,10 @@ performance advice.
 
 | Gate | Requirement to advance |
 |---|---|
-| simulation | golden scenarios written; deterministic outputs stable across 3 runs |
-| regression | added to strategy regression suite; no golden diffs |
+| simulation | golden scenarios written. Deterministic outputs stable across 3 runs |
+| regression | added to strategy regression suite. No golden diffs |
 | paper | ≥ 4 weeks paper history, ≥ 20 decisions, zero blocking-rule breaches *originated by the strategy*, drawdown within policy |
-| approval-mode (v0.2) | human review of paper journal; explicit user opt-in per strategy |
+| approval-mode (v0.2) | human review of paper journal. Explicit user opt-in per strategy |
 | autopilot (v0.3) | extensive paper + approval history, safety review checklist, dedicated account |
 
 Demotion is automatic on: any strategy-originated limit breach, golden
@@ -78,7 +78,7 @@ Promotion/demotion are events + notifications.
 
 Same context package + prompt → N providers → compare structured theses on
 citation quality, calibration (confidence vs outcome), and latency/cost. No
-consensus trading in 0.x; comparison is evaluation data only.
+consensus trading in 0.x. Comparison is evaluation data only.
 
 ## 7. Acceptance criteria (v0.1)
 

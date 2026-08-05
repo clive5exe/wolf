@@ -7,8 +7,8 @@ v0.1 needs a polished macOS terminal interface fast, a scriptable CLI, and a
 headless core reusable by a future desktop app. The team's agent tooling
 (Claude Code) and the financial/typing ecosystem (Pydantic, Decimal, pytest)
 are strongest in Python. Textual 8.2.8 (MIT, actively released 2026-06) offers
-CSS-styled widgets, DataTable, async workers, and headless Pilot testing —
-verified against current docs (RESEARCH_NOTES §3).
+CSS-styled widgets, DataTable, async workers, and headless Pilot testing.
+Verified against current docs (RESEARCH_NOTES §3).
 
 ## Decision
 Python ≥3.12 (dev on 3.14). Textual for the TUI, Typer for the CLI, both as

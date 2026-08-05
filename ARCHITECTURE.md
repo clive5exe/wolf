@@ -1,11 +1,11 @@
-# TradeOS — Architecture
+# WOLF Architecture
 
 **Status:** v0.1 · **Related ADRs:** specs/decisions/ADR-0001…0011
 
 ## 1. Shape
 
 One reusable **headless core** (`src/tradeos/`) with thin interfaces on top.
-Interfaces render state and send commands; they contain zero business logic
+Interfaces render state and send commands. They contain zero business logic
 (enforced by review + import-linting in `scripts/safety_check.sh`).
 
 ```
@@ -42,16 +42,16 @@ Interfaces render state and send commands; they contain zero business logic
 | `portfolio/` | Portfolio state, statistics, drift | domain, market_data |
 | `strategies/` | Strategy plugin protocol + built-ins | domain, portfolio |
 | `risk/` | Deterministic rule engine, `ValidatedOrder` issuance | domain, events |
-| `execution/` | Sole caller of `broker.submit_order`; idempotency | domain, brokers, events |
+| `execution/` | Sole caller of `broker.submit_order`. Idempotency | domain, brokers, events |
 | `runtime/` | Facade, decision cycle, scheduler, registries, kill switch | everything above |
 | `notifications/` | Notifier protocol + macOS adapter | domain |
 | `evaluation/`, `replay/` | Metrics, golden scenarios, replay engine | events, storage, domain |
-| `telemetry/` | Logging with redaction; OTel later | stdlib |
+| `telemetry/` | Logging with redaction. OTel later | stdlib |
 | `security/` | Keychain access, secret redaction helpers | stdlib |
 | `cli/`, `tui/` | Interfaces | runtime facade ONLY |
 
 Forbidden edges (checked mechanically): `cli|tui → brokers|providers|risk`
-directly; `providers → brokers`; `strategies → brokers`; anything → `tui`.
+directly. `providers → brokers`. `strategies → brokers`. Anything → `tui`.
 Only `execution/` may call `submit_order`.
 
 ## 3. The decision cycle (runtime/cycle.py)
@@ -74,60 +74,60 @@ trigger ──► observe ──► retrieve ──► candidates ──► AI s
         events + notification + journal ──► later: evaluation vs outcome
 ```
 
-Each cycle gets a `correlation_id`; every event in the cycle carries it. A
+Each cycle gets a `correlation_id`. Every event in the cycle carries it. A
 cycle that stops early (stale data, missing context, veto) is a *successful*
 cycle with outcome `no_action` and a recorded reason.
 
 ## 4. Contracts (canonical Pydantic models, `domain/`)
 
-- `InvestmentPolicy` — versioned, deterministic; see INVESTMENT_POLICY_SPEC.md.
-- `ContextItem` / `MarketContextPackage` — sourced, timestamped, TTL'd; see
+- `InvestmentPolicy`: versioned, deterministic. See INVESTMENT_POLICY_SPEC.md.
+- `ContextItem` / `MarketContextPackage`: sourced, timestamped, TTL'd. See
   MARKET_CONTEXT_SPEC.md.
-- `ProposedAction` / `TradeProposal` — strategy output; quantities as
-  `Decimal`; includes `strategy_id@version`, `context_package_id`, rationale.
-- `StructuredThesis` — the ONLY accepted LLM synthesis shape: bull case, bear
+- `ProposedAction` / `TradeProposal`: strategy output. Quantities as
+  `Decimal`. Includes `strategy_id@version`, `context_package_id`, rationale.
+- `StructuredThesis`: the ONLY accepted LLM synthesis shape: bull case, bear
   case, why-now, what-changed, invalidation conditions, data gaps, confidence,
-  supporting `ContextItem` ids. Schema-validated; failures are retried once
-  then recorded as provider errors — never "best-effort parsed".
-- `RiskVerdict` — list of `RiskCheckResult` (rule_id, passed, blocking,
-  observed, limit, message); `approved` iff all blocking rules pass.
-- `ValidatedOrder` — constructible only via `risk.engine.validate()`; carries
+  supporting `ContextItem` ids. Schema-validated. Failures are retried once
+  then recorded as provider errors. Never "best-effort parsed".
+- `RiskVerdict`: list of `RiskCheckResult` (rule_id, passed, blocking,
+  observed, limit, message). `approved` iff all blocking rules pass.
+- `ValidatedOrder`: constructible only via `risk.engine.validate()`. Carries
   the verdict, policy version, `client_order_id` (deterministic idempotency
   key), and `valid_until`. Broker adapters type-require it and re-assert
   `verdict.approved` at the boundary.
-- `Event` — append-only envelope: `event_id` (ULID), `event_type`,
+- `Event`: append-only envelope: `event_id` (ULID), `event_type`,
   `occurred_at`/`recorded_at` (UTC), `correlation_id`, `causation_id`,
   `schema_version`, JSON payload.
 
 ## 5. Storage
 
 SQLite (WAL) at `~/Library/Application Support/TradeOS/tradeos.db`
-(override: `TRADEOS_DATA_DIR`). `events` table is append-only — UPDATE/DELETE
+(override: `TRADEOS_DATA_DIR`). `events` table is append-only. UPDATE/DELETE
 blocked by triggers. Derived state (paper positions, journal views, stats
-caches) is rebuildable from events; replay equality is a release gate.
+caches) is rebuildable from events. Replay equality is a release gate.
 Migrations are numbered SQL files applied by `storage/migrations.py`.
-Secrets never touch SQLite — macOS Keychain only (`security/keychain.py`).
+Secrets never touch SQLite. MacOS Keychain only (`security/keychain.py`).
 DuckDB is a later, justified addition for analytics (ADR-0006).
 
 ## 6. Failure behavior (design, not aspiration)
 
 | Failure | Behavior |
 |---|---|
-| Provider missing/unauthenticated | Doctor reports fix; cycles run without AI synthesis (deterministic-only) or skip, per config |
+| Provider missing/unauthenticated | Doctor reports fix. Cycles run without AI synthesis (deterministic-only) or skip, per config |
 | Provider timeout / invalid output | One retry with error feedback → recorded `provider.error` event → cycle continues without thesis or aborts (config), never fabricates |
-| Stale quote/context | Blocking risk rule `stale_data` vetoes; cycle outcome `no_action` |
-| Broker read failure | Cycle aborts pre-proposal; alert raised |
+| Stale quote/context | Blocking risk rule `stale_data` vetoes. Cycle outcome `no_action` |
+| Broker read failure | Cycle aborts pre-proposal. Alert raised |
 | Duplicate submission | `client_order_id` dedupe in execution layer + broker adapter |
-| Crash mid-cycle | Events already appended are truth; restart reconciles derived state from log |
-| Kill switch | Flag checked by scheduler, cycle entry, risk engine, and execution; engages → all execution paths refuse, notification sent |
+| Crash mid-cycle | Events already appended are truth. Restart reconciles derived state from log |
+| Kill switch | Flag checked by scheduler, cycle entry, risk engine, and execution. Engages → all execution paths refuse, notification sent |
 
 ## 7. Concurrency model
 
 Sync core, async only at the edges that need it: the Textual TUI (its own
 event loop), the scheduler, and future streaming ingestion. Broker/provider
-adapters expose sync methods in v0.1 (subprocess + HTTP timeouts); an async
+adapters expose sync methods in v0.1 (subprocess + HTTP timeouts). An async
 provider session API is a v0.2 concern. No threads sharing mutable domain
-state; the event store serializes writes.
+state. The event store serializes writes.
 
 ## 8. Cloud (optional, later)
 
