@@ -13,7 +13,7 @@ without this row.** "Legally questionable" means excluded, not risk-accepted.
 |---|---|---|---|---|---|
 | Paper engine / fake broker | A: broker state | `brokers/paper.py`, `fake.py` | local | n/a | 0.95 |
 | Robinhood Agentic Trading MCP (read-only) | A: broker + market data | `brokers/robinhood.py` via `mcp/` | hosted MCP `agent.robinhood.com/mcp/trading`; OAuth-style in-app approval; beta | **Official product**; read-only tool allowlist in v0.1; user must accept RH's data-sharing warning during onboarding | 0.85–0.95 |
-| SEC EDGAR | B: filings | `ingestion/edgar.py` | `data.sec.gov` submissions + companyfacts JSON; ≤10 req/s; declared `User-Agent: TradeOS <user-contact>`; gzip | **Official, free, no key**; fair-access policy honored by a client-side rate limiter (hard-coded ≤5 req/s) | 0.95 |
+| SEC EDGAR | B: filings | `ingestion/edgar.py` | `data.sec.gov` submissions + companyfacts JSON; ≤10 req/s; declared `User-Agent: WOLF/<version> (+repo URL)` by default, overridable; gzip | **Official, free, no key**; fair-access policy honored by a client-side rate limiter (hard-coded ≤5 req/s) | 0.95 |
 | User documents (policy, journal, strategy notes) | B | `ingestion/user_docs.py` | local | user-owned | 1.0 (as *user intent*, not market truth) |
 | Derived intelligence | C | `context/derive.py` | computed | n/a | inherits min of inputs |
 
