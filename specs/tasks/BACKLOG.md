@@ -4,6 +4,16 @@
 
 State legend: ☐ ready · ◐ in progress · ☑ done (this scaffold session) · ▷ blocked-by noted
 
+**Only one task may be ◐ at a time.** A session that touches anything else is
+scope drift, and it is how one session ended with T-024 open all day while
+unrelated work shipped. Read `DECISIONS.md` before proposing or researching
+anything: it lists what is already settled.
+
+Done means **verified against something real**, not "code written". The two most
+valuable findings of 2026-08-05 (SEC refusing our User-Agent, and 158 phantom
+restatements from a period-length bug) both came from pointing code at the live
+API. Neither would have surfaced from fixtures.
+
 ## M1. Foundation (repo runs, verifies, stores events)
 | ID | Task | Class | State |
 |---|---|---|---|
@@ -52,7 +62,7 @@ State legend: ☐ ready · ◐ in progress · ☑ done (this scaffold session) �
 | ID | Task | Class | State |
 |---|---|---|---|
 | T-023 | SEC EDGAR connector: submissions+companyfacts, rate limiter, raw events | S1 | ☑ (companyfacts landed with point-in-time selection; HTTP transport built; limiter done. Companyfacts/XBRL pending) |
-| T-024 | Robinhood Agentic MCP read-only adapter + tool-probe + allowlist registry | **S2** | ◐ (allowlist registry + tool probe done. OAuth client and adapter pending yes 2026-08-05). Fixture-driven dev now, live connect after owner completes RH onboarding |
+| T-024 | Robinhood Agentic MCP read-only adapter + tool-probe + allowlist registry | **S2** | ◐ (allowlist + probe done. Auth is NOT a blocker: the MCP is already registered and authenticated at `~/Dev/rh-probe` and returns live quotes. Remaining work is passing allowlisted tools through the Claude Code provider yes 2026-08-05). Fixture-driven dev now, live connect after owner completes RH onboarding |
 | T-025 | Sentiment interface + deterministic aggregation (+ optional Bluesky connector, flag-off) | S1 | ☐ |
 | T-026 | Portfolio statistics module with documented formulas | S1 | ◐ (core stats done. Sharpe/Sortino/beta pending benchmark decision A13) |
 | T-027 | Golden scenarios (6) + replay hash-equality gate | S1 | ◐ (replay equality done. Goldens 5/6) |
