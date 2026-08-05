@@ -12,8 +12,16 @@ from rich.table import Table
 
 import tradeos
 from tradeos.notifications.factory import default_notifier
+from tradeos.runtime.connect import (
+    ConnectError,
+    alpaca_status,
+    alpaca_steps,
+    forget_alpaca,
+    save_alpaca,
+)
 from tradeos.runtime.diagnostics import CheckStatus
 from tradeos.runtime.facade import RuntimeConfig, TradeOSRuntime
+from tradeos.security.store import default_secret_store
 
 app = typer.Typer(
     name="wolf",
@@ -132,6 +140,57 @@ def policy_init_sample() -> None:
     runtime = _runtime()
     policy = runtime.policy_service.create_sample_policy()
     console.print(f"[green]created[/] sample policy v{policy.version} (mode={policy.mode.value})")
+
+
+@app.command()
+def connect(
+    provider: str = typer.Argument("alpaca", help="Which account to connect"),
+    forget: bool = typer.Option(False, "--forget", help="Remove the stored credential"),
+) -> None:
+    """Connect a market data or broker account.
+
+    Opens a browser and prints the link as well, because a browser that
+    reports success has still shown nothing on a headless machine.
+    """
+    if provider.lower() != "alpaca":
+        console.print(
+            f"[red]unknown provider[/] {provider!r}. "
+            "Robinhood connects through `wolf setup`, since it authorises "
+            "over OAuth rather than with a pasted key."
+        )
+        raise typer.Exit(code=2)
+
+    store = default_secret_store()
+
+    if forget:
+        removed = forget_alpaca(store)
+        console.print(
+            "[green]removed[/] the stored Alpaca credential"
+            if removed
+            else "[dim]nothing stored to remove[/]"
+        )
+        return
+
+    console.print(f"[dim]alpaca:[/] {alpaca_status(store)}\n")
+    signup, keys = alpaca_steps()
+
+    console.print(signup.show())
+    typer.confirm("Account created?", default=True, abort=True)
+
+    console.print()
+    console.print(keys.show())
+
+    key_id = typer.prompt("Key id").strip()
+    secret = typer.prompt("Secret key", hide_input=True).strip()
+
+    try:
+        save_alpaca(store, key_id, secret)
+    except ConnectError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(code=1) from exc
+
+    console.print(f"\n[green]stored in your OS keystore[/] {alpaca_status(store)}")
+    console.print("[dim]never written to disk, and not in the event log[/]")
 
 
 @app.command()
