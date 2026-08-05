@@ -59,14 +59,15 @@
                     </h1>
 
                     <p class="hero-sub fade-in fade-in-d4">
-                        It reads the market and argues for a trade. Then twenty-one
-                        deterministic checks decide whether that trade happens. Position
-                        caps, loss limits, quote staleness, cooldowns. Any one of them
-                        vetoes. How convincing the model was is not an input to any of them.
+                        Language models are persuasive and occasionally wrong, which is a
+                        bad combination near money. So the model here has no authority. It
+                        reads, argues, and hands its case to code that cannot be persuaded,
+                        cannot be prompted, and holds the only veto.
                     </p>
                     <p class="hero-sub hero-sub-2 fade-in fade-in-d4">
-                        Every decision lands in an append-only log that replays
-                        byte-identically. Including the ones where the answer was no.
+                        Everything it does is written to a log that cannot be edited and
+                        replays byte for byte, so months later you can prove what it knew
+                        and when, rather than trusting a summary of itself.
                     </p>
 
                     <div class="hero-ctas fade-in fade-in-d5">
@@ -130,23 +131,24 @@
                 <div class="section-inner-wide">
                     <div style="display: flex; flex-direction: column; align-items: center">
                         <div class="section-badge">The interface</div>
-                        <h2 class="section-title">Six screens, one keystroke apart</h2>
+                        <h2 class="section-title">It shows you the reasoning, not the result</h2>
                         <p class="section-sub">
-                            Real captures, produced by running the app, not mockups.
-                            Every figure on them is one the code actually computed.
+                            Most tools show you a number. This shows the argument, every
+                            rule that tested it, and the receipt, so you can disagree with
+                            a specific step rather than the whole black box.
                         </p>
                     </div>
 
                     <div class="show" id="show">
                         <div class="show-tabs" role="tablist" aria-label="Screens">
                             <button class="show-tab is-on" role="tab"
-                                aria-selected="true" data-i="0">den</button>
+                                aria-selected="true" data-i="0">boot</button>
                             <button class="show-tab" role="tab"
-                                aria-selected="false" data-i="1">cycle</button>
+                                aria-selected="false" data-i="1">den</button>
                             <button class="show-tab" role="tab"
-                                aria-selected="false" data-i="2">verdict</button>
+                                aria-selected="false" data-i="2">cycle</button>
                             <button class="show-tab" role="tab"
-                                aria-selected="false" data-i="3">boot</button>
+                                aria-selected="false" data-i="3">verdict</button>
                             <button class="show-tab" role="tab"
                                 aria-selected="false" data-i="4">journal</button>
                             <button class="show-tab" role="tab"
@@ -155,16 +157,16 @@
 
                         <div class="show-stage">
                             <img class="show-img is-on" data-i="0"
-                                src="./screens/den.svg" alt="The den screen"
-                                 />
+                                src="./screens/boot.svg" alt="Boot screen"
+                                />
                             <img class="show-img" data-i="1"
-                                src="./screens/cycle.svg" alt="Decision cycle screen"
+                                src="./screens/den.svg" alt="The den screen"
                                 loading="lazy" />
                             <img class="show-img" data-i="2"
-                                src="./screens/verdict.svg" alt="Verdict screen"
+                                src="./screens/cycle.svg" alt="Decision cycle screen"
                                 loading="lazy" />
                             <img class="show-img" data-i="3"
-                                src="./screens/boot.svg" alt="Boot screen"
+                                src="./screens/verdict.svg" alt="Verdict screen"
                                 loading="lazy" />
                             <img class="show-img" data-i="4"
                                 src="./screens/journal.svg" alt="Journal screen"
@@ -198,7 +200,7 @@
                             <div class="show-desc" id="show-desc">One row answers five questions per holding: how much, how far from plan, what it costs, how fresh the price is. The ◆┼ gauge shows drift spatially, scaled so the end of the track is the point where the strategy trades.</div>
                         </div>
                     </div>
-                    <script id="show-data" type="application/json">[{"title": "The den", "desc": "One row answers five questions per holding: how much, how far from plan, what it costs, how fresh the price is. The ◆┼ gauge shows drift spatially, scaled so the end of the track is the point where the strategy trades."}, {"title": "Decision cycle", "desc": "Watchable as it happens. Stages complete left to right, so you can see the model occupy exactly one box, with deterministic walls on both sides."}, {"title": "Verdict", "desc": "Thesis on top, the rule wall below, receipt at the bottom. Every rule is listed, every time, including on a veto, when it would be easiest to summarise."}, {"title": "Boot", "desc": "The environment checks are the startup sequence. A failing check halts the cascade with its fix hint, so you cannot boot past a broken setup."}, {"title": "Journal", "desc": "Vetoes and no-actions carry the same weight as fills. “We did not trade” is a result, not an absence."}, {"title": "Kill switch", "desc": "Reachable from anywhere with one key, checked at four separate layers, and deliberately the ugliest thing in the app. Disengaging takes two intentional presses. Safety should not be tasteful."}]</script>
+                    <script id="show-data" type="application/json">[{"title": "Boot", "desc": "The environment checks are the startup sequence. A failing check halts the cascade with its fix hint, so you cannot boot past a broken setup."}, {"title": "The den", "desc": "One row answers five questions per holding: how much, how far from plan, what it costs, how fresh the price is. The \u25c6\u253c gauge shows drift spatially, scaled so the end of the track is the point where the strategy trades."}, {"title": "Decision cycle", "desc": "Watchable as it happens. Stages complete left to right, so you can see the model occupy exactly one box, with deterministic walls on both sides."}, {"title": "Verdict", "desc": "Thesis on top, the rule wall below, receipt at the bottom. Every rule is listed, every time, including on a veto, when it would be easiest to summarise."}, {"title": "Journal", "desc": "Vetoes and no-actions carry the same weight as fills. \u201cWe did not trade\u201d is a result, not an absence."}, {"title": "Kill switch", "desc": "Reachable from anywhere with one key, checked at four separate layers, and deliberately the ugliest thing in the app. Disengaging takes two intentional presses. Safety should not be tasteful."}]</script>
                     </div>
                 </div>
             </section>

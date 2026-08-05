@@ -432,16 +432,16 @@ nav {
     outline-offset: 2px;
 }
 
-/* Matches the captures exactly (1238x782), so slides fill the frame with no
-   letterboxing and swapping one for another shifts nothing. */
+/* No frame here. The captures carry their own terminal chrome (title bar and
+   traffic lights), so a bordered container around them draws a second window
+   around the first. The aspect ratio must track the capture exactly or the
+   image letterboxes inside a box that looks too big for it. */
 .show-stage {
     position: relative;
     width: 100%;
-    aspect-ratio: 1238 / 782;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    aspect-ratio: 1238 / 880;
     overflow: hidden;
+    border-radius: var(--radius);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
 }
 .show-img {
@@ -449,7 +449,7 @@ nav {
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: fill;
     opacity: 0;
     transition: opacity 0.32s ease;
     pointer-events: none;
