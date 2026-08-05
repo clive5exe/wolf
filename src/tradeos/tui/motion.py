@@ -17,7 +17,7 @@ from typing import Final
 
 # -- the vocabulary -----------------------------------------------------------
 
-#: the runtime is alive — one cursor, always amber, on every screen
+#: the runtime is alive — one cursor, always infrared, on every screen
 CURSOR_BLINK_S: Final = 1.06
 
 #: a data source is live and fresh; stale sources stop moving and go hollow

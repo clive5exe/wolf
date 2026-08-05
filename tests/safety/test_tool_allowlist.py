@@ -17,10 +17,12 @@ import pytest
 
 from tradeos.mcp.registry import (
     ALLOWED,
+    EXECUTION_TOOLS,
     STATE_WRITE_CLASS,
     TRADE_CLASS,
     ToolClass,
     ToolPermissionError,
+    allowed_for_mode,
     audit_server_tools,
     ensure_callable,
     tool_class,
@@ -86,18 +88,47 @@ ADVERTISED = frozenset(
 )
 
 
+class TestModeGatesExecution:
+    """Placing orders is the destination, not a hazard — but only from the mode
+    where a human said so."""
+
+    @pytest.mark.parametrize("mode", [None, "read_only", "paper", "garbage"])
+    def test_orders_are_unreachable_below_approval(self, mode: str | None) -> None:
+        with pytest.raises(ToolPermissionError, match="approval mode"):
+            ensure_callable("place_equity_order", mode=mode)
+
+    @pytest.mark.parametrize("mode", ["approval", "autopilot"])
+    def test_orders_become_reachable_once_the_ladder_is_climbed(self, mode: str) -> None:
+        assert ensure_callable("place_equity_order", mode=mode) == "place_equity_order"
+
+    def test_an_unrecognised_mode_narrows_rather_than_widens(self) -> None:
+        """Mode arrives from stored policy; a corrupt value must fail closed."""
+        assert "place_equity_order" not in allowed_for_mode("APPROVAL_maybe?")
+        assert "place_equity_order" not in allowed_for_mode("")
+
+    def test_reaching_the_tool_is_necessary_never_sufficient(self) -> None:
+        """Even in approval mode every call still passes strategy sizing, the
+        risk engine's veto, ValidatedOrder, the executor, and the kill switch."""
+        broker = (Path(__file__).resolve().parents[2] / "src/tradeos/brokers/base.py").read_text()
+        assert "ValidatedOrder" in broker
+
+
 class TestNoTradeToolIsReachable:
-    @pytest.mark.parametrize("name", sorted(TRADE_CLASS))
-    def test_every_order_tool_is_refused(self, name: str) -> None:
-        with pytest.raises(ToolPermissionError):
-            ensure_callable(name)
+    @pytest.mark.parametrize("name", sorted(TRADE_CLASS - set(EXECUTION_TOOLS)))
+    def test_order_tools_wolf_never_uses_are_refused_in_every_mode(self, name: str) -> None:
+        """Options, exercise, and order-preview endpoints have no role in any
+        mode — unreachable regardless of how far up the ladder you go."""
+        for mode in (None, "read_only", "paper", "approval", "autopilot"):
+            with pytest.raises(ToolPermissionError):
+                ensure_callable(name, mode=mode)
 
     @pytest.mark.parametrize("name", sorted(STATE_WRITE_CLASS))
     def test_every_mutating_tool_is_refused(self, name: str) -> None:
         with pytest.raises(ToolPermissionError):
             ensure_callable(name)
 
-    def test_the_allowlist_and_the_dangerous_sets_never_intersect(self) -> None:
+    def test_the_default_allowlist_holds_no_trade_or_write_tools(self) -> None:
+        """ALLOWED with no mode context is the read-only reading."""
         assert not set(ALLOWED) & TRADE_CLASS
         assert not set(ALLOWED) & STATE_WRITE_CLASS
 
@@ -140,7 +171,7 @@ class TestAgainstTheRealServerSurface:
             assert ensure_callable(name) == name
         else:
             with pytest.raises(ToolPermissionError):
-                ensure_callable(name)
+                ensure_callable(name)  # no mode context => read-only
 
     def test_the_reachable_surface_is_small(self) -> None:
         """53 tools advertised; single digits reachable. Least privilege is a
@@ -162,6 +193,10 @@ class TestAgainstTheRealServerSurface:
 class TestTradeToolNamesAppearNowhereElse:
     """The allowlist already makes these unreachable. This catches a config or
     fixture edit that adds one by hand."""
+
+    def test_execution_tools_are_never_reachable_by_default(self) -> None:
+        for name in EXECUTION_TOOLS:
+            assert name not in ALLOWED
 
     def test_no_trade_tool_name_appears_in_source_outside_the_registry(self) -> None:
         root = Path(__file__).resolve().parents[2] / "src" / "tradeos"

@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>WOLF — watches obsessively, lacks feelings</title>
+        <meta
+            name="description"
+            content="An open-source AI portfolio runtime for macOS and Linux. The model advises; deterministic code decides. Paper trading, event-sourced, runs on your machine."
+        />
+        <meta property="og:title" content="WOLF — watches obsessively, lacks feelings" />
+        <meta
+            property="og:description"
+            content="An AI portfolio runtime that runs on your machine. The model advises; deterministic code decides."
+        />
+        <meta name="theme-color" content="#000000" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="./styles.css" />
+    </head>
+    <body>
+        <nav>
+            <div class="nav-inner">
+                <a class="nav-logo" href="#top">W<span class="eye">◉</span>LF</a>
+                <div class="nav-links">
+                    <a href="#screens" class="hide-sm">Screens</a>
+                    <a href="#how" class="hide-sm">How it works</a>
+                    <a href="#honest">Honesty</a>
+                    <a href="https://github.com/clive5exe/wolf">GitHub</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="page" id="top">
+            <!-- ─────────────── HERO ─────────────── -->
+            <section class="hero">
+                <div class="hero-content">
+                    <a
+                        href="https://github.com/clive5exe/wolf"
+                        class="eyebrow fade-in fade-in-d1"
+                    >
+                        Open source · runs on your machine →
+                    </a>
+
+                    <img class="wordmark fade-in fade-in-d2" src="./wordmark.svg" alt="WOLF" width="392" height="100" />
+
+                    <div class="acronym fade-in fade-in-d3">
+                        watches obsessively, lacks feelings
+                    </div>
+
+                    <h1 class="hero-headline fade-in fade-in-d3">
+                        The model advises. Your machine decides.
+                    </h1>
+
+                    <p class="hero-sub fade-in fade-in-d4">
+                        An AI portfolio runtime for macOS and Linux. An LLM can read the
+                        market and argue a case; it cannot touch a position limit, a loss
+                        limit, or the kill switch. Those are ordinary, fully-tested code
+                        with absolute veto.
+                    </p>
+
+                    <div class="hero-ctas fade-in fade-in-d5">
+                        <a href="#install" class="btn btn-primary">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path
+                                    d="M7 1.5v7M4.5 6 7 8.5 9.5 6M2.5 11.5h9"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
+                            Install
+                        </a>
+                        <a
+                            href="https://github.com/clive5exe/wolf"
+                            class="btn btn-outline"
+                        >
+                            Read the source
+                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                                <path
+                                    d="M2.5 6.5h8M7 3l3.5 3.5L7 10"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ─────────────── INSTALL ─────────────── -->
+                <div class="install fade-in fade-in-d5" id="install">
+                    <div class="install-label">Quick start</div>
+                    <button class="copy" id="copy-btn" type="button">copy</button>
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <span class="dot"></span><span class="dot"></span
+                            ><span class="dot"></span>
+                            <span class="terminal-title">macOS &amp; Linux</span>
+                        </div>
+                        <div class="terminal-body"><span class="comment"># Prints what it will do before doing it. No sudo, no account.</span>
+<span class="prompt">$</span> <span class="cmd" id="install-cmd">curl -fsSL https://raw.githubusercontent.com/clive5exe/wolf/main/install.sh | sh</span>
+<span class="prompt">$</span> <span class="cmd">wolf setup</span></div>
+                    </div>
+                    <p class="install-note">
+                        Prefer to read it first? Swap <code>| sh</code> for
+                        <code>| less</code> — it touches two paths and prints them before
+                        it starts. Then <code>wolf setup</code> turns your goals into a
+                        policy you confirm field by field.
+                    </p>
+                </div>
+            </section>
+
+            <hr class="sep" style="margin-top: 76px" />
+
+            <!-- ─────────────── SCREENS ─────────────── -->
+            <section class="section" id="screens">
+                <div class="section-inner-wide">
+                    <div style="display: flex; flex-direction: column; align-items: center">
+                        <div class="section-badge">The interface</div>
+                        <h2 class="section-title">Six screens, one keystroke apart</h2>
+                        <p class="section-sub">
+                            Real captures, produced by running the app — not mockups.
+                            Every figure on them is one the code actually computed.
+                        </p>
+                    </div>
+
+                    <div class="screens">
+                        <div class="screen-card wide">
+                            <img
+                                src="./screens/den.svg"
+                                alt="The den — WOLF's dashboard, showing holdings, drift gauges and freshness"
+                                loading="lazy"
+                            />
+                            <div class="screen-meta">
+                                <div class="screen-name">The den</div>
+                                <div class="screen-desc">
+                                    One row answers five questions per holding: how much,
+                                    how far from plan, what it costs, how fresh the price
+                                    is. The ◆┼ gauge shows drift spatially, scaled so the
+                                    end of the track is the point where the strategy
+                                    trades.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="screen-card">
+                            <img
+                                src="./screens/cycle.svg"
+                                alt="Live decision cycle showing pipeline stages"
+                                loading="lazy"
+                            />
+                            <div class="screen-meta">
+                                <div class="screen-name">Decision cycle</div>
+                                <div class="screen-desc">
+                                    Watchable as it happens. Stages complete left to
+                                    right, so you can see the model occupy exactly one
+                                    box — with deterministic walls on both sides.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="screen-card">
+                            <img
+                                src="./screens/verdict.svg"
+                                alt="Verdict screen showing thesis, all risk rules, and the fill receipt"
+                                loading="lazy"
+                            />
+                            <div class="screen-meta">
+                                <div class="screen-name">Verdict</div>
+                                <div class="screen-desc">
+                                    Thesis on top, the rule wall below, receipt at the
+                                    bottom. Every rule is listed, every time — including
+                                    on a veto, when it would be easiest to summarise.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="screen-card">
+                            <img
+                                src="./screens/boot.svg"
+                                alt="Boot screen running environment checks"
+                                loading="lazy"
+                            />
+                            <div class="screen-meta">
+                                <div class="screen-name">Boot</div>
+                                <div class="screen-desc">
+                                    The environment checks <em>are</em> the startup
+                                    sequence. A failing check halts the cascade with its
+                                    fix hint, so you cannot boot past a broken setup.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="screen-card">
+                            <img
+                                src="./screens/journal.svg"
+                                alt="Journal listing past decisions including no-actions"
+                                loading="lazy"
+                            />
+                            <div class="screen-meta">
+                                <div class="screen-name">Journal</div>
+                                <div class="screen-desc">
+                                    Vetoes and no-actions carry the same weight as fills.
+                                    "We did not trade" is a result, not an absence.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="screen-card wide">
+                            <img
+                                src="./screens/kill.svg"
+                                alt="Kill switch takeover screen"
+                                loading="lazy"
+                            />
+                            <div class="screen-meta">
+                                <div class="screen-name">Kill switch</div>
+                                <div class="screen-desc">
+                                    Reachable from anywhere with one key, checked at four
+                                    separate layers, and deliberately the ugliest thing
+                                    in the app. Disengaging takes two intentional presses
+                                    or a typed command — safety should not be tasteful.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <hr class="sep" />
+
+            <!-- ─────────────── HOW IT WORKS ─────────────── -->
+            <section class="section" id="how">
+                <div class="section-inner">
+                    <div class="section-badge">How a decision works</div>
+                    <ol class="steps">
+                        <li class="step-item">
+                            <span class="step-num">1.</span>
+                            <div class="step-body">
+                                <div class="step-title">Observe, then retrieve.</div>
+                                <div class="step-desc">
+                                    Positions and quotes are read, then assembled into a
+                                    context package where every item carries a source, a
+                                    timestamp, a TTL and a credibility score. Stale data
+                                    is a stop sign: "insufficient or stale data, no
+                                    action" is a successful outcome.
+                                </div>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <span class="step-num">2.</span>
+                            <div class="step-body">
+                                <div class="step-title">Propose deterministically.</div>
+                                <div class="step-desc">
+                                    The strategy computes candidate trades in explicit
+                                    Decimal arithmetic. Sizing is never a model's job —
+                                    it is arithmetic, and arithmetic belongs to code you
+                                    can read.
+                                </div>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <span class="step-num">3.</span>
+                            <div class="step-body">
+                                <div class="step-title">Ask the model for judgement.</div>
+                                <div class="step-desc">
+                                    Optionally. It receives proportions, never amounts —
+                                    "39.9% of the portfolio against a 40% target", never
+                                    a dollar figure or a share count. It returns a
+                                    structured thesis with citations, or nothing.
+                                </div>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <span class="step-num">4.</span>
+                            <div class="step-body">
+                                <div class="step-title">Run every rule, every time.</div>
+                                <div class="step-desc">
+                                    Twenty-one deterministic checks — position and sector
+                                    caps, loss limits, cooldowns, trading hours, quote
+                                    and context staleness, duplicate orders, the kill
+                                    switch. Any blocking failure vetoes the trade. The
+                                    model has no say here at all.
+                                </div>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <span class="step-num">5.</span>
+                            <div class="step-body">
+                                <div class="step-title">Record it so it can be replayed.</div>
+                                <div class="step-desc">
+                                    Context, thesis, every rule result, fills and
+                                    notifications land in an append-only log that replays
+                                    byte-identically. The database refuses UPDATE and
+                                    DELETE outright.
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <hr class="sep" />
+
+            <!-- ─────────────── PRINCIPLES ─────────────── -->
+            <section class="section">
+                <div class="section-inner-wide">
+                    <div style="display: flex; flex-direction: column; align-items: center">
+                        <div class="section-badge">Why it is built this way</div>
+                        <h2 class="section-title">
+                            Trust is earned with evidence, not disclaimers
+                        </h2>
+                    </div>
+                    <div class="cards">
+                        <div class="card">
+                            <div class="card-glyph" style="color: var(--green)">✓</div>
+                            <div class="card-title">Deterministic code disposes</div>
+                            <div class="card-body">
+                                An LLM may synthesise research and draft a thesis. It
+                                cannot touch limits, hours, symbol permissions, or the
+                                kill switch. Only the risk engine can issue an order, and
+                                broker adapters accept nothing else.
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-glyph" style="color: var(--cyan)">●</div>
+                            <div class="card-title">Freshness is never hidden</div>
+                            <div class="card-body">
+                                Nothing enters a decision without an event time, an
+                                ingestion time and a TTL. Live sources pulse on screen;
+                                stale ones go still, so you notice the absence of motion.
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-glyph" style="color: var(--amber)">⌂</div>
+                            <div class="card-title">No service behind it</div>
+                            <div class="card-body">
+                                No account with us, no backend, no telemetry. Your
+                                history is a SQLite file you own. It does use the network
+                                — your AI provider, your broker, public filings — always
+                                through your own credentials.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <hr class="sep" />
+
+            <!-- ─────────────── HONESTY ─────────────── -->
+            <section class="section" id="honest">
+                <div class="section-inner">
+                    <div class="section-badge">What it does not do</div>
+                    <h2 class="section-title">The limitations, up front</h2>
+                    <p class="section-sub">
+                        A project that argues for honest software should be honest about
+                        itself. This list is maintained in the README too.
+                    </p>
+                    <ul class="plain-list">
+                        <li class="plain-item">
+                            <span class="plain-mark" style="color: var(--red)">✕</span>
+                            <div>
+                                <div class="plain-q">It does not trade real money yet.</div>
+                                <div class="plain-a">
+                                    v0.1 is read-only intelligence plus paper trading.
+                                    The paper engine exercises the identical
+                                    proposal → risk → order path live execution will, so
+                                    the evidence is comparable rather than a toy.
+                                    Human-approved execution is the next milestone.
+                                </div>
+                            </div>
+                        </li>
+                        <li class="plain-item">
+                            <span class="plain-mark" style="color: var(--red)">✕</span>
+                            <div>
+                                <div class="plain-q">It is not investment advice.</div>
+                                <div class="plain-a">
+                                    Experimental research software. Nothing it produces
+                                    predicts markets, and no output should be treated as
+                                    a recommendation to buy or sell anything.
+                                </div>
+                            </div>
+                        </li>
+                        <li class="plain-item">
+                            <span class="plain-mark" style="color: var(--amber)">!</span>
+                            <div>
+                                <div class="plain-q">Some statistics report "unavailable".</div>
+                                <div class="plain-a">
+                                    Sharpe, Sortino and beta need a benchmark series that
+                                    is not yet configured, so they say so rather than
+                                    being approximated. The dashboard likewise draws no
+                                    per-symbol sparkline, because no price history is
+                                    stored and drawing one would be invented.
+                                </div>
+                            </div>
+                        </li>
+                        <li class="plain-item">
+                            <span class="plain-mark" style="color: var(--amber)">!</span>
+                            <div>
+                                <div class="plain-q">The market clock is holiday-naive.</div>
+                                <div class="plain-a">
+                                    It knows regular NYSE hours but not the exchange
+                                    holiday calendar. Paper mode simulates sessions; live
+                                    modes require a holiday source before enabling
+                                    trading-hours enforcement for real orders.
+                                </div>
+                            </div>
+                        </li>
+                        <li class="plain-item">
+                            <span class="plain-mark" style="color: var(--amber)">!</span>
+                            <div>
+                                <div class="plain-q">Windows is untested.</div>
+                                <div class="plain-a">
+                                    macOS and Linux are covered by CI. Nothing is known
+                                    to break on Windows, but nobody has run it — and an
+                                    untested claim is one you get called on.
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <hr class="sep" />
+
+            <!-- ─────────────── FINAL CTA ─────────────── -->
+            <section class="final-cta">
+                <div class="section-inner">
+                    <div class="final-headline">
+                        A patient predator that explains itself.
+                    </div>
+                    <div class="final-sub">
+                        Watches everything. Moves only when the numbers say move.
+                    </div>
+                    <a href="#install" class="btn btn-primary">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path
+                                d="M7 1.5v7M4.5 6 7 8.5 9.5 6M2.5 11.5h9"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                        Install WOLF
+                    </a>
+                </div>
+                <p class="disclaimer">
+                    WOLF is experimental research software for paper trading. It is not
+                    investment advice, it does not predict markets, and it ships with no
+                    real-money execution path. Markets carry risk; you are responsible
+                    for your own decisions.
+                </p>
+            </section>
+        </div>
+
+        <footer>
+            <div class="footer-inner">
+                <div class="footer-note">
+                    © 2026 WOLF contributors · MIT licensed<br />
+                    Watches obsessively, lacks feelings.
+                </div>
+                <div class="footer-links">
+                    <a href="https://github.com/clive5exe/wolf">GitHub</a>
+                    <a href="https://github.com/clive5exe/wolf/blob/main/ARCHITECTURE.md">Architecture</a>
+                    <a href="https://github.com/clive5exe/wolf/blob/main/THREAT_MODEL.md">Threat model</a>
+                    <a href="https://github.com/clive5exe/wolf/blob/main/SECURITY.md">Security</a>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // Copy the install one-liner.
+            const btn = document.getElementById("copy-btn");
+            btn.addEventListener("click", async () => {
+                const cmd = document.getElementById("install-cmd").textContent.trim();
+                try {
+                    await navigator.clipboard.writeText(cmd);
+                    btn.textContent = "copied";
+                } catch {
+                    btn.textContent = "press ⌘C";
+                }
+                setTimeout(() => (btn.textContent = "copy"), 1600);
+            });
+        </script>
+    </body>
+</html>

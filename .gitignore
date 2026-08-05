@@ -35,3 +35,6 @@ credentials*.json
 # Editors
 .idea/
 .vscode/
+
+# Browser tooling scratch
+.playwright-mcp/

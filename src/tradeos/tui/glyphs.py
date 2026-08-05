@@ -113,7 +113,7 @@ def paint_gauge(
     full_scale: Decimal = GAUGE_FULL_SCALE,
     width: int = GAUGE_WIDTH,
 ) -> str:
-    """The gauge as markup: amber marker and target, faint track."""
+    """The gauge as markup: infrared marker and target, faint track."""
     raw = drift_gauge(drift, full_scale=full_scale, width=width)
     out: list[str] = []
     for char in raw:

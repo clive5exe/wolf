@@ -15,30 +15,34 @@ from typing import Final
 class Ink:
     """Terminal ink roles. Values are the approved palette — do not inline hexes."""
 
-    # surfaces
-    BG: Final = "#0E1219"
-    CHROME: Final = "#161C26"
-    SELECTED: Final = "#1D2634"
+    # surfaces — true black ground
+    BG: Final = "#000000"
+    CHROME: Final = "#121212"
+    SELECTED: Final = "#1C1C1C"
 
     # text weights
-    BRIGHT: Final = "#EAF0F8"  # emphasis: symbols, NAV, headline numbers
-    INK: Final = "#C7D0DC"  # body
-    DIM: Final = "#57616F"  # labels, chrome, secondary
-    FAINT: Final = "#39424E"  # leaders, rules, inactive scaffolding
+    BRIGHT: Final = "#F5F5F5"  # emphasis: symbols, NAV, headline numbers
+    INK: Final = "#D4D4D4"  # body
+    DIM: Final = "#8A8A8A"  # labels, chrome, secondary
+    FAINT: Final = "#4A4A4A"  # leaders, rules, inactive scaffolding
 
     # semantic
-    AMBER: Final = "#F0B45C"  # the wolf: brand, targets, key hints
+    INFRARED: Final = "#EA553B"  # the wolf: brand, targets, key hints
     GREEN: Final = "#7ED491"  # money up / passed / fresh
     RED: Final = "#F08C8C"  # money down / vetoed / halted
     CYAN: Final = "#83D2E4"  # data, history, sparklines
 
+    #: Retained so existing call sites keep reading naturally; the hue moved
+    #: from amber to infrared, the meaning did not.
+    AMBER: Final = INFRARED
+
     # badge fills (dark text on a colour block)
-    ON_AMBER: Final = "#161207"
+    ON_AMBER: Final = "#140603"
     ON_RED: Final = "#2A0D0D"
 
 
 #: Inline brand mark, for headers where there is no room for the full lockup.
-WORDMARK: Final = f"[{Ink.BRIGHT}]W[/][{Ink.AMBER}]◉[/][{Ink.BRIGHT}]LF[/]"
+WORDMARK: Final = f"[{Ink.BRIGHT}]W[/][{Ink.INFRARED}]◉[/][{Ink.BRIGHT}]LF[/]"
 WORDMARK_PLAIN: Final = "W◉LF"
 
 #: Splash lockup. Block lettering rather than art: a hand-drawn wolf reads as
@@ -68,12 +72,12 @@ DISCLAIMER: Final = "experimental · paper trading · not investment advice"
 
 def badge(text: str, *, danger: bool = False) -> str:
     """A filled block badge (PAPER, HALTED) — dark ink on a colour field."""
-    fg, bg = (Ink.ON_RED, Ink.RED) if danger else (Ink.ON_AMBER, Ink.AMBER)
+    fg, bg = (Ink.ON_RED, Ink.RED) if danger else (Ink.ON_AMBER, Ink.INFRARED)
     return f"[{fg} on {bg}] {text} [/]"
 
 
 def key(label: str, rest: str = "") -> str:
-    """A footer key hint: amber bracketed key, dim description.
+    """A footer key hint: infrared bracketed key, dim description.
 
     The opening bracket is escaped — unescaped ``[c]`` is parsed as a style tag
     and vanishes from the footer entirely.
