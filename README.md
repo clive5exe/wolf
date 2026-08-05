@@ -1,7 +1,16 @@
-# W◉LF
+```
+██╗    ██╗ ██████╗ ██╗     ███████╗
+██║    ██║██╔═══██╗██║     ██╔════╝
+██║ █╗ ██║██║   ██║██║     █████╗
+██║███╗██║██║   ██║██║     ██╔══╝
+╚███╔███╔╝╚██████╔╝███████╗██║
+ ╚══╝╚══╝  ╚═════╝ ╚══════╝╚═╝
+```
 
 **Watches obsessively, lacks feelings.**
-An open-source AI portfolio-management runtime for macOS and Linux. The model advises; deterministic code decides.
+*The model advises · your machine decides*
+
+An open-source AI portfolio-management runtime for macOS and Linux.
 
 WOLF orchestrates AI tools you already have (Claude Code under your
 existing subscription first; Codex CLI, Ollama, and API providers later), MCP
