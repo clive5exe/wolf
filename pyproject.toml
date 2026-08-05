@@ -47,6 +47,10 @@ packages = ["src/tradeos"]
 line-length = 100
 target-version = "py312"
 src = ["src", "tests"]
+# Vendored third-party code is kept byte-for-byte upstream apart from the
+# import fixes documented in src/tradeos/vendor/README.md. Linting it would
+# only invite edits that the next update silently drops.
+extend-exclude = ["src/tradeos/vendor"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF", "DTZ"]
@@ -77,6 +81,12 @@ plugins = ["pydantic.mypy"]
 [[tool.mypy.overrides]]
 module = "textual.*"
 ignore_missing_imports = true
+
+# Vendored code is not ours to annotate. See src/tradeos/vendor/README.md.
+[[tool.mypy.overrides]]
+module = "tradeos.vendor.*"
+ignore_errors = true
+follow_imports = "skip"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
