@@ -98,3 +98,9 @@ failure. A homelab is an excellent place to run *your own* WOLF. It is the
 wrong place to run *everyone's*.
 
 This leaves ADR-0007 live rather than superseded — see its own correction.
+
+### See also
+
+ADR-0013 turns this rule into a decision procedure. The placement of any new
+data source is determined by which class it falls into — account, market, or
+public reference — rather than by re-arguing the principle each time.

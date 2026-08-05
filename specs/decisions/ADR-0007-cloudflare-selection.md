@@ -108,3 +108,16 @@ The stale free-tier figures recorded above still stand as corrections — D1 is
 5 GB, and Cron Triggers appear to need the paid plan. The latter matters less
 now: scheduled *personal* cycles are `wolf watch` on the user's own machine,
 so any Cron use would be for shared ingestion only.
+
+---
+
+### Settled by ADR-0013
+
+The question this ADR kept re-opening — and which was answered three different
+ways in one day — is resolved by classifying the data rather than arguing about
+the infrastructure. See ADR-0013.
+
+Short version: account and market data are per-user and never centralised;
+public reference data is cached, ingested by a long-running host and served
+from R2 with free egress; the expected bill is $0/month because the ingestion
+does not run on Cloudflare.
