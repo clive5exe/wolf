@@ -3,7 +3,7 @@
 Two invariants live here (RISK_POLICY_SPEC §2, THREAT_MODEL T1):
 1. ``submit_order`` accepts only a ``ValidatedOrder`` instance.
 2. ``assert_submittable`` re-verifies approval and TTL at the adapter
-   boundary even though the risk engine already did — defense in depth
+   boundary even though the risk engine already did. Defense in depth
    against object tampering or stale orders.
 """
 

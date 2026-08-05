@@ -1,14 +1,14 @@
 """Secret storage across operating systems (ADR-0010).
 
-Secrets live ONLY in an OS-provided credential store — never in files, SQLite,
+Secrets live ONLY in an OS-provided credential store. Never in files, SQLite,
 events, logs, or prompts.
 
 **The load-bearing rule of this module: there is no fallback.** If no OS
 keystore is available, every operation raises. It would be trivially easy to
 "helpfully" degrade to a dotfile when libsecret is missing, and that single
 convenience would silently convert a machine with brokerage credentials from
-protected to unprotected — with nothing on screen to say so. A loud failure
-that stops the user is the correct outcome; a quiet one that keeps working is
+protected to unprotected. With nothing on screen to say so. A loud failure
+that stops the user is the correct outcome. A quiet one that keeps working is
 the dangerous one.
 """
 
@@ -22,7 +22,7 @@ from typing import Protocol, runtime_checkable
 #: Service namespace for stored items. Deliberately NOT renamed alongside the
 #: product, for the same reason the database filename was not: this string is
 #: the address of state that already exists on a user's machine. Changing it
-#: would not migrate secrets, it would orphan them — leaving WOLF unable to
+#: would not migrate secrets, it would orphan them. Leaving WOLF unable to
 #: find a credential that is still sitting in the keystore.
 _SERVICE_PREFIX = "tradeos."
 _TIMEOUT_S = 10
@@ -80,7 +80,7 @@ class KeychainStore:
             timeout=_TIMEOUT_S,
         )
         if result.returncode != 0:
-            # stderr may name the service; it never contains the value itself.
+            # stderr may name the service. It never contains the value itself.
             raise SecretStoreError(f"keychain write failed for {name}: {result.stderr.strip()}")
 
     def get_secret(self, name: str, account: str = "wolf") -> str | None:
@@ -103,7 +103,7 @@ class KeychainStore:
 
 
 class SecretToolStore:
-    """Linux keyring via `secret-tool` (libsecret) — GNOME Keyring, KWallet."""
+    """Linux keyring via `secret-tool` (libsecret): GNOME Keyring, KWallet."""
 
     name = "libsecret"
     _BIN = "secret-tool"
@@ -160,9 +160,9 @@ class UnavailableStore:
 
     def _refuse(self) -> None:
         raise NoSecureStore(
-            f"{self.reason} — WOLF stores secrets only in an OS credential store "
+            f"{self.reason}. WOLF stores secrets only in an OS credential store "
             f"and will not write them to disk. On Linux install libsecret "
-            f"(`secret-tool`); on macOS the Keychain is built in."
+            f"(`secret-tool`). On macOS the Keychain is built in."
         )
 
     def set_secret(self, name: str, value: str, account: str = "wolf") -> None:

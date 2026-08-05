@@ -1,10 +1,10 @@
-"""The den — home. Every other screen is one keystroke away and one esc back.
+"""The den. Home. Every other screen is one keystroke away and one esc back.
 
 One row answers five questions per holding: how much, how far from plan (the
 ◆┼ gauge shows drift *spatially*, scaled so the end of the track is the point
 at which the strategy trades), what it is costing, how fresh the price is, and
 what it is worth. Freshness dots pulse while data is live and go hollow and
-motionless when it is not — you notice the *absence* of movement.
+motionless when it is not. You notice the *absence* of movement.
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ from tradeos.tui.glyphs import (
 from tradeos.tui.motion import REFRESH_INTERVAL_S
 from tradeos.tui.theme import Ink, badge, key, money_ink
 
-#: Numeric columns stay fixed — tabular figures should not stretch. Spare
+#: Numeric columns stay fixed. Tabular figures should not stretch. Spare
 #: width goes to the drift gauge, the one element that gains from it.
 #: Counts every cell in a holding row *including* indent and separators:
 #: 2 indent + 6 sym + 6 qty + 13 value + 9 weight + 2 gap + 3 gap
@@ -42,7 +42,7 @@ from tradeos.tui.theme import Ink, badge, key, money_ink
 _FIXED_COLUMNS = 62
 #: Unrealised P&L is the first column to go when space runs out: it is the only
 #: one derivable from what remains on screen, and dropping it beats wrapping a
-#: row — a wrapped table stops being readable at all.
+#: row. A wrapped table stops being readable at all.
 _PNL_COLUMN = 11
 #: Below this the full row cannot fit even with the shortest gauge.
 _COMPACT_BELOW = 72
@@ -50,7 +50,7 @@ _COMPACT_BELOW = 72
 _MAX_GAUGE = 28
 
 PNL_HEADER = f"{'uP&L':>11}"
-DASH = "—"
+DASH = "·"
 
 
 def _is_compact(frame: int) -> bool:
@@ -110,7 +110,7 @@ class DenScreen(WolfScreen):
     # -- rendering -------------------------------------------------------------
 
     def _dot(self, *, live: bool) -> str:
-        """A live source breathes; a stale one is hollow and still."""
+        """A live source breathes. A stale one is hollow and still."""
         if not live:
             return f"[{Ink.RED}]○[/]"
         if self.motion.calm or self._pulse_on:
@@ -167,18 +167,18 @@ class DenScreen(WolfScreen):
         day = view.day_change
         if day is None:
             day_part = (
-                f"[{Ink.DIM}]day[/] [{Ink.FAINT}]— no session history[/]"
+                f"[{Ink.DIM}]day[/] [{Ink.FAINT}]no session history[/]"
                 if roomy
-                else f"[{Ink.DIM}]day[/] [{Ink.FAINT}]—[/]"
+                else f"[{Ink.DIM}]day[/] [{Ink.FAINT}]·[/]"
             )
         else:
-            arrow = "▲" if day > 0 else "▼" if day < 0 else "—"
+            arrow = "▲" if day > 0 else "▼" if day < 0 else "·"
             day_part = f"[{Ink.DIM}]day[/] [{money_ink(day)}]{arrow} {fmt_signed_pct(day)}[/]"
         dd = view.max_drawdown
         dd_part = (
             f"[{Ink.DIM}]max dd[/] [{Ink.INK}]{fmt_pct(dd)}[/]"
             if dd is not None
-            else f"[{Ink.DIM}]max dd[/] [{Ink.FAINT}]—[/]"
+            else f"[{Ink.DIM}]max dd[/] [{Ink.FAINT}]·[/]"
         )
         cash_part = f"[{Ink.DIM}]cash[/] [{Ink.AMBER}]{fmt_pct(view.cash_weight)}[/]"
         nav = fmt_money(view.nav) if view.nav is not None else "unpriced"
@@ -209,7 +209,7 @@ class DenScreen(WolfScreen):
         self, holding: HoldingView, threshold: Decimal, gauge: int, compact: bool
     ) -> str:
         pnl = holding.unrealized_pnl
-        pnl_text = fmt_signed(pnl) if pnl is not None else "—"
+        pnl_text = fmt_signed(pnl) if pnl is not None else "·"
         dot = self._dot(live=not holding.is_stale)
         if holding.is_stale:
             dot = f"[{freshness_ink(holding.quote_age_s, holding.quote_ttl_s)}]"
@@ -226,7 +226,7 @@ class DenScreen(WolfScreen):
         )
 
     def _cash_row(self, view: DashboardView, gauge: int, compact: bool) -> str:
-        """Cash carries a floor, not a target — so it gets a floor readout, not a gauge.
+        """Cash carries a floor, not a target. So it gets a floor readout, not a gauge.
 
         Rendering ``min_cash_pct`` as drift would report healthy compliance as a
         deviation, which is precisely backwards.
@@ -238,7 +238,7 @@ class DenScreen(WolfScreen):
             status = f"[{Ink.GREEN}]{'above floor':<12}[/]"
         else:
             status = f"[{Ink.RED}]{'BELOW FLOOR':<12}[/]"
-        floor_text = f"min {fmt_pct(view.cash_floor)}" if view.cash_floor is not None else "—"
+        floor_text = f"min {fmt_pct(view.cash_floor)}" if view.cash_floor is not None else "·"
         return (
             f"  [{Ink.DIM}]{'CASH':<6}{'':>6}[/]"
             f"[{Ink.INK}]{fmt_money(view.cash):>13}[/]"
@@ -248,7 +248,7 @@ class DenScreen(WolfScreen):
         )
 
     def _concentration(self, view: DashboardView) -> str:
-        hhi = f"{view.hhi:.3f}" if view.hhi is not None else "—"
+        hhi = f"{view.hhi:.3f}" if view.hhi is not None else "·"
         age = fmt_age(view.oldest_quote_age_s)
         return (
             f"\n  [{Ink.FAINT}]◆ current · ┼ target · track ends at the "
@@ -261,7 +261,7 @@ class DenScreen(WolfScreen):
         record = view.last_cycle
         if record is None:
             return (
-                f"\n  [{Ink.DIM}]no decisions yet — press[/] "
+                f"\n  [{Ink.DIM}]no decisions yet, press[/] "
                 f"[{Ink.AMBER}]c[/] [{Ink.DIM}]to run a paper cycle[/]\n"
             )
         tint = Ink.RED if record.veto_reasons else Ink.GREEN
@@ -276,7 +276,7 @@ class DenScreen(WolfScreen):
             else ""
         )
         return (
-            f"\n  [{Ink.DIM}]last cycle {record.occurred_at.strftime('%H:%M:%S')} —[/] "
+            f"\n  [{Ink.DIM}]last cycle {record.occurred_at.strftime('%H:%M:%S')} ·[/] "
             f"[{tint}]{record.headline}[/][{Ink.DIM}],[/] {rules}{thesis}\n"
         )
 
@@ -293,7 +293,7 @@ class DenScreen(WolfScreen):
             self.wolf.focused_cycle_id = self._view.last_cycle.correlation_id
             self.app.push_screen("verdict")
         else:
-            self.notify("no decision to inspect yet — run a cycle first", severity="warning")
+            self.notify("no decision to inspect yet, run a cycle first", severity="warning")
 
     def action_open_journal(self) -> None:
         self.app.push_screen("journal")
@@ -304,7 +304,7 @@ class DenScreen(WolfScreen):
     def action_open_policy(self) -> None:
         policy = self.runtime.active_policy()
         if policy is None:
-            self.notify("no active policy — run `wolf policy-init-sample`", severity="warning")
+            self.notify("no active policy, run `wolf policy-init-sample`", severity="warning")
             return
         targets = ", ".join(f"{t.symbol} {fmt_pct(t.weight)}" for t in policy.target_allocations)
         self.notify(

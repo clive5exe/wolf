@@ -1,4 +1,4 @@
-"""TradeOSRuntime — the single facade interfaces are allowed to talk to
+"""TradeOSRuntime. The single facade interfaces are allowed to talk to
 (ARCHITECTURE §2). Wires storage, brokers, risk, strategy, notifications.
 """
 
@@ -70,7 +70,7 @@ def default_data_dir() -> Path:
 
 @dataclass
 class RuntimeConfig:
-    data_dir: Path | None = None  # None => default_data_dir(); in_memory ignores it
+    data_dir: Path | None = None  # None => default_data_dir(), in_memory ignores it
     in_memory: bool = False
     use_provider: bool = False  # AI synthesis is opt-in per invocation
     notifier: Notifier | None = None
@@ -139,8 +139,8 @@ class TradeOSRuntime:
     def run_cycle(
         self, trigger: str = "manual", progress: CycleProgress | None = None
     ) -> CycleOutcome:
-        """Run one decision cycle. ``progress`` is a display-only observer —
-        it is notified of stage transitions and can never change the outcome."""
+        """Run one decision cycle. ``progress`` is a display-only observer.
+        It is notified of stage transitions and can never change the outcome."""
         return self._cycle.run(trigger, progress)
 
     def engage_kill_switch(self, reason: str) -> None:
@@ -158,7 +158,7 @@ class TradeOSRuntime:
         return self.provider.detect()
 
     def provider_health(self) -> object | None:
-        """Structured round-trip probe; returns the ProviderResult or None if
+        """Structured round-trip probe. Returns the ProviderResult or None if
         the active provider has no health check."""
         if isinstance(self.provider, ClaudeCodeProvider):
             return self.provider.health_check()
@@ -188,7 +188,7 @@ class TradeOSRuntime:
         return list(self.events.iter_events())[-limit:]
 
     def onboarding(self, *, use_provider: bool = True) -> OnboardingService:
-        """Policy setup. The provider only drafts; nothing activates unconfirmed."""
+        """Policy setup. The provider only drafts. Nothing activates unconfirmed."""
         return OnboardingService(
             self.policy_service,
             self._clock,
@@ -211,7 +211,7 @@ class TradeOSRuntime:
         )
 
     def risk_rule_ids(self) -> tuple[str, ...]:
-        """Every rule the engine will run — the armed-rule count interfaces show."""
+        """Every rule the engine will run. The armed-rule count interfaces show."""
         return self._engine.rule_ids
 
     def diagnostics(self, *, full: bool = False) -> list[DoctorCheck]:
@@ -252,7 +252,7 @@ class TradeOSRuntime:
         return equity_history(self.events.iter_events())
 
     def dashboard(self) -> DashboardView:
-        """The den screen's single source — every displayed number resolved here."""
+        """The den screen's single source. Every displayed number resolved here."""
         now = self._clock.now()
         policy = self.active_policy()
         account = self.broker.get_account()

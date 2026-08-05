@@ -1,6 +1,6 @@
 """Where WOLF keeps its state, per operating system.
 
-There was never an architectural reason for macOS-only — the risk engine,
+There was never an architectural reason for macOS-only. The risk engine,
 event store, strategies, and TUI are all portable. The mac assumption lived in
 three unexamined places, and this module removes one of them.
 
@@ -15,7 +15,7 @@ import os
 import sys
 from pathlib import Path
 
-#: Kept as the primary override for continuity with existing installs; the
+#: Kept as the primary override for continuity with existing installs. The
 #: WOLF-named variable is preferred and wins if both are set.
 _LEGACY_ENV = "TRADEOS_DATA_DIR"
 _ENV = "WOLF_DATA_DIR"
@@ -26,7 +26,7 @@ _APP = "WOLF"
 #: The event store's filename. Deliberately NOT renamed alongside the product.
 #: The log is append-only and is the audit source of truth, so a rename that
 #: leaves an existing install pointing at an empty database would destroy
-#: history silently — the precise failure this project exists to prevent.
+#: history silently. The precise failure this project exists to prevent.
 DB_FILENAME = "tradeos.db"
 
 #: Pre-rename location. Still authoritative when it holds a database.
@@ -46,7 +46,7 @@ def default_data_dir() -> Path:
     macOS   ``~/Library/Application Support/WOLF``
     Linux   ``$XDG_DATA_HOME/wolf`` (default ``~/.local/share/wolf``)
     Windows ``%LOCALAPPDATA%\\WOLF``
-    other   ``~/.wolf`` — a documented fallback, not a claim of support
+    other   ``~/.wolf``: a documented fallback, not a claim of support
 
     An existing pre-rename directory wins over all of these. Adopting it in
     place is safer than moving it: nothing is copied, nothing is deleted, and

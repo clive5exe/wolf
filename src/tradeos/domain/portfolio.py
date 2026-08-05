@@ -38,7 +38,7 @@ class AccountState(BaseModel):
 
 
 class PortfolioSnapshot(BaseModel):
-    """Account state priced with quotes — the risk engine's view of the world.
+    """Account state priced with quotes. The risk engine's view of the world.
 
     ``total_value`` includes cash. Weights are fractions of total value.
     Symbols without a usable quote appear in ``unpriced`` and make any
@@ -89,7 +89,7 @@ class PortfolioSnapshot(BaseModel):
         return self.account.cash / total
 
     def sector_weight(self, sector: str) -> Decimal | None:
-        """Combined weight of positions in ``sector``; None if any member is
+        """Combined weight of positions in ``sector``. None if any member is
         unpriced or total is unknown (fail-closed semantics upstream)."""
         total = self.total_value
         if total is None or total == 0:

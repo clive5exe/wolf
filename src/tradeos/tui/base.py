@@ -1,7 +1,7 @@
 """Shared screen scaffolding: chrome, footers, and facade access.
 
 Screens reach the runtime only through ``self.runtime`` (the facade). Nothing
-in ``tui/`` may import brokers, providers, risk, or storage — if a screen needs
+in ``tui/`` may import brokers, providers, risk, or storage. If a screen needs
 something the facade does not expose, the facade grows a tested method.
 """
 
@@ -69,16 +69,16 @@ class WolfScreen(Screen[None]):
 
 
 def header_bar(right: str, *, width: int = FRAME_WIDTH) -> str:
-    """``┌─ W◉LF ────────── <status> ─┐`` — the brand and the truth on one line."""
+    """``┌─ W◉LF ────────── <status> ─┐``: the brand and the truth on one line."""
     lead = f"[{Ink.DIM}]┌─[/] {WORDMARK} "
     fill = max(1, width - visible_len(lead) - visible_len(right) - 3)
     return f"{lead}[{Ink.DIM}]{'─' * fill}[/] {right} [{Ink.DIM}]┐[/]"
 
 
 def footer_bar(keys: str, note: str = "", *, width: int = FRAME_WIDTH) -> str:
-    """``└ \\[c]ycle  \\[j]ournal … <note> ┘`` — every screen ends with its keys.
+    """``└ \\[c]ycle  \\[j]ournal … <note> ┘``: every screen ends with its keys.
 
-    Keys always survive; the decorative note is dropped when it would push the
+    Keys always survive. The decorative note is dropped when it would push the
     bar past ``width``. Overflowing the frame would break the box alignment that
     the whole layout depends on, and a key hint outranks an atmosphere line.
     """
@@ -90,7 +90,7 @@ def footer_bar(keys: str, note: str = "", *, width: int = FRAME_WIDTH) -> str:
 
 
 def section(title: str, *, width: int = FRAME_WIDTH) -> str:
-    """``─ thesis ────────────────`` — a labelled divider."""
+    """``─ thesis ────────────────``: a labelled divider."""
     lead = f"[{Ink.DIM}]─ {title} [/]"
     fill = max(1, width - visible_len(lead))
     return f"{lead}[{Ink.DIM}]{'─' * fill}[/]"

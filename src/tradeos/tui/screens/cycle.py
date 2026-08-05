@@ -3,7 +3,7 @@
 Transparency as theatre. The pipeline tracker makes the architecture visible:
 stages complete left to right, and the model is provably *one box* with
 deterministic walls on either side. A deterministic cycle skips the THESIS
-stage outright and costs nothing — which the screen says, in those words.
+stage outright and costs nothing. Which the screen says, in those words.
 
 The cycle runs on a worker thread and reports through the facade's progress
 observer, which cannot alter what the cycle decides.
@@ -34,7 +34,7 @@ _STATE_INK = {
 _STATE_MARK = {
     StageState.PENDING: "·",
     StageState.DONE: "✓",
-    StageState.SKIPPED: "–",
+    StageState.SKIPPED: "·",
     StageState.FAILED: "✗",
 }
 
@@ -79,7 +79,7 @@ class CycleScreen(WolfScreen):
     # -- worker ----------------------------------------------------------------
 
     def _run_cycle(self) -> None:
-        """Runs off the UI thread; every update marshals back via call_from_thread."""
+        """Runs off the UI thread. Every update marshals back via call_from_thread."""
         outcome = self.runtime.run_cycle(trigger="tui", progress=self._on_progress)
         self.app.call_from_thread(self._finish, outcome)
 
@@ -149,7 +149,7 @@ class CycleScreen(WolfScreen):
         if self._outcome is None:
             return (
                 f"\n  [{Ink.DIM}]cost so far[/] [{Ink.BRIGHT}]$0.00[/] "
-                f"[{Ink.DIM}]· deterministic stages are free; only THESIS calls a model[/]"
+                f"[{Ink.DIM}]· deterministic stages are free, only THESIS calls a model[/]"
             )
         outcome = self._outcome
         tint = Ink.GREEN if outcome.status == "completed" else Ink.AMBER
@@ -157,7 +157,7 @@ class CycleScreen(WolfScreen):
             tint = Ink.RED
         lines = [
             "",
-            f"  [{tint}]{outcome.status.replace('_', ' ')}[/] [{Ink.DIM}]— {outcome.reason}[/]",
+            f"  [{tint}]{outcome.status.replace('_', ' ')}[/] [{Ink.DIM}]· {outcome.reason}[/]",
             f"  [{Ink.DIM}]approved[/] [{Ink.BRIGHT}]{outcome.approved_actions}[/] "
             f"[{Ink.DIM}]· vetoed[/] [{Ink.BRIGHT}]{outcome.vetoed_actions}[/]",
         ]

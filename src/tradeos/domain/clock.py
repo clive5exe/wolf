@@ -1,4 +1,4 @@
-"""Injectable clock. Rules and strategies receive ``now`` as data; only
+"""Injectable clock. Rules and strategies receive ``now`` as data. Only
 runtime edges hold a Clock. FixedClock powers deterministic tests/replay."""
 
 from __future__ import annotations

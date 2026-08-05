@@ -1,4 +1,4 @@
-"""Journal — the memory.
+"""Journal. The memory.
 
 Vetoes and no-actions sit in this list at the same visual weight as fills,
 because "we did not trade" is a result, not an absence. Each row carries what
@@ -84,7 +84,7 @@ class JournalScreen(WolfScreen):
         if not self._records:
             return (
                 f"  [{Ink.DIM}]nothing decided yet.[/]\n"
-                f"  [{Ink.FAINT}]run a cycle from the den — no-actions get recorded too.[/]"
+                f"  [{Ink.FAINT}]run a cycle from the den, no-actions get recorded too.[/]"
             )
         lines: list[str] = []
         for position, record in enumerate(self._records[: self._revealed]):
@@ -102,7 +102,7 @@ class JournalScreen(WolfScreen):
         else:
             glyph, tint = "◐", Ink.AMBER
 
-        rules = f"{record.rules_passed}/{record.rules_total}" if record.rules_total else "—"
+        rules = f"{record.rules_passed}/{record.rules_total}" if record.rules_total else "·"
         rules_ink = Ink.RED if record.veto_reasons else Ink.DIM
         thesis = (
             f"[{Ink.CYAN}]thesis {record.thesis.confidence}[/]"
@@ -121,7 +121,7 @@ class JournalScreen(WolfScreen):
     def _expansion(self, record: CycleRecord) -> list[str]:
         lines = [
             f"      [{Ink.FAINT}]└ what we knew:[/] [{Ink.DIM}]package "
-            f"{record.context_package_id[:10] or '—'} · {record.context_items} items · "
+            f"{record.context_package_id[:10] or '·'} · {record.context_items} items · "
             f"completeness {fmt_completeness(record.context_completeness)}[/]"
         ]
         if record.veto_reasons:
@@ -164,10 +164,10 @@ class JournalScreen(WolfScreen):
 def _strategy_label(strategy: str) -> str:
     """``target_allocation_rebalance@1.0.0`` → ``rebalance``.
 
-    The journal is a list of decisions, not of module names; the distinguishing
+    The journal is a list of decisions, not of module names. The distinguishing
     word is the last one, and truncation would otherwise cut mid-prefix.
     """
     name = strategy.split("@")[0]
     if not name:
-        return "—"
+        return "·"
     return truncate(name.rsplit("_", 1)[-1], 11)

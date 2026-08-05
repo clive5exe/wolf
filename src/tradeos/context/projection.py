@@ -1,12 +1,12 @@
 """The outbound projection: what a model is allowed to be told.
 
 Everything else in WOLF is local. A provider prompt is the one thing that
-leaves the machine, so this module defines — as *types*, not as a filter — the
+leaves the machine, so this module defines, as *types*, not as a filter, the
 only shape portfolio information may take on the way out.
 
 The rule is level A (ASSUMPTIONS Q3): **relative quantities only**. No dollar
 amounts, no share counts, no account identifiers. That is not primarily a
-privacy setting; it is the same boundary that stops the model sizing orders.
+privacy setting. It is the same boundary that stops the model sizing orders.
 Every use of an absolute figure is arithmetic, and arithmetic belongs to the
 deterministic strategy and risk engine. A component that supplies judgement
 rather than calculation has no need of the units.
@@ -46,7 +46,7 @@ class ProjectionLeak(ValueError):
 def _is_ratio(token: str) -> bool:
     """Level A permits exactly two numeric shapes: a percentage, or a 0..1 ratio.
 
-    Anything else — 140 shares, 10694.50 of cash — is an absolute, and the whole
+    Anything else. 140 shares, 10694.50 of cash. Is an absolute, and the whole
     point of this projection is that absolutes do not leave the machine.
     """
     token = token.strip()
@@ -61,7 +61,7 @@ def _is_ratio(token: str) -> bool:
 def _assert_no_absolutes(field: str, value: str) -> str:
     if _MONEY_MARKERS.search(value):
         raise ProjectionLeak(
-            f"{field!r} contains a currency marker; the outbound projection carries "
+            f"{field!r} contains a currency marker. The outbound projection carries "
             f"relative quantities only (ASSUMPTIONS Q3, level A): {value!r}"
         )
     for match in _NUMBER.finditer(value):
@@ -87,7 +87,7 @@ class _NoAbsolutes(BaseModel):
     #: these are part of a name, not a measurement: a ULID, a trigger label like
     #: ``schedule/15m``, a ticker that legitimately contains numerals. Scanning
     #: them for "absolute amounts" rejects ordinary text and takes the whole
-    #: prompt down with it — which is exactly what happened to the scheduler.
+    #: prompt down with it. Which is exactly what happened to the scheduler.
     #: The scan still applies by default to every field not listed here, so a
     #: newly added prose field is protected without anyone remembering to opt in.
     OPAQUE_FIELDS: ClassVar[frozenset[str]] = frozenset(
@@ -103,7 +103,7 @@ class _NoAbsolutes(BaseModel):
         }
     )
 
-    #: Fields carrying third-party content — a news headline, a filing extract.
+    #: Fields carrying third-party content. A news headline, a filing extract.
     #: These are exempt from the ratio rule, and the exemption is safe for a
     #: specific reason: the rule exists so *the user's financial position* does
     #: not leave the machine. A headline reading "Q3 profit up $2.1B" is public
@@ -133,7 +133,7 @@ class HoldingLine(_NoAbsolutes):
     weight: Decimal  # 0..1 of portfolio value
     target_weight: Decimal | None = None
     drift: Decimal | None = None  # weight − target
-    #: Position size as a fraction of the symbol's average daily volume — the
+    #: Position size as a fraction of the symbol's average daily volume. The
     #: figure that actually governs whether liquidity constrains a trade, and a
     #: strictly better scale signal than a dollar amount. Requires a volume
     #: source: ``None`` until the Robinhood market-data tools land (T-024).
@@ -155,7 +155,7 @@ class CandidateLine(_NoAbsolutes):
     symbol: str
     #: Order value as a fraction of portfolio value.
     size_of_portfolio: Decimal | None = None
-    #: Expected execution drag, in basis points — a ratio, not a cash figure.
+    #: Expected execution drag, in basis points. A ratio, not a cash figure.
     est_slippage_bps: Decimal | None = None
     rationale: str = ""
 
@@ -163,12 +163,12 @@ class CandidateLine(_NoAbsolutes):
 class PromptContextItem(_NoAbsolutes):
     """A context item as the model sees it.
 
-    Structured payloads are projected into typed ratio fields; ``note`` remains
+    Structured payloads are projected into typed ratio fields. ``note`` remains
     free text for genuinely non-numeric context (market session, etc.) and is
     validated on construction.
     """
 
-    item_id: str  # unchanged — citation integrity depends on it
+    item_id: str  # unchanged. Citation integrity depends on it
     source_name: str
     source_type: SourceType
     event_time: datetime
@@ -179,7 +179,7 @@ class PromptContextItem(_NoAbsolutes):
     cash_weight: Decimal | None = None
     note: str | None = None
     #: Verbatim third-party content (headline, filing extract, post). Carried
-    #: unmodified so the injection frame's promise holds — the model is told
+    #: unmodified so the injection frame's promise holds. The model is told
     #: this block is untrusted data, and the risk engine is the real defense.
     text: str | None = None
     #: Price movement relative to a reference, as a ratio. Absolute prices are

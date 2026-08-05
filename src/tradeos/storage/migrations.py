@@ -1,4 +1,4 @@
-"""Numbered SQL migrations. Additive only for the events table — its
+"""Numbered SQL migrations. Additive only for the events table. Its
 append-only triggers are part of the audit guarantee (THREAT_MODEL T6)."""
 
 from __future__ import annotations

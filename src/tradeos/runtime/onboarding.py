@@ -2,15 +2,15 @@
 
 Three properties make this safe to put in front of a new user:
 
-**The model drafts; it cannot decide.** ``PolicyDraft`` has no field for
+**The model drafts. It cannot decide.** ``PolicyDraft`` has no field for
 ``mode`` or ``autopilot``, so a draft cannot even express "trade for real" or
 "trade unattended". That is enforced by the schema, not by this module.
 
 **A draft can narrow a limit, never widen one.** INVESTMENT_POLICY_SPEC states
-that nothing model-generated may widen a limit; :data:`GUARDRAILS` enforces it.
+that nothing model-generated may widen a limit. :data:`GUARDRAILS` enforces it.
 A model suggesting a 90% single-position cap gets clamped to the ceiling and
 the clamp is *recorded and shown*, because silently ignoring a suggestion is
-its own kind of dishonesty. A human can still type a wider value — they just
+its own kind of dishonesty. A human can still type a wider value. They just
 have to do it themselves, having seen the default.
 
 **Nothing activates without explicit confirmation of every enforceable field.**
@@ -45,8 +45,8 @@ from tradeos.runtime.policy_service import PolicyService
 class Bound(StrEnum):
     """Which direction a limit becomes *more permissive* in."""
 
-    CEILING = "ceiling"  # larger is riskier — a draft may not exceed this
-    FLOOR = "floor"  # smaller is riskier — a draft may not go below this
+    CEILING = "ceiling"  # larger is riskier. A draft may not exceed this
+    FLOOR = "floor"  # smaller is riskier. A draft may not go below this
 
 
 @dataclass(frozen=True)
@@ -57,7 +57,7 @@ class Guardrail:
 
 
 #: The most permissive a *drafted* value may be. These are not the policy's
-#: limits — a human may deliberately set something wider — they are the limit
+#: limits, a human may deliberately set something wider, they are the limit
 #: on what a language model is allowed to talk you into during onboarding.
 GUARDRAILS: dict[str, Guardrail] = {
     "max_position_pct": Guardrail(
@@ -78,7 +78,7 @@ GUARDRAILS: dict[str, Guardrail] = {
 #: for them. This is stronger than a guardrail: a clamp bounds what a model may
 #: suggest, whereas these are beyond its reach entirely. The loss limits, the
 #: order rate limits, and the staleness thresholds are set by a human or left
-#: at their defaults — a model never participates.
+#: at their defaults. A model never participates.
 #:
 #: Enforced by ``test_onboarding.py``, so widening ``PolicyDraft`` in future
 #: cannot quietly hand any of them over.
@@ -107,9 +107,7 @@ class Adjustment:
     why: str
 
     def describe(self) -> str:
-        return (
-            f"{self.field}: model suggested {self.suggested}, held at {self.applied} — {self.why}"
-        )
+        return f"{self.field}: model suggested {self.suggested}, held at {self.applied}, {self.why}"
 
 
 @dataclass
@@ -134,11 +132,11 @@ class PolicyProposal:
     adjustments: tuple[Adjustment, ...] = ()
     #: What the model said it inferred, for the human to sanity-check.
     interpretation_notes: tuple[str, ...] = ()
-    #: True when a model contributed; False means these are plain defaults.
+    #: True when a model contributed. False means these are plain defaults.
     drafted_by_model: bool = False
 
     #: Mode is deliberately absent as an editable field. Onboarding always
-    #: produces PAPER; moving up the ladder is a separate, deliberate act
+    #: produces PAPER. Moving up the ladder is a separate, deliberate act
     #: through PolicyService.change_mode, one step at a time.
     mode: TradingMode = TradingMode.PAPER
 
@@ -163,12 +161,12 @@ class PolicyProposal:
         total = self.allocation_total + self.target_cash_weight
         if total > Decimal("1"):
             problems.append(
-                f"targets: weights plus cash come to {total:.0%} — they cannot exceed 100%"
+                f"targets: weights plus cash come to {total:.0%}, they cannot exceed 100%"
             )
         heaviest = max(self.target_allocations.values(), default=Decimal("0"))
         if heaviest > self.max_position_pct:
             problems.append(
-                f"targets: {heaviest:.0%} exceeds the {self.max_position_pct:.0%} position cap — "
+                f"targets: {heaviest:.0%} exceeds the {self.max_position_pct:.0%} position cap, "
                 "raise the cap or lower the target"
             )
         if self.min_cash_pct > self.target_cash_weight:
@@ -252,7 +250,7 @@ def apply_guardrails(
 
 ONBOARDING_PROMPT = """You are helping someone set up an investment policy for
 WOLF, a portfolio runtime. They will review and confirm every field before
-anything takes effect — you are drafting a starting point, not deciding.
+anything takes effect, you are drafting a starting point, not deciding.
 
 Their words:
 ---
@@ -289,7 +287,7 @@ class OnboardingService:
 
     def propose(self, goals_text: str) -> PolicyProposal:
         """A proposal for the human to edit. Uses the model when one is
-        available, and conservative defaults when it is not — never a dead end."""
+        available, and conservative defaults when it is not. Never a dead end."""
         proposal = PolicyProposal(goals_text=goals_text)
         if self._provider is None:
             return proposal
@@ -298,7 +296,7 @@ class OnboardingService:
             prompt=ONBOARDING_PROMPT.format(goals=goals_text), schema=PolicyDraft
         )
         if not result.ok or result.value is None:
-            # A provider failure must not block setup; the adapter already
+            # A provider failure must not block setup. The adapter already
             # recorded the error, and defaults are a fine starting point.
             return proposal
         merged, _ = apply_guardrails(proposal, result.value)
@@ -308,7 +306,7 @@ class OnboardingService:
         """Activate a reviewed proposal. Raises if it is not internally valid."""
         problems = proposal.validation_errors()
         if problems:
-            raise ValueError("; ".join(problems))
+            raise ValueError(" · ".join(problems))
         current = self._policies.active_policy()
         policy = proposal.to_policy(
             policy_id=new_ulid(),

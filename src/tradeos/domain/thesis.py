@@ -1,5 +1,5 @@
 """Schemas for model output. Everything an LLM returns is validated into one
-of these (ADR-0011); free text never flows into decisions."""
+of these (ADR-0011). Free text never flows into decisions."""
 
 from __future__ import annotations
 
@@ -28,13 +28,13 @@ class StructuredThesis(BaseModel):
     """The only accepted shape for AI synthesis of a trade decision.
 
     ``supporting_item_ids`` must be validated against the context package's
-    citations by the caller (engine-level check) — the schema enforces shape,
+    citations by the caller (engine-level check): the schema enforces shape,
     the cycle enforces referential integrity.
     """
 
     model_config = ConfigDict(frozen=True)
 
-    recommended_action_index: int | None  # index into candidate list; None = no action
+    recommended_action_index: int | None  # index into candidate list, None = no action
     bull_case: str
     bear_case: str
     why_now: str
@@ -59,7 +59,7 @@ class StructuredThesis(BaseModel):
 
 
 class PolicyDraft(BaseModel):
-    """Model-drafted policy fields for onboarding. All optional; the human
+    """Model-drafted policy fields for onboarding. All optional. The human
     confirms every enforceable field before a real InvestmentPolicy exists.
 
     Deliberately excludes ``autopilot`` and ``mode`` above PAPER: a draft
@@ -83,6 +83,6 @@ class PolicyDraft(BaseModel):
     @model_validator(mode="after")
     def _no_forbidden_fields(self) -> PolicyDraft:
         # Defense in depth: schema has no autopilot/mode fields, and extra
-        # fields are ignored by pydantic default; this validator documents the
+        # fields are ignored by pydantic default. This validator documents the
         # invariant for future editors.
         return self

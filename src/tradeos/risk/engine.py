@@ -1,6 +1,6 @@
 """The risk engine: sole issuer of ValidatedOrder (ADR-0008).
 
-Pure: no I/O, no clock reads — everything arrives via RiskContext. The engine
+Pure: no I/O, no clock reads. Everything arrives via RiskContext. The engine
 simulates the proposal's cumulative effect action-by-action so a buy that only
 fits because an earlier sell freed cash is judged against that reality, while
 vetoed actions contribute nothing.
@@ -93,10 +93,10 @@ class RiskEngine:
 
 
 def _apply_simulated(snapshot: PortfolioSnapshot, action: ProposedAction) -> PortfolioSnapshot:
-    """Working-state update at quote price (slippage is an execution concern;
-    the sizing approximation is documented in RISK_POLICY_SPEC §3)."""
+    """Working-state update at quote price (slippage is an execution concern.
+    The sizing approximation is documented in RISK_POLICY_SPEC §3)."""
     quote = snapshot.quotes.get(action.symbol)
-    if quote is None:  # rules already failed closed; keep state unchanged
+    if quote is None:  # rules already failed closed. Keep state unchanged
         return snapshot
     notional = (quote.price * action.quantity).quantize(_CENT, rounding=ROUND_HALF_EVEN)
     positions = {p.symbol: p for p in snapshot.account.positions}

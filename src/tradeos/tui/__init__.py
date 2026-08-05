@@ -1,1 +1,1 @@
-"""Textual TUI. Renders runtime state; contains no business logic."""
+"""Textual TUI. Renders runtime state. Contains no business logic."""

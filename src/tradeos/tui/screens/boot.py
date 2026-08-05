@@ -1,4 +1,4 @@
-"""Boot sequence — startup doubles as diagnosis.
+"""Boot sequence. Startup doubles as diagnosis.
 
 The doctor checks *are* the boot sequence, so you cannot boot past a broken
 environment: a failing check halts the cascade in place, shows its fix hint,
@@ -27,7 +27,7 @@ _LEADER_WIDTH = 22
 
 
 class BootScreen(WolfScreen):
-    """The check cascade. Lines land one by one; a failure stops the cascade."""
+    """The check cascade. Lines land one by one. A failure stops the cascade."""
 
     BINDINGS: ClassVar[list[BindingType]] = [
         Binding("enter", "enter_den", "enter the den"),
@@ -61,7 +61,7 @@ class BootScreen(WolfScreen):
 
     @staticmethod
     def _splash() -> str:
-        """The one brand moment, above the checks — never gating them.
+        """The one brand moment, above the checks. Never gating them.
 
         A splash is ornament in an app whose rule is that decoration must mean
         something, so it earns its place by staying out of the way: it renders
@@ -122,7 +122,7 @@ class BootScreen(WolfScreen):
         if self._blocked:
             body = (
                 f"\n  [{Ink.RED}]environment check failed[/] "
-                f"[{Ink.DIM}]— fix the line above, or press[/] "
+                f"[{Ink.DIM}]fix the line above, or press[/] "
                 f"[{Ink.BRIGHT}]⏎[/] [{Ink.DIM}]to continue anyway[/] {cursor}"
             )
         else:
@@ -131,7 +131,7 @@ class BootScreen(WolfScreen):
                 f" [{Ink.DIM}]({warned} warning{'s' if warned != 1 else ''})[/]" if warned else ""
             )
             body = (
-                f"\n  [{Ink.GREEN}]all systems nominal[/]{note} [{Ink.DIM}]—[/] "
+                f"\n  [{Ink.GREEN}]all systems nominal[/]{note} [{Ink.DIM}]·[/] "
                 f"[{Ink.DIM}]press[/] [{Ink.BRIGHT}]⏎[/] [{Ink.DIM}]to enter the den[/] {cursor}"
             )
         self.query_one("#boot-status", Static).update(body)

@@ -2,9 +2,9 @@
 
 Strictly an observer: the decision cycle *tells* a listener what stage it
 reached, and nothing a listener does can change what the cycle decides.
-``emit`` swallows every listener exception for that reason — a TUI bug must
+``emit`` swallows every listener exception for that reason. A TUI bug must
 never alter, delay past its own frame, or abort a decision. Progress is
-therefore display-only and is deliberately **not** recorded as events; the
+therefore display-only and is deliberately **not** recorded as events. The
 event log remains the single audit source (ARCHITECTURE §2).
 """
 
@@ -25,7 +25,7 @@ class CycleStage(StrEnum):
     EXECUTE = "execute"
 
 
-#: Render order for the pipeline tracker; the model occupies exactly one box.
+#: Render order for the pipeline tracker. The model occupies exactly one box.
 STAGE_ORDER: tuple[CycleStage, ...] = (
     CycleStage.OBSERVE,
     CycleStage.RETRIEVE,

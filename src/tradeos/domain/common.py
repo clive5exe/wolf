@@ -1,6 +1,6 @@
 """Shared primitives: ULIDs, UTC time, canonical JSON, money formatting.
 
-Money is Decimal end-to-end; floats never touch financial arithmetic.
+Money is Decimal end-to-end. Floats never touch financial arithmetic.
 """
 
 from __future__ import annotations
@@ -22,8 +22,8 @@ _last_rand = 0
 def utc_now() -> datetime:
     """Current time, always timezone-aware UTC.
 
-    Domain/risk/strategy code must receive time via injection (``ctx.now``);
-    this is for runtime edges (event recording, id generation).
+    Domain/risk/strategy code must receive time via injection (``ctx.now``).
+    This is for runtime edges (event recording, id generation).
     """
     return datetime.now(UTC)
 
@@ -68,7 +68,7 @@ def _canonical_default(obj: Any) -> str:
 
 
 def format_money(value: Decimal, currency: str = "$") -> str:
-    """Render a Decimal as money for interfaces. Display-only — never parse back."""
+    """Render a Decimal as money for interfaces. Display-only. Never parse back."""
     quantized = value.quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)
     sign = "-" if quantized < 0 else ""
     return f"{sign}{currency}{abs(quantized):,}"

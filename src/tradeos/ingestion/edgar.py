@@ -1,4 +1,4 @@
-"""SEC EDGAR connector — filings as primary-source market context.
+"""SEC EDGAR connector. Filings as primary-source market context.
 
 EDGAR is open: no registration, no API key, no browser step. The only
 obligations are a User-Agent that identifies who is calling and staying inside
@@ -10,7 +10,7 @@ Two properties are worth stating because they are easy to get wrong:
 **``event_time`` is the filing's acceptance time, never ingestion time.** A
 filing accepted three weeks ago is three weeks old however recently it was
 downloaded. Stamping it with "now" would make stale information look fresh to
-every freshness rule downstream — the exact failure T5 in the threat model
+every freshness rule downstream. The exact failure T5 in the threat model
 describes, introduced by the source rather than by an outage.
 
 **Malformed payloads are quarantined, not parsed leniently.** A partially
@@ -45,7 +45,7 @@ TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 #: nothing, and the cost of being blocked is every user at once.
 MAX_REQUESTS_PER_SECOND = 5.0
 
-#: Filings are durable — a 10-K does not go stale — but retrieval still
+#: Filings are durable, a 10-K does not go stale, but retrieval still
 #: re-checks that nothing newer exists before one is cited as current.
 FILING_TTL_S = DEFAULT_TTLS["filing"]
 EDGAR_CREDIBILITY = Decimal("0.95")
@@ -61,14 +61,14 @@ class EdgarError(RuntimeError):
 
 
 class Transport(Protocol):
-    """HTTP indirection. Tests supply fixtures; nothing here opens a socket."""
+    """HTTP indirection. Tests supply fixtures. Nothing here opens a socket."""
 
     def get(self, url: str, *, headers: dict[str, str], timeout_s: float) -> tuple[int, bytes]: ...
 
 
 @dataclass(frozen=True)
 class EdgarConfig:
-    """Connector configuration. Disabled by default — a data source that
+    """Connector configuration. Disabled by default. A data source that
     reaches the network should be switched on deliberately."""
 
     enabled: bool = False
@@ -90,8 +90,8 @@ class EdgarConfig:
 def normalize_cik(raw: str | int) -> str:
     """CIK as EDGAR wants it: ten digits, zero-padded.
 
-    ``320193`` and ``"0000320193"`` and ``"CIK0000320193"`` all denote Apple;
-    only the padded form resolves.
+    ``320193`` and ``"0000320193"`` and ``"CIK0000320193"`` all denote Apple.
+    Only the padded form resolves.
     """
     text = str(raw).strip().upper().removeprefix("CIK").lstrip("0")
     if not text or not text.isdigit():
@@ -252,7 +252,7 @@ class EdgarConnector:
         primary = recent.get("primaryDocument") or []
         reports = recent.get("reportDate") or []
 
-        # EDGAR returns parallel arrays; a length mismatch means the shape
+        # EDGAR returns parallel arrays. A length mismatch means the shape
         # changed and rows would silently pair up wrongly.
         lengths = {len(forms), len(accessions), len(accepted), len(filed)}
         if len(lengths) > 1:
@@ -303,7 +303,7 @@ class EdgarConnector:
                 source_url=filing.url,
                 source_type=SourceType.FILING,
                 entities=(filing.ticker,),
-                # The filing's own acceptance time — never when we downloaded it.
+                # The filing's own acceptance time. Never when we downloaded it.
                 event_time=filing.accepted_at,
                 ingested_at=ingested_at,
                 ttl_s=FILING_TTL_S,

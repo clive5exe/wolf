@@ -1,1 +1,1 @@
-"""WOLF screens. Each renders runtime state; none contains business logic."""
+"""WOLF screens. Each renders runtime state. None contains business logic."""

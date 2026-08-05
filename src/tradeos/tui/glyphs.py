@@ -1,6 +1,6 @@
 """Pure text renderers: gauges, sparklines, freshness, number formatting.
 
-No Textual imports and no runtime access — these take values and return
+No Textual imports and no runtime access. These take values and return
 strings, which is what makes the dense parts of the dashboard unit-testable
 without a terminal.
 """
@@ -76,7 +76,7 @@ def drift_gauge(
 
     ``┼`` is always the target and always sits in the same column, so a column
     of holdings reads as one aligned ruler. The track is scaled to
-    ``full_scale`` — the rebalance threshold — which makes position on the
+    ``full_scale``: the rebalance threshold. Which makes position on the
     gauge mean something specific: reaching the edge is the point at which the
     strategy proposes a trade. Drift past that pins to ◀ / ▶ rather than
     silently clamping, because off-scale must look off-scale.
@@ -157,14 +157,14 @@ def sparkline(values: Sequence[Decimal], width: int = 22) -> str:
 
 def fmt_money(value: Decimal | None, *, places: int = 2) -> str:
     if value is None:
-        return "—"
+        return "·"
     quant = Decimal(1).scaleb(-places)
     return f"${value.quantize(quant):,}"
 
 
 def fmt_signed(value: Decimal | None, *, places: int = 2) -> str:
     if value is None:
-        return "—"
+        return "·"
     quant = Decimal(1).scaleb(-places)
     rounded = value.quantize(quant)
     return f"{'+' if rounded > 0 else '−' if rounded < 0 else ''}{abs(rounded):,}"
@@ -173,7 +173,7 @@ def fmt_signed(value: Decimal | None, *, places: int = 2) -> str:
 def fmt_pct(value: Decimal | None, *, places: int = 1) -> str:
     """A 0..1 fraction as a percentage."""
     if value is None:
-        return "—"
+        return "·"
     quant = Decimal(1).scaleb(-places)
     return f"{(value * 100).quantize(quant)}%"
 
@@ -181,7 +181,7 @@ def fmt_pct(value: Decimal | None, *, places: int = 1) -> str:
 def fmt_signed_pct(value: Decimal | None, *, places: int = 1) -> str:
     """A signed percentage using a true minus sign, so columns align."""
     if value is None:
-        return "—"
+        return "·"
     quant = Decimal(1).scaleb(-places)
     rounded = (value * 100).quantize(quant)
     sign = "+" if rounded > 0 else "−" if rounded < 0 else ""
@@ -191,11 +191,11 @@ def fmt_signed_pct(value: Decimal | None, *, places: int = 1) -> str:
 def fmt_qty(value: Decimal | None) -> str:
     """Share counts: integers stay integers, fractions keep their precision.
 
-    Uses fixed-point formatting throughout — ``normalize`` alone renders 140 as
+    Uses fixed-point formatting throughout. ``normalize`` alone renders 140 as
     ``1.4E+2``, which is never what a share count should look like.
     """
     if value is None:
-        return "—"
+        return "·"
     normalized = value.normalize()
     if normalized == normalized.to_integral_value():
         return f"{int(normalized):,}"
@@ -203,9 +203,9 @@ def fmt_qty(value: Decimal | None) -> str:
 
 
 def fmt_completeness(raw: str) -> str:
-    """Context completeness is stored as a 0..1 decimal string; show it as a percent."""
+    """Context completeness is stored as a 0..1 decimal string. Show it as a percent."""
     if not raw:
-        return "—"
+        return "·"
     try:
         return fmt_pct(Decimal(raw), places=0)
     except (InvalidOperation, ValueError):

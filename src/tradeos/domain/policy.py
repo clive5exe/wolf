@@ -1,7 +1,7 @@
 """Investment policy: the deterministic source of truth for what the system may want.
 
 Spec: INVESTMENT_POLICY_SPEC.md. Fields marked ⚡ there are read by the risk
-engine as hard limits. Models may draft policies; only user-confirmed
+engine as hard limits. Models may draft policies. Only user-confirmed
 instances become active, and nothing model-generated can widen a limit.
 """
 
@@ -79,7 +79,7 @@ class TradingHoursSpec(BaseModel):
 
 
 class AutopilotEnvelope(BaseModel):
-    """v0.3 envelope. Constructible for schema purposes; never activatable in 0.1/0.2."""
+    """v0.3 envelope. Constructible for schema purposes. Never activatable in 0.1/0.2."""
 
     model_config = ConfigDict(frozen=True)
 
@@ -95,7 +95,7 @@ class AutopilotEnvelope(BaseModel):
     def _structurally_disabled(self) -> AutopilotEnvelope:
         if not AUTOPILOT_SUPPORTED:
             raise ValueError(
-                "autopilot is not supported in this build; "
+                "autopilot is not supported in this build, "
                 "the envelope cannot exist before the v0.3 safety review (ADR-0009)"
             )
         return self
@@ -166,7 +166,7 @@ class InvestmentPolicy(BaseModel):
             if heaviest > self.max_position_pct:
                 raise ValueError(
                     f"a target weight ({heaviest}) exceeds max_position_pct "
-                    f"({self.max_position_pct}) — raise the cap or lower the target"
+                    f"({self.max_position_pct}), raise the cap or lower the target"
                 )
         if self.symbol_allowlist is not None:
             overlap = set(self.symbol_allowlist) & set(self.symbol_denylist)

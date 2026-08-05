@@ -2,7 +2,7 @@
 
 Lives in the runtime layer (not the CLI) because both interfaces need it: the
 CLI renders it as `wolf doctor`, and the TUI boot sequence *is* this check list
-— startup doubles as diagnosis, so a broken environment can never be booted past.
+startup doubles as diagnosis, so a broken environment can never be booted past.
 """
 
 from __future__ import annotations
@@ -50,7 +50,7 @@ def run_checks(runtime: TradeOSRuntime, *, full: bool = False) -> list[DoctorChe
                 "Platform",
                 CheckStatus.WARN,
                 f"{label} is untested",
-                "macOS and Linux are tested in CI; nothing is known to break here, "
+                "macOS and Linux are tested in CI. Nothing is known to break here, "
                 "but no one has run it",
             )
         )
@@ -102,7 +102,7 @@ def run_checks(runtime: TradeOSRuntime, *, full: bool = False) -> list[DoctorChe
         )
     else:
         auth = "authenticated" if status.authenticated else "auth state unknown"
-        checks.append(DoctorCheck("Claude Code", CheckStatus.OK, f"{status.version} — {auth}"))
+        checks.append(DoctorCheck("Claude Code", CheckStatus.OK, f"{status.version}, {auth}"))
 
     if full and status.installed and status.authenticated is not False:
         result = runtime.provider_health()
@@ -158,7 +158,7 @@ def run_checks(runtime: TradeOSRuntime, *, full: bool = False) -> list[DoctorChe
             DoctorCheck(
                 "Kill switch",
                 CheckStatus.WARN,
-                "ENGAGED — all execution refused",
+                "ENGAGED, all execution refused",
                 "run `wolf unkill` after reviewing why it was engaged",
             )
         )
@@ -176,7 +176,7 @@ def run_checks(runtime: TradeOSRuntime, *, full: bool = False) -> list[DoctorChe
                 "Secret store",
                 CheckStatus.WARN,
                 getattr(store, "reason", "unavailable"),
-                "paper mode needs no secrets; a live broker will refuse to start "
+                "paper mode needs no secrets, a live broker will refuse to start "
                 "without an OS credential store",
             )
         )
@@ -187,7 +187,7 @@ def run_checks(runtime: TradeOSRuntime, *, full: bool = False) -> list[DoctorChe
             "Notifications",
             CheckStatus.OK if ok else CheckStatus.WARN,
             detail,
-            "" if ok else "cycles still run and record; you just lose the banner",
+            "" if ok else "cycles still run and record, you just lose the banner",
         )
     )
 

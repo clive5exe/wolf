@@ -1,8 +1,8 @@
 """The v0.1 rule set (RISK_POLICY_SPEC §4). Every rule:
 
-- is a pure function of (action, action_index, ctx);
-- FAILS CLOSED when data it needs is missing;
-- reports observed value and applied limit as human-readable strings;
+- is a pure function of (action, action_index, ctx).
+- FAILS CLOSED when data it needs is missing.
+- reports observed value and applied limit as human-readable strings.
 - runs on every evaluation (the engine never short-circuits).
 """
 
@@ -49,12 +49,12 @@ _Check = tuple[bool, str, str, str]
 
 
 def _fail_closed(what: str, limit: str) -> _Check:
-    return False, f"missing: {what}", limit, f"fail closed — {what} unavailable"
+    return False, f"missing: {what}", limit, f"fail closed, {what} unavailable"
 
 
 def kill_switch(action: ProposedAction, action_index: int, ctx: RiskContext) -> _Check:
     if ctx.kill_switch_engaged:
-        return False, "engaged", "disengaged", "kill switch is engaged — all orders vetoed"
+        return False, "engaged", "disengaged", "kill switch is engaged, all orders vetoed"
     return True, "disengaged", "disengaged", "kill switch clear"
 
 
@@ -190,7 +190,7 @@ def sufficient_holdings(action: ProposedAction, action_index: int, ctx: RiskCont
         ok,
         f"sell {action.quantity} vs held {held_qty}",
         "held quantity",
-        ("holdings sufficient" if ok else "oversell — shorting is not supported"),
+        ("holdings sufficient" if ok else "oversell, shorting is not supported"),
     )
 
 
@@ -231,7 +231,7 @@ def max_daily_loss(action: ProposedAction, action_index: int, ctx: RiskContext) 
         ok,
         pct(max(loss, Decimal("0"))),
         limit,
-        ("daily loss within limit" if ok else "daily loss limit breached — trading halted"),
+        ("daily loss within limit" if ok else "daily loss limit breached, trading halted"),
     )
 
 
@@ -246,7 +246,7 @@ def max_drawdown(action: ProposedAction, action_index: int, ctx: RiskContext) ->
         ok,
         pct(max(drawdown, Decimal("0"))),
         limit,
-        ("drawdown within limit" if ok else "max drawdown breached — trading halted"),
+        ("drawdown within limit" if ok else "max drawdown breached, trading halted"),
     )
 
 
@@ -287,7 +287,7 @@ def stale_context(action: ProposedAction, action_index: int, ctx: RiskContext) -
 
 
 def duplicate_order(action: ProposedAction, action_index: int, ctx: RiskContext) -> _Check:
-    # proposal_id lives on the verdict; the engine passes it via closure — see
+    # proposal_id lives on the verdict. The engine passes it via closure. See
     # RiskEngine._duplicate_rule. This module-level variant checks the shared set.
     return True, "n/a", "unique client_order_id", "checked by engine-bound rule"
 
@@ -298,7 +298,7 @@ def policy_changed(action: ProposedAction, action_index: int, ctx: RiskContext) 
         ok,
         f"pinned v{ctx.policy.version}, active v{ctx.active_policy_version}",
         ("pinned == active"),
-        ("policy stable since trigger" if ok else "policy changed mid-cycle — re-trigger required"),
+        ("policy stable since trigger" if ok else "policy changed mid-cycle, re-trigger required"),
     )
 
 
@@ -360,7 +360,7 @@ def make_duplicate_rule(proposal_id: str) -> RiskRule:
                 False,
                 f"client_order_id {client_id[:12]}… seen",
                 "unique",
-                ("duplicate order — already submitted"),
+                ("duplicate order, already submitted"),
             )
         return True, f"client_order_id {client_id[:12]}… new", "unique", "no duplicate found"
 

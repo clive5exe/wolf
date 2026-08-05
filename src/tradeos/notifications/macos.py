@@ -1,9 +1,9 @@
 """macOS notifications via `osascript display notification` (RESEARCH_NOTES §3).
 
-Chosen for zero dependencies; limitation: Notification Center attributes the
+Chosen for zero dependencies. Limitation: Notification Center attributes the
 banner to the scripting process, not "WOLF". terminal-notifier is a
 documented optional upgrade. Approvals NEVER happen through notifications
-(THREAT_MODEL T9) — banners are informational.
+(THREAT_MODEL T9): banners are informational.
 """
 
 from __future__ import annotations

@@ -1,8 +1,8 @@
 """Build the outbound :mod:`projection` from real (absolute) local state.
 
 This is the only place absolutes are converted into ratios for a prompt. It
-reads the full context package — which keeps real cash and share counts for the
-strategy, risk engine, event log, and replay — and emits the relative view.
+reads the full context package. Which keeps real cash and share counts for the
+strategy, risk engine, event log, and replay. And emits the relative view.
 """
 
 from __future__ import annotations
@@ -66,7 +66,7 @@ def project_context(
                             weight=row.weight,
                             target_weight=row.target_weight,
                             drift=row.drift,
-                            # pct_adv needs a volume source; lands with T-024.
+                            # pct_adv needs a volume source. Lands with T-024.
                             pct_adv=None,
                         )
                         for row in stats.rows
@@ -76,7 +76,7 @@ def project_context(
             )
         elif kind.startswith("quote:"):
             # The price itself is public, but paired with a weight it would
-            # reconstruct the portfolio's absolute value — so quotes contribute
+            # reconstruct the portfolio's absolute value. So quotes contribute
             # freshness and identity only.
             items.append(PromptContextItem(**common, note="priced"))
         else:
@@ -142,11 +142,11 @@ _NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?\s*%?")
 def _scrub(text: str) -> str:
     """Strip absolute figures out of strategy-authored prose.
 
-    Rationales come from our own strategies and legitimately mention sizing
-    ("buy 140 @ ~$285.10"). Rather than trusting every present and future
-    strategy to phrase itself carefully, absolutes are removed at this boundary
-    — which is the boundary's job. The projection's validators are the backstop:
-    anything this misses raises rather than being sent.
+        Rationales come from our own strategies and legitimately mention sizing
+        ("buy 140 @ ~$285.10"). Rather than trusting every present and future
+        strategy to phrase itself carefully, absolutes are removed at this boundary
+    . Which is the boundary's job. The projection's validators are the backstop:
+        anything this misses raises rather than being sent.
     """
     text = _MONEY.sub("[amount]", text)
 

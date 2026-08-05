@@ -1,8 +1,8 @@
 """macOS Keychain access (ADR-0010).
 
-Retained for continuity; the cross-platform entry point is
+Retained for continuity. The cross-platform entry point is
 ``tradeos.security.store.default_secret_store``. Secrets live ONLY in an OS
-credential store — never in files, SQLite, events, logs, or prompts.
+credential store. Never in files, SQLite, events, logs, or prompts.
 """
 
 from __future__ import annotations

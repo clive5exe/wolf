@@ -1,6 +1,6 @@
 """Notifier protocol. Message contract (COMMS requirement): bodies must carry
 the exact action, quantities, mode, strategy version, and an audit identifier
-— the cycle composes these; adapters only deliver."""
+the cycle composes these. Adapters only deliver."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ class Notifier(Protocol):
 
 
 class NullNotifier:
-    """Records instead of delivering — for tests and headless CI."""
+    """Records instead of delivering. For tests and headless CI."""
 
     name = "null"
 

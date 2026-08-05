@@ -1,5 +1,5 @@
 """Quote source abstraction. Real sources arrive with the Robinhood MCP
-adapter (T-024); Static/callable sources power tests, demos, and paper mode."""
+adapter (T-024). Static/callable sources power tests, demos, and paper mode."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ class QuoteSource(Protocol):
 
 
 class StaticQuoteSource:
-    """Fixed price table; quotes are stamped ``as_of=now`` (always fresh) unless
+    """Fixed price table. Quotes are stamped ``as_of=now`` (always fresh) unless
     a fixed ``as_of`` is supplied (useful for staleness tests)."""
 
     name = "static"

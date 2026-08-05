@@ -1,7 +1,7 @@
-"""WOLF — the terminal application.
+"""WOLF. The terminal application.
 
 Interface discipline: everything on screen comes from the ``TradeOSRuntime``
-facade, and keys send commands back through it. The dashboard is home; every
+facade, and keys send commands back through it. The dashboard is home. Every
 screen is one keystroke away and one ``esc`` back. There are no menus.
 
 ``k`` reaches the kill switch from anywhere, on every screen, always.
@@ -70,7 +70,7 @@ class WolfApp(App[None]):
         super().__init__()
         self.runtime = runtime or TradeOSRuntime(RuntimeConfig())
         self.motion = Motion(calm=calm)
-        #: Which decision the verdict screen should open; set by den/journal/cycle.
+        #: Which decision the verdict screen should open. Set by den/journal/cycle.
         self.focused_cycle_id: str = ""
         self._start_screen = start_screen
 
@@ -83,10 +83,10 @@ class WolfApp(App[None]):
         self.push_screen(start)
 
     def action_kill_switch(self) -> None:
-        """``k`` from anywhere. Never a toggle — engaging and disengaging differ.
+        """``k`` from anywhere. Never a toggle. Engaging and disengaging differ.
 
         This binding is ``priority``, so it would otherwise shadow the kill
-        screen's own ``k``; there we hand the key back to the screen instead of
+        screen's own ``k``. There we hand the key back to the screen instead of
         swallowing it.
         """
         if isinstance(self.screen, KillScreen):

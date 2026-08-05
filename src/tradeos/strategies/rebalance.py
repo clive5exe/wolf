@@ -1,9 +1,9 @@
-"""Target-allocation rebalancing — the v0.1 strategy (deliberately explicit).
+"""Target-allocation rebalancing, the v0.1 strategy (deliberately explicit).
 
 Algorithm (all Decimal, deterministic):
 1. For each policy target, drift = current_weight − target_weight.
 2. If |drift| > drift_threshold, propose closing the gap at current quotes:
-   delta_value = −drift × total_value; qty = delta_value ÷ price.
+   delta_value = −drift × total_value, qty = delta_value ÷ price.
 3. Whole-share flooring unless the policy allows fractional shares (sells
    also never exceed held quantity).
 4. Trades below min_trade_value are skipped (churn guard).
@@ -123,7 +123,7 @@ class TargetAllocationRebalance:
                 order_type=OrderType.MARKET,
                 rationale=(
                     f"drift {pct(drift)}: current {pct(current)} vs target "
-                    f"{pct(target.weight)}; {side.value} {raw_qty} @ ~${quote.price} "
+                    f"{pct(target.weight)} · {side.value} {raw_qty} @ ~${quote.price} "
                     f"(~${trade_value}) to close the gap"
                 ),
             )
@@ -131,10 +131,10 @@ class TargetAllocationRebalance:
 
         actions = tuple(sells + buys)
         if not actions:
-            return no_action("; ".join(notes) if notes else "all targets within threshold")
+            return no_action(" · ".join(notes) if notes else "all targets within threshold")
         summary = (
             f"rebalance toward targets (threshold {pct(self._drift_threshold)}): "
-            f"{len(sells)} sell(s), {len(buys)} buy(s). " + "; ".join(notes)
+            f"{len(sells)} sell(s), {len(buys)} buy(s). " + " · ".join(notes)
         )
         return TradeProposal(
             proposal_id=proposal_id,

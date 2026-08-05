@@ -2,7 +2,7 @@
 
 Rate limits published by a data source are not suggestions, and exceeding them
 is how a project gets its whole user base blocked at once. WOLF therefore
-limits itself *below* every documented ceiling rather than up against it — SEC
+limits itself *below* every documented ceiling rather than up against it. SEC
 permits 10 requests/second and this ships at 5.
 
 Time and sleeping are injected so the limiter can be tested at speed. A rate

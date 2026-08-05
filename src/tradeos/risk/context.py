@@ -1,7 +1,7 @@
 """RiskContext: the complete, injected world-view a rule may consult.
 
-Rules are pure functions over (action, index, ctx) — no I/O, no clocks, no
-globals. The runtime assembles this once per cycle; the engine derives
+Rules are pure functions over (action, index, ctx): no I/O, no clocks, no
+globals. The runtime assembles this once per cycle. The engine derives
 per-action working copies as it simulates the proposal's cumulative effect.
 """
 
@@ -20,7 +20,7 @@ class RiskContext:
     policy: InvestmentPolicy  # pinned at cycle trigger
     active_policy_version: int  # currently active version (policy_changed rule)
     snapshot: PortfolioSnapshot  # priced portfolio (working copy during validation)
-    now: datetime  # injected — the single time source for all rules
+    now: datetime  # injected. The single time source for all rules
     market_open: bool
     market_note: str  # e.g. "regular session" / "simulated session (paper)"
     orders_today: int

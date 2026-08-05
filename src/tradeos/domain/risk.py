@@ -1,4 +1,4 @@
-"""Risk verdicts and the ValidatedOrder — the only object with execution authority.
+"""Risk verdicts and the ValidatedOrder. The only object with execution authority.
 
 Spec: RISK_POLICY_SPEC.md §2. Containment is layered (ADR-0008):
 1. This module's validators reject inconsistent/unapproved construction.
@@ -44,7 +44,7 @@ class RiskVerdict(BaseModel):
         derived = all(r.passed for r in self.results if r.blocking)
         if self.approved != derived:
             raise ValueError(
-                "verdict.approved is inconsistent with its rule results — "
+                "verdict.approved is inconsistent with its rule results, "
                 "verdicts cannot be hand-assembled"
             )
         if self.approved and not self.results:

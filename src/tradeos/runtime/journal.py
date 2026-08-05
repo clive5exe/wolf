@@ -1,6 +1,6 @@
 """The journal: the event log reduced into decisions a human can read.
 
-This module is a pure reducer — events in, records out, no I/O and no clock
+This module is a pure reducer. Events in, records out, no I/O and no clock
 reads. That matters twice over: the journal is replayable (same events always
 produce the same records), and "we did not trade" is a first-class result here,
 carrying exactly the same structure as a fill.
@@ -47,7 +47,7 @@ class RuleOutcome(BaseModel):
 
     @property
     def is_advisory_flag(self) -> bool:
-        """Non-blocking rule that did not pass — recorded, never vetoed."""
+        """Non-blocking rule that did not pass. Recorded, never vetoed."""
         return not self.blocking and not self.passed
 
 
@@ -119,7 +119,7 @@ class FillRecord(BaseModel):
         """What slippage *cost*, always a positive number.
 
         A buy fills above the quote and a sell below it, so the signed impact
-        flips direction while the economic effect does not — both are money lost
+        flips direction while the economic effect does not. Both are money lost
         to execution. Reporting the signed figure would render half of all
         slippage as a gain.
         """
@@ -128,7 +128,7 @@ class FillRecord(BaseModel):
 
 
 class CycleRecord(BaseModel):
-    """One decision, whatever its outcome — fill, veto, or deliberate no-action."""
+    """One decision, whatever its outcome. Fill, veto, or deliberate no-action."""
 
     model_config = ConfigDict(frozen=True)
 
@@ -164,7 +164,7 @@ class CycleRecord(BaseModel):
 
     @property
     def rules_passed(self) -> int:
-        """Passed-rule count for the first action — the headline 20/20 figure."""
+        """Passed-rule count for the first action. The headline 20/20 figure."""
         return self.verdicts[0].rules_passed if self.verdicts else 0
 
     @property
@@ -189,7 +189,7 @@ class CycleRecord(BaseModel):
 
 
 class _Draft:
-    """Mutable accumulator; frozen into a CycleRecord once the log is consumed."""
+    """Mutable accumulator. Frozen into a CycleRecord once the log is consumed."""
 
     def __init__(self, correlation_id: str, occurred_at: datetime) -> None:
         self.correlation_id = correlation_id
@@ -355,7 +355,7 @@ class EquityPoint(BaseModel):
 
 
 def equity_history(events: Iterable[Event]) -> tuple[EquityPoint, ...]:
-    """Equity points in recording order — the dashboard sparkline's only source."""
+    """Equity points in recording order. The dashboard sparkline's only source."""
     points: list[EquityPoint] = []
     for event in events:
         if event.event_type != EventType.PORTFOLIO_SNAPSHOT:
@@ -370,7 +370,7 @@ def max_drawdown(points: Iterable[EquityPoint]) -> Decimal | None:
     """Largest peak-to-trough decline as a 0..1 fraction.
 
     Formula: max over t of (peak_upto_t − equity_t) ÷ peak_upto_t. Computed from
-    recorded equity snapshots only, so it measures the observed history — not
+    recorded equity snapshots only, so it measures the observed history. Not
     intraday extremes the runtime never sampled (a documented limitation).
     """
     peak: Decimal | None = None

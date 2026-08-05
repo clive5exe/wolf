@@ -110,7 +110,7 @@ class TestNumberFormatting:
     def test_completeness_renders_as_a_percentage(self) -> None:
         assert fmt_completeness("1") == "100%"
         assert fmt_completeness("0.5") == "50%"
-        assert fmt_completeness("") == "—"
+        assert fmt_completeness("") == "·"
         assert fmt_completeness("not-a-number") == "not-a-number"
 
     def test_age(self) -> None:

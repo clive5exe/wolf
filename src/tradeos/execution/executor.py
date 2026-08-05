@@ -1,6 +1,6 @@
 """Idempotent order execution (RISK_POLICY_SPEC §2, THREAT_MODEL T4).
 
-The executor does not reason about whether a trade is good — that already
+The executor does not reason about whether a trade is good. That already
 happened. It: re-checks the kill switch, enforces order TTL, deduplicates by
 client_order_id against the event log, records the submission, and reports
 exactly what the broker returned.
@@ -50,7 +50,7 @@ class Executor:
                 f"executor accepts only ValidatedOrder, got {type(order).__name__}"
             )
         if self._kill.is_engaged():
-            raise ExecutionHalted("kill switch engaged — execution refused")
+            raise ExecutionHalted("kill switch engaged, execution refused")
         now = self._clock.now()
         if not order.is_valid_at(now):
             self._events.append(
@@ -81,7 +81,7 @@ class Executor:
                 order_id=order.order_id,
                 client_order_id=order.client_order_id,
                 status=OrderStatus.DUPLICATE,
-                error="client_order_id already submitted — not re-executed",
+                error="client_order_id already submitted, not re-executed",
             )
 
         self._events.append(

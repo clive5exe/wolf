@@ -1,8 +1,8 @@
-"""Kill switch — the loud screen.
+"""Kill switch. The loud screen.
 
 Anti-design, on purpose: no sparklines, no shimmer, no charm. Safety should not
-be tasteful. Engaging is one key; disengaging is deliberately annoying — two
-separate presses, or the typed `wolf unkill` command — because an accidental
+be tasteful. Engaging is one key. Disengaging is deliberately annoying. Two
+separate presses, or the typed `wolf unkill` command. Because an accidental
 keystroke must never re-arm execution. Both paths are recorded with who and when.
 """
 
@@ -64,7 +64,7 @@ class KillScreen(WolfScreen):
         if not engaged:
             return (
                 f"\n       [{Ink.GREEN}]● execution armed[/]\n"
-                f"       [{Ink.DIM}]the kill switch is clear — trading can proceed[/]\n"
+                f"       [{Ink.DIM}]the kill switch is clear, trading can proceed[/]\n"
             )
         tint = Ink.RED if (self._pulse_on or self.motion.calm) else Ink.ON_RED
         bar = "█" * _BANNER_WIDTH
@@ -82,20 +82,20 @@ class KillScreen(WolfScreen):
             return (
                 f"\n       [{Ink.DIM}]press[/] [{Ink.AMBER}]k[/] "
                 f"[{Ink.DIM}]to halt everything immediately.[/]\n"
-                f"       [{Ink.FAINT}]execution is refused at four layers — "
+                f"       [{Ink.FAINT}]execution is refused at four layers: "
                 f"scheduler · cycle · engine · broker.[/]\n"
             )
         state = self.runtime.kill_state()
-        when = state.since.strftime("%H:%M:%SZ") if state.since else "—"
-        reason = state.reason or "—"
+        when = state.since.strftime("%H:%M:%SZ") if state.since else "·"
+        reason = state.reason or "·"
         who = state.source or "unknown"
         armed = (
             f"\n       [{Ink.AMBER}]press[/] [{Ink.AMBER} bold]u[/] "
-            f"[{Ink.AMBER}]again to confirm — this re-arms execution[/]"
+            f"[{Ink.AMBER}]again to confirm, this re-arms execution[/]"
             if self._disengage_armed
             else (
                 f"\n       [{Ink.DIM}]nothing trades until a human types:[/]\n"
-                f"       [{Ink.AMBER} bold]wolf unkill[/] [{Ink.DIM}]— or —[/] "
+                f"       [{Ink.AMBER} bold]wolf unkill[/] [{Ink.DIM}]or[/] "
                 f"[{Ink.AMBER}]u[/] [{Ink.DIM}]here, twice, deliberately[/]"
             )
         )
@@ -104,7 +104,7 @@ class KillScreen(WolfScreen):
             f"[{Ink.BRIGHT}]{when}[/] [{Ink.DIM}]· by[/] [{Ink.BRIGHT}]{who}[/]\n"
             f"       [{Ink.DIM}]reason:[/] [{Ink.INK}]{reason}[/]\n\n"
             f"       [{Ink.DIM}]execution refused at[/] [{Ink.BRIGHT}]4 layers[/] "
-            f"[{Ink.DIM}]— scheduler · cycle · engine · broker[/]\n"
+            f"[{Ink.DIM}]at scheduler · cycle · engine · broker[/]\n"
             f"{armed}\n"
         )
 
@@ -129,7 +129,7 @@ class KillScreen(WolfScreen):
         self._paint()
 
     def action_arm_disengage(self) -> None:
-        """First press arms, second press disengages — never one accidental key."""
+        """First press arms, second press disengages. Never one accidental key."""
         if not self.runtime.kill_switch.is_engaged():
             return
         if not self._disengage_armed:
@@ -139,7 +139,7 @@ class KillScreen(WolfScreen):
         self.runtime.disengage_kill_switch()
         self._disengage_armed = False
         self._paint()
-        self.notify("kill switch disengaged — execution re-armed", severity="warning")
+        self.notify("kill switch disengaged, execution re-armed", severity="warning")
 
     def action_open_journal(self) -> None:
         self.app.push_screen("journal")

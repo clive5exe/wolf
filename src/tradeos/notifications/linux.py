@@ -2,7 +2,7 @@
 
 Same contract as the macOS adapter: the cycle composes the message, the adapter
 only delivers. Approvals NEVER happen through a notification (THREAT_MODEL T9)
-— banners are informational, so a delivery failure is logged and swallowed
+banners are informational, so a delivery failure is logged and swallowed
 rather than propagated into a decision.
 """
 

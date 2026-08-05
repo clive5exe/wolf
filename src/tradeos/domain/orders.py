@@ -1,6 +1,6 @@
 """Order-related models: strategy proposals through broker results.
 
-A ProposedAction is *intent*; it carries no authority. Authority exists only
+A ProposedAction is *intent*. It carries no authority. Authority exists only
 as a ValidatedOrder (domain/risk.py), issued by the risk engine.
 """
 

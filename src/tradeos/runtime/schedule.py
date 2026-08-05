@@ -5,13 +5,13 @@ existed that was false: cycles only ran when a human pressed a key. This makes
 the claim true.
 
 **The scheduler is a trigger, not an authority.** It decides *when* to ask for
-a cycle and nothing else — it calls the same ``run_cycle`` a keypress does, so
+a cycle and nothing else. It calls the same ``run_cycle`` a keypress does, so
 every rule, the mode gate, and the kill switch apply exactly as they would
 otherwise. It cannot approve, size, or execute anything, and a bug here can
 only cause a cycle to run at the wrong moment, never a bad trade to pass.
 
-Timing is split from running on purpose. :class:`Schedule` is pure — given a
-clock reading and the last run, it returns a decision — so the awkward cases
+Timing is split from running on purpose. :class:`Schedule` is pure. Given a
+clock reading and the last run, it returns a decision. So the awkward cases
 (market closed, kill switch engaged, a cycle overrunning its own interval) are
 unit-testable without a single ``sleep``.
 
@@ -81,7 +81,7 @@ class ScheduleConfig:
 
 
 class Schedule:
-    """Pure timing decisions. No I/O, no clock reads — everything is injected."""
+    """Pure timing decisions. No I/O, no clock reads. Everything is injected."""
 
     def __init__(self, config: ScheduleConfig | None = None) -> None:
         self.config = config or ScheduleConfig()
@@ -110,7 +110,7 @@ class Schedule:
 
         if kill_engaged:
             return ScheduleDecision(
-                False, "kill switch engaged — no cycles scheduled", poll, SkipReason.KILL_SWITCH
+                False, "kill switch engaged, no cycles scheduled", poll, SkipReason.KILL_SWITCH
             )
 
         if cycle_in_flight:
@@ -205,7 +205,7 @@ class Scheduler:
         self._stopped = True
 
     def tick(self) -> object | None:
-        """Evaluate once; run a cycle if due. Returns the outcome, or None."""
+        """Evaluate once. Run a cycle if due. Returns the outcome, or None."""
         decision = self._schedule.decide(
             now=self._clock.now(),
             last_run=self._runtime.last_cycle_at(),
@@ -223,7 +223,7 @@ class Scheduler:
         self._last_skip = None
         self._on_event(decision.reason)
         outcome = self._runtime.run_cycle(self.config.label)
-        # After a run the next one is a full interval away; no need to wake
+        # After a run the next one is a full interval away. No need to wake
         # sooner than the poll to find that out.
         self._next_wait = min(float(self.config.interval_s), self.config.poll_s)
         return outcome

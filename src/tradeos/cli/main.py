@@ -1,6 +1,6 @@
-"""WOLF CLI. Interfaces display state and send commands — nothing else.
+"""WOLF CLI. Interfaces display state and send commands. Nothing else.
 
-The command is ``wolf``; the Python distribution stays ``tradeos`` because
+The command is ``wolf``. The Python distribution stays ``tradeos`` because
 the PyPI name ``wolf`` is already taken (see ADR-0012).
 """
 
@@ -18,8 +18,8 @@ from tradeos.runtime.facade import RuntimeConfig, TradeOSRuntime
 app = typer.Typer(
     name="wolf",
     help=(
-        "WOLF — watches obsessively, lacks feelings. The model advises; "
-        "deterministic code decides. Experimental — not investment advice."
+        "WOLF, watches obsessively, lacks feelings. The model advises, "
+        "deterministic code decides. Experimental, not investment advice."
     ),
     no_args_is_help=True,
 )
@@ -33,7 +33,7 @@ _STATUS_GLYPH = {
 
 
 def _runtime(*, notify: bool = False) -> TradeOSRuntime:
-    # Platform-appropriate notifier, or a null one where none exists — the
+    # Platform-appropriate notifier, or a null one where none exists. The
     # runtime must never fail to start because a desktop lacks a banner daemon.
     notifier = default_notifier() if notify else None
     return TradeOSRuntime(RuntimeConfig(notifier=notifier))
@@ -43,7 +43,7 @@ def _runtime(*, notify: bool = False) -> TradeOSRuntime:
 def version() -> None:
     """Print the WOLF version."""
     console.print(
-        f"[bold]W[/][#F0B45C]◉[/][bold]LF[/] {tradeos.__version__} — "
+        f"[bold]W[/][#F0B45C]◉[/][bold]LF[/] {tradeos.__version__}, "
         "watches obsessively, lacks feelings\n"
         "experimental · paper trading · not investment advice"
     )
@@ -83,7 +83,7 @@ def demo(
     for i in range(cycles):
         outcome = runtime.run_cycle(trigger=f"cli-demo-{i + 1}")
         console.print(
-            f"[bold]cycle {i + 1}[/] [{outcome.status}] {outcome.reason} — "
+            f"[bold]cycle {i + 1}[/] [{outcome.status}] {outcome.reason}, "
             f"approved={outcome.approved_actions} vetoed={outcome.vetoed_actions}"
         )
         for fill in outcome.fills:
@@ -121,7 +121,7 @@ def policy_show() -> None:
     """Show the active investment policy (the enforceable struct, not prose)."""
     policy = _runtime().active_policy()
     if policy is None:
-        console.print("[yellow]no active policy — run `wolf policy-init-sample`[/]")
+        console.print("[yellow]no active policy, run `wolf policy-init-sample`[/]")
         raise typer.Exit(code=1)
     console.print_json(policy.model_dump_json(indent=2))
 
@@ -138,7 +138,7 @@ def policy_init_sample() -> None:
 def kill(reason: str = typer.Argument(..., help="Why you are stopping everything")) -> None:
     """Engage the kill switch: all execution refused until `wolf unkill`."""
     _runtime().engage_kill_switch(reason)
-    console.print("[red]kill switch ENGAGED[/] — execution refused everywhere")
+    console.print("[red]kill switch ENGAGED[/] execution refused everywhere")
 
 
 @app.command()
@@ -151,13 +151,13 @@ def unkill() -> None:
 @app.command()
 def tui(
     calm: bool = typer.Option(
-        False, "--calm", help="Disable animation (reduced motion); no information is lost"
+        False, "--calm", help="Disable animation (reduced motion), no information is lost"
     ),
     skip_boot: bool = typer.Option(
         False, "--skip-boot", help="Go straight to the den, past the check cascade"
     ),
 ) -> None:
-    """Enter the den — the full terminal interface."""
+    """Enter the den. The full terminal interface."""
     from tradeos.tui.app import WolfApp
 
     WolfApp(
@@ -171,12 +171,12 @@ def tui(
 def setup(
     calm: bool = typer.Option(False, "--calm", help="Disable animation"),
 ) -> None:
-    """Create your investment policy — goals in your words, then you confirm."""
+    """Create your investment policy. Goals in your words, then you confirm."""
     from tradeos.tui.app import WolfApp
 
     runtime = _runtime()
     if runtime.active_policy() is not None:
-        console.print("[yellow]a policy already exists[/] — `wolf policy-show` to see it")
+        console.print("[yellow]a policy already exists[/] `wolf policy-show` to see it")
         raise typer.Exit(code=1)
     WolfApp(runtime, calm=calm, start_screen="setup").run()
 
@@ -191,14 +191,14 @@ def watch(
 ) -> None:
     """Run decision cycles on a schedule until interrupted.
 
-    The scheduler only decides *when* to ask for a cycle — every rule, the mode
+    The scheduler only decides *when* to ask for a cycle. Every rule, the mode
     gate, and the kill switch apply exactly as they do for a manual run.
     """
     from tradeos.runtime.schedule import ScheduleConfig, Scheduler
 
     runtime = _runtime(notify=notify)
     if runtime.active_policy() is None:
-        console.print("[yellow]no active policy — run `wolf policy-init-sample` first[/]")
+        console.print("[yellow]no active policy, run `wolf policy-init-sample` first[/]")
         raise typer.Exit(code=1)
 
     config = ScheduleConfig(
@@ -251,9 +251,9 @@ def _print_portfolio(runtime: TradeOSRuntime) -> None:
     table.add_column("drift", justify="right")
     table.add_column("unreal P&L", justify="right")
     for row in stats.rows:
-        drift = f"{row.drift:+.2%}" if row.drift is not None else "—"
-        target = f"{row.target_weight:.0%}" if row.target_weight is not None else "—"
-        pnl = f"{row.unrealized_pnl:,.2f}" if row.unrealized_pnl is not None else "—"
+        drift = f"{row.drift:+.2%}" if row.drift is not None else "·"
+        target = f"{row.target_weight:.0%}" if row.target_weight is not None else "·"
+        pnl = f"{row.unrealized_pnl:,.2f}" if row.unrealized_pnl is not None else "·"
         table.add_row(row.symbol, f"${row.value:,.2f}", f"{row.weight:.2%}", target, drift, pnl)
     console.print(table)
     cash_weight = f"{stats.cash_weight:.2%}" if stats.cash_weight is not None else "n/a"

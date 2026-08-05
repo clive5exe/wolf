@@ -1,8 +1,8 @@
-"""Setup — where a new install becomes a policy.
+"""Setup. Where a new install becomes a policy.
 
 Three steps: say what this portfolio is for, let a model draft a starting
 point, then confirm every enforceable field yourself. The third step is the
-product's whole stance in miniature — the model proposes, you decide — so the
+product's whole stance in miniature, the model proposes, you decide, so the
 screen shows the draft as *suggestions on a form you own*, never as a fait
 accompli you dismiss.
 
@@ -25,7 +25,7 @@ from tradeos.tui.base import WolfScreen, footer_bar
 from tradeos.tui.glyphs import fmt_money, fmt_pct, truncate
 from tradeos.tui.theme import ACRONYM, WORDMARK_BLOCK, Ink, key
 
-#: (attribute, label, kind) — the enforceable fields a human must confirm.
+#: (attribute, label, kind): the enforceable fields a human must confirm.
 FIELDS: tuple[tuple[str, str, str], ...] = (
     ("goals_text", "goals", "text"),
     ("target_allocations", "targets", "alloc"),
@@ -117,7 +117,7 @@ class SetupScreen(WolfScreen):
         field = self.query_one("#setup-input", Input)
         field.display = True
         field.value = self._raw_value(attr, kind)
-        field.placeholder = f"{label} — press enter to accept, esc to cancel"
+        field.placeholder = f"{label}, press enter to accept, esc to cancel"
         field.focus()
         self._editing = True
         self._paint()
@@ -209,7 +209,7 @@ class SetupScreen(WolfScreen):
             return f"\n  [{Ink.AMBER}]drafting a policy from your goals…[/]\n"
         return (
             f"\n  [{Ink.BRIGHT}]Review every field before anything activates.[/]\n"
-            f"  [{Ink.DIM}]This becomes an enforceable policy — the risk engine reads "
+            f"  [{Ink.DIM}]This becomes an enforceable policy. The risk engine reads "
             f"these numbers, not your intent.[/]\n"
         )
 
@@ -228,12 +228,12 @@ class SetupScreen(WolfScreen):
         source = (
             f"[{Ink.CYAN}]drafted from your goals[/]"
             if proposal.drafted_by_model
-            else f"[{Ink.FAINT}]conservative defaults — no model was available[/]"
+            else f"[{Ink.FAINT}]conservative defaults, no model was available[/]"
         )
         lines += ["", f"  {source}"]
 
         if proposal.adjustments:
-            lines.append(f"\n  [{Ink.AMBER}]the draft asked for wider limits; held at these:[/]")
+            lines.append(f"\n  [{Ink.AMBER}]the draft asked for wider limits, held at these:[/]")
             for adjustment in proposal.adjustments:
                 lines.append(
                     f"    [{Ink.FAINT}]· {truncate(adjustment.describe(), self.frame - 6)}[/]"
@@ -251,7 +251,7 @@ class SetupScreen(WolfScreen):
                 lines.append(f"    [{Ink.RED}]· {truncate(problem, self.frame - 6)}[/]")
 
         lines.append(
-            f"\n  [{Ink.FAINT}]mode is always paper at setup; moving up the ladder "
+            f"\n  [{Ink.FAINT}]mode is always paper at setup, moving up the ladder "
             f"is a separate, deliberate step[/]"
         )
         return "\n".join(lines)
@@ -262,7 +262,7 @@ class SetupScreen(WolfScreen):
         value = getattr(proposal, attr)
         if kind == "alloc":
             if not value:
-                return "— none set"
+                return "none set"
             return " · ".join(f"{s} {fmt_pct(w)}" for s, w in sorted(value.items()))
         if kind == "pct":
             return fmt_pct(value)
@@ -270,7 +270,7 @@ class SetupScreen(WolfScreen):
             return fmt_money(value)
         if kind == "text":
             text = str(value).strip()
-            return (text[:56] + "…") if len(text) > 57 else (text or "—")
+            return (text[:56] + "…") if len(text) > 57 else (text or "·")
         return str(value)
 
     def _footer(self) -> str:

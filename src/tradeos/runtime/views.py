@@ -17,7 +17,7 @@ from tradeos.runtime.journal import CycleRecord, EquityPoint
 
 
 class KillSwitchState(BaseModel):
-    """Who halted trading, when, and why — the kill screen's headline."""
+    """Who halted trading, when, and why. The kill screen's headline."""
 
     model_config = ConfigDict(frozen=True)
 
@@ -83,7 +83,7 @@ class DashboardView(BaseModel):
     holdings: tuple[HoldingView, ...] = ()
     top3_concentration: Decimal | None = None
     hhi: Decimal | None = None
-    #: Drift at which the strategy proposes a trade — the drift gauge's full scale.
+    #: Drift at which the strategy proposes a trade. The drift gauge's full scale.
     drift_threshold: Decimal = Decimal("0.02")
 
     equity: tuple[EquityPoint, ...] = ()

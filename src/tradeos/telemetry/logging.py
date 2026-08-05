@@ -2,7 +2,7 @@
 
 Ordinary logs must never contain: credentials, account identifiers, or
 secret-shaped strings. The redaction filter is attached to every tradeos
-logger; ``redact()`` is also called directly on strings destined for event
+logger. ``redact()`` is also called directly on strings destined for event
 payload excerpts.
 """
 

@@ -1,4 +1,4 @@
-"""Event type registry. Append here; never rename a shipped value (events are forever)."""
+"""Event type registry. Append here. Never rename a shipped value (events are forever)."""
 
 from __future__ import annotations
 

@@ -6,8 +6,8 @@ Uses only documented CLI behavior (RESEARCH_NOTES §1):
   → envelope fields `structured_output` / `result` / `is_error` /
   `total_cost_usd` / `session_id`
 
-The adapter never reads or writes credentials — authentication belongs to the
-user's own `claude` login. No tools are granted; `--max-turns` defaults to 1.
+The adapter never reads or writes credentials. Authentication belongs to the
+user's own `claude` login. No tools are granted. `--max-turns` defaults to 1.
 """
 
 from __future__ import annotations
@@ -60,7 +60,7 @@ class ClaudeCodeProvider:
 
     def capabilities(self) -> frozenset[ProviderCapability]:
         # Only documented capabilities are declared (PROVIDER_SPEC §4):
-        # native --json-schema structured output; --resume sessions.
+        # native --json-schema structured output. --resume sessions.
         return frozenset({ProviderCapability.STRUCTURED_OUTPUT, ProviderCapability.SESSIONS})
 
     def detect(self) -> ProviderStatus:
@@ -68,7 +68,7 @@ class ClaudeCodeProvider:
         if exe is None:
             return ProviderStatus(
                 installed=False,
-                detail="claude CLI not found on PATH — install Claude Code and run `claude` once",
+                detail="claude CLI not found on PATH, install Claude Code and run `claude` once",
             )
         version = self._read_version(exe)
         authenticated, auth_detail = self._read_auth_status(exe)
@@ -153,7 +153,7 @@ class ClaudeCodeProvider:
                 if attempt == 1:
                     attempt_prompt = (
                         f"{prompt}\n\nYour previous response failed schema validation "
-                        f"with these errors — respond again, strictly matching the "
+                        f"with these errors, respond again, strictly matching the "
                         f"schema:\n{last_error_detail}"
                     )
                     continue
@@ -208,7 +208,7 @@ class ClaudeCodeProvider:
     @staticmethod
     def _read_auth_status(exe: str) -> tuple[bool | None, str]:
         """`claude auth status` exit-code semantics are undocumented
-        (RESEARCH_NOTES §6.2) — parse output defensively; unknown stays None."""
+        (RESEARCH_NOTES §6.2): parse output defensively. Unknown stays None."""
         try:
             proc = subprocess.run(
                 [exe, "auth", "status"], capture_output=True, text=True, timeout=15
@@ -217,10 +217,10 @@ class ClaudeCodeProvider:
             return None, "auth status probe failed to run"
         text = f"{proc.stdout}\n{proc.stderr}".lower()
         if any(marker in text for marker in _NOT_AUTH_MARKERS):
-            return False, "claude CLI is installed but not logged in — run `claude` to log in"
+            return False, "claude CLI is installed but not logged in, run `claude` to log in"
         if proc.returncode == 0 and text.strip():
             return True, "claude CLI authenticated"
-        return None, "authentication state unknown — health check will probe"
+        return None, "authentication state unknown, health check will probe"
 
     def _invoke(
         self,
@@ -292,7 +292,7 @@ class ClaudeCodeProvider:
 
     @staticmethod
     def _extract_structured(envelope: dict[str, Any]) -> Any:
-        """Prefer the documented `structured_output` field; fall back to parsing
+        """Prefer the documented `structured_output` field. Fall back to parsing
         `result` text as JSON (older CLIs), stripping markdown fences."""
         if "structured_output" in envelope and envelope["structured_output"] is not None:
             return envelope["structured_output"]

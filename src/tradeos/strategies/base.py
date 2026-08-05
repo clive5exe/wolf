@@ -1,4 +1,4 @@
-"""Strategy protocol. Strategies read state and propose; they never execute,
+"""Strategy protocol. Strategies read state and propose. They never execute,
 never see brokers, and never touch risk parameters (ARCHITECTURE §2)."""
 
 from __future__ import annotations

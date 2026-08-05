@@ -3,10 +3,10 @@
 Simulation model (documented assumptions):
 - Market orders fill entirely at quote price adjusted by ``slippage_bps``
   against the trader (buys pay more, sells receive less).
-- No partial fills, no spread model, no market impact in v0.1 — these are
+- No partial fills, no spread model, no market impact in v0.1. These are
   recorded limitations, not hidden ones (fill events carry the assumption).
 - State is event-sourced: every accepted order appends ``order.filled`` with
-  the resulting cash balance; ``from_events`` rebuilds identical state
+  the resulting cash balance. ``from_events`` rebuilds identical state
   (replay-equality tested).
 """
 

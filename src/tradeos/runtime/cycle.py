@@ -76,7 +76,7 @@ class DecisionCycle:
         now = d.clock.now()
 
         def stage(step: CycleStage, state: StageState, detail: str = "") -> None:
-            """Display-only notification; never affects what this cycle decides."""
+            """Display-only notification. Never affects what this cycle decides."""
             emit(
                 progress,
                 correlation_id=correlation_id,
@@ -89,7 +89,7 @@ class DecisionCycle:
         # Stamped with the cycle's own clock rather than letting the store
         # default to wall time. The scheduler reads this event back to decide
         # when the next run is due, so a clock injected for replay or testing
-        # has to reach the log — otherwise the two disagree about "now".
+        # has to reach the log. Otherwise the two disagree about "now".
         d.events.append(
             EventType.CYCLE_TRIGGERED,
             {"trigger": trigger},
@@ -100,7 +100,7 @@ class DecisionCycle:
         policy = d.policy_service.active_policy()
         if policy is None:
             stage(CycleStage.OBSERVE, StageState.FAILED, "no active investment policy")
-            return self._abort(correlation_id, "no active investment policy — run onboarding")
+            return self._abort(correlation_id, "no active investment policy, run onboarding")
         if policy.mode == TradingMode.READ_ONLY:
             stage(CycleStage.OBSERVE, StageState.SKIPPED, "read-only mode")
             return self._no_action(correlation_id, None, "read-only mode: intelligence only")
@@ -229,7 +229,7 @@ class DecisionCycle:
                 f"confidence {thesis.confidence} · {len(thesis.supporting_item_ids)} citations",
             )
         elif d.provider is not None:
-            stage(CycleStage.THESIS, StageState.FAILED, "no usable thesis — proceeding without")
+            stage(CycleStage.THESIS, StageState.FAILED, "no usable thesis, proceeding without")
 
         # -- risk -------------------------------------------------------------
         stage(CycleStage.RISK, StageState.RUNNING, "every rule runs · any veto stops everything")
@@ -420,7 +420,7 @@ class DecisionCycle:
         body = (
             f"{proposal.strategy_id}@{proposal.strategy_version}: "
             f"{outcome.approved_actions} approved, {outcome.vetoed_actions} vetoed. "
-            + ("; ".join(outcome.fills[:3]) if outcome.fills else "no fills")
+            + (" · ".join(outcome.fills[:3]) if outcome.fills else "no fills")
             + f" [cycle {outcome.correlation_id[:8]}]"
         )
         sent = d.notifier.notify("WOLF · paper cycle", body)
@@ -454,6 +454,6 @@ class DecisionCycle:
     def _policy_summary(policy: InvestmentPolicy) -> str:
         targets = ", ".join(f"{t.symbol} {t.weight}" for t in policy.target_allocations)
         return (
-            f"mode={policy.mode.value}; targets: {targets}; "
-            f"max_position={policy.max_position_pct}; min_cash={policy.min_cash_pct}"
+            f"mode={policy.mode.value} · targets: {targets} · "
+            f"max_position={policy.max_position_pct} · min_cash={policy.min_cash_pct}"
         )

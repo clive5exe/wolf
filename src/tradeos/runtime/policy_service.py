@@ -56,7 +56,7 @@ class PolicyService:
         return policy
 
     def change_mode(self, new_mode: TradingMode) -> InvestmentPolicy:
-        """Mode ladder: one step up at a time; any number of steps down."""
+        """Mode ladder: one step up at a time. Any number of steps down."""
         current = self.active_policy()
         if current is None:
             raise PolicyError("no active policy")
@@ -89,7 +89,7 @@ class PolicyService:
     def create_sample_policy(self, *, mode: TradingMode = TradingMode.PAPER) -> InvestmentPolicy:
         """Demo/dogfood policy: diversified ETF-tilted targets, conservative caps."""
         if self.active_policy() is not None:
-            raise PolicyError("a policy already exists — edit it instead of re-sampling")
+            raise PolicyError("a policy already exists, edit it instead of re-sampling")
         policy = InvestmentPolicy(
             policy_id=new_ulid(),
             version=1,

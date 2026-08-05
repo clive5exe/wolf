@@ -1,7 +1,7 @@
 """One motion vocabulary, one beat.
 
 Every timing the TUI animates on lives here, so the whole app moves together.
-The rule that governs this file: **motion always means something** — alive,
+The rule that governs this file: **motion always means something**. Alive,
 working, arriving, confirmed, or dead. Decorative animation is banned, which is
 why each constant below names the system state it represents.
 
@@ -17,13 +17,13 @@ from typing import Final
 
 # -- the vocabulary -----------------------------------------------------------
 
-#: the runtime is alive — one cursor, always infrared, on every screen
+#: the runtime is alive. One cursor, always infrared, on every screen
 CURSOR_BLINK_S: Final = 1.06
 
-#: a data source is live and fresh; stale sources stop moving and go hollow
+#: a data source is live and fresh. Stale sources stop moving and go hollow
 FRESHNESS_PULSE_S: Final = 2.4
 
-#: a stage is working — always rendered adjacent to the label it belongs to
+#: a stage is working. Always rendered adjacent to the label it belongs to
 SPINNER_FRAME_S: Final = 0.08
 SPINNER_FRAMES: Final = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 
@@ -31,20 +31,20 @@ SPINNER_FRAMES: Final = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 RISE_STAGGER_S: Final = 0.07
 RISE_DURATION_S: Final = 0.42
 
-#: rules verified one by one — fast enough to feel mechanical, slow enough to count
+#: rules verified one by one. Fast enough to feel mechanical, slow enough to count
 TICK_STAGGER_S: Final = 0.028
 
-#: model text being generated; never used for system text
+#: model text being generated. Never used for system text
 TYPE_CHAR_S: Final = 0.018
 
 #: money moved (paper or real)
 FLASH_S: Final = 0.38
 FLASH_REPEATS: Final = 2
 
-#: ambient "the market is breathing" — dashboard equity strip only
+#: ambient "the market is breathing". Dashboard equity strip only
 SHIMMER_LOOP_S: Final = 3.4
 
-#: halted; overrides every other motion on screen
+#: halted. Overrides every other motion on screen
 KILL_PULSE_S: Final = 1.2
 
 #: a displayed value changed (tabular figures, so no layout shift)
@@ -59,7 +59,7 @@ class Motion:
     """Resolved timings for one app instance.
 
     ``calm=True`` zeroes every duration. Screens must still render their final
-    state when a duration is zero — never gate content on an animation finishing.
+    state when a duration is zero. Never gate content on an animation finishing.
     """
 
     calm: bool = False

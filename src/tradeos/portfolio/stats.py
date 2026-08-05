@@ -2,7 +2,7 @@
 
 Every function documents: formula, data source, window, assumptions,
 limitations. Statistics that lack a sound input in v0.1 (benchmark-relative
-measures) are reported as ``unavailable`` with the reason — never faked.
+measures) are reported as ``unavailable`` with the reason. Never faked.
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ class PortfolioStats(BaseModel):
     cash_weight: Decimal | None
     rows: tuple[AllocationRow, ...]
     top3_concentration: Decimal | None  # sum of 3 largest weights
-    hhi: Decimal | None  # Herfindahl–Hirschman index over position weights
+    hhi: Decimal | None  # Herfindahl, Hirschman index over position weights
     unavailable: dict[str, str]  # stat name -> reason it cannot be computed honestly
 
 
@@ -46,14 +46,14 @@ def compute_stats(
     Formulas:
     - weight_i = quantity_i × price_i ÷ total_value (total includes cash)
     - drift_i = weight_i − target_i (only for symbols with targets)
-    - unrealized_pnl_i = quantity_i × (price_i − avg_cost_i); average-cost
+    - unrealized_pnl_i = quantity_i × (price_i − avg_cost_i). Average-cost
       method, ignores lots/taxes (limitation)
     - top3_concentration = Σ of the 3 largest position weights
-    - HHI = Σ weight_i² over positions (0..1; >0.25 is highly concentrated)
+    - HHI = Σ weight_i² over positions (0..1. >0.25 is highly concentrated)
 
     Source: the provided priced snapshot (no history). Time-series stats
     (volatility, drawdown, Sharpe/Sortino, beta, turnover) are computed from
-    equity history and land with T-026; benchmark-dependent measures remain
+    equity history and land with T-026. Benchmark-dependent measures remain
     unavailable until a licensed benchmark series exists (ASSUMPTIONS A13).
     """
     targets = {k.upper(): v for k, v in (targets or {}).items()}

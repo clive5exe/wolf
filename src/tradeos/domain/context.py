@@ -1,7 +1,7 @@
 """Market context models: sourced, timestamped, expiring information assets.
 
-Spec: MARKET_CONTEXT_SPEC.md. Freshness is always computed from (age, ttl) —
-never stored — so a persisted item can never lie about being fresh.
+Spec: MARKET_CONTEXT_SPEC.md. Freshness is always computed from (age, ttl).
+Never stored. So a persisted item can never lie about being fresh.
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ class Provenance(StrEnum):
 class Freshness(StrEnum):
     FRESH = "fresh"  # age <= 0.5 * ttl
     AGING = "aging"  # 0.5*ttl < age <= ttl
-    STALE = "stale"  # ttl < age <= 2*ttl — display only, never decision-bearing
+    STALE = "stale"  # ttl < age <= 2*ttl. Display only, never decision-bearing
     EXPIRED = "expired"  # age > 2*ttl
 
 

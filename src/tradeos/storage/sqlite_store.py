@@ -1,8 +1,8 @@
 """Durable append-only event store on SQLite (WAL).
 
 Append-only is enforced in-database by triggers (see migrations.py), not by
-convention. Secrets never enter this database (ADR-0010) — payloads pass the
-caller's redaction discipline; there is no secrets table by design.
+convention. Secrets never enter this database (ADR-0010): payloads pass the
+caller's redaction discipline. There is no secrets table by design.
 """
 
 from __future__ import annotations

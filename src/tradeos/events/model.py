@@ -14,7 +14,7 @@ from tradeos.events.types import EventType
 class Event(BaseModel):
     model_config = ConfigDict(frozen=True)
 
-    event_id: str  # ULID — lexicographic order == creation order
+    event_id: str  # ULID. Lexicographic order == creation order
     event_type: EventType
     occurred_at: datetime
     recorded_at: datetime

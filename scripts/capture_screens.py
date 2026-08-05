@@ -44,7 +44,7 @@ async def capture(name: str, screen: str, cycles: int, engage_kill: bool) -> Non
     for index in range(cycles):
         runtime.run_cycle(f"demo-{index}")
     if engage_kill:
-        runtime.engage_kill_switch("market data storm — engaged by operator")
+        runtime.engage_kill_switch("market data storm · engaged by operator")
 
     app = WolfApp(runtime, calm=True, start_screen=screen)
     async with app.run_test(size=SIZE) as pilot:

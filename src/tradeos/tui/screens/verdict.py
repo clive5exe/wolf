@@ -1,7 +1,7 @@
-"""Verdict — where the thesis meets the wall.
+"""Verdict. Where the thesis meets the wall.
 
 The page reads in the exact order the system works: thesis on top, the rule
-wall below, receipt at the bottom. Nothing is summarised away — every rule is
+wall below, receipt at the bottom. Nothing is summarised away. Every rule is
 listed, every time, including the ones that passed and the advisory ones that
 did not veto. A veto stops the cascade dead on the red ✗.
 
@@ -64,7 +64,7 @@ class VerdictScreen(WolfScreen):
         self._start_cascade()
 
     def _start_cascade(self) -> None:
-        """Rules land one by one — mechanical, but slow enough to read as checks."""
+        """Rules land one by one. Mechanical, but slow enough to read as checks."""
         verdict = self._current_verdict()
         total = len(verdict.results) if verdict is not None else 0
         if self.motion.calm or total == 0:
@@ -103,7 +103,7 @@ class VerdictScreen(WolfScreen):
         record, verdict = self._record, self._current_verdict()
         if record is None:
             self.query_one("#verdict-order", Static).update(
-                f"\n  [{Ink.DIM}]no decision recorded yet — run a cycle from the den[/]\n"
+                f"\n  [{Ink.DIM}]no decision recorded yet, run a cycle from the den[/]\n"
             )
             return
         if verdict is None:
@@ -120,7 +120,7 @@ class VerdictScreen(WolfScreen):
             None,
         )
         # A vetoed order never reached a broker, so it has no price. Printing
-        # "@ — ≈ —" would imply a fill that was attempted and came back empty.
+        # "@. ≈ ·" would imply a fill that was attempted and came back empty.
         if price is not None and verdict.quantity is not None:
             pricing = f"@ {fmt_money(price)} ≈ {fmt_money(price * verdict.quantity)} · "
         else:
@@ -141,14 +141,14 @@ class VerdictScreen(WolfScreen):
         if thesis is None:
             widget.update(
                 f"{self._section('thesis')}\n"
-                f"  [{Ink.DIM}]deterministic cycle — no model was called, so there is "
+                f"  [{Ink.DIM}]deterministic cycle, no model was called, so there is "
                 f"no thesis to show.[/]\n"
                 f"  [{Ink.FAINT}]the rebalance rationale below is the whole reasoning.[/]\n"
                 f"  [{Ink.INK}]{truncate(record.verdicts[0].rationale, 70)}[/]\n"
                 if record.verdicts
                 else (
                     f"{self._section('thesis')}\n"
-                    f"  [{Ink.DIM}]deterministic cycle — no model call.[/]\n"
+                    f"  [{Ink.DIM}]deterministic cycle, no model call.[/]\n"
                 )
             )
             return
@@ -216,18 +216,18 @@ class VerdictScreen(WolfScreen):
         if extra:
             rows.append(
                 f"  [{Ink.FAINT}]{configured} policy rules + {extra} per-proposal "
-                f"idempotency check — all run, every time[/]"
+                f"idempotency check, all run, every time[/]"
             )
 
         for rule in verdict.results[: self._revealed_rules]:
             if rule.is_veto:
                 rows.append(
-                    f"  [{Ink.RED}]✗ {rule.rule_id}[/] [{Ink.DIM}]— {rule.message}[/]"
+                    f"  [{Ink.RED}]✗ {rule.rule_id}[/] [{Ink.DIM}]· {rule.message}[/]"
                     f"\n    [{Ink.FAINT}]observed {rule.observed} · limit {rule.limit}[/]"
                 )
             elif rule.is_advisory_flag:
                 rows.append(
-                    f"  [{Ink.FAINT}]◇ advisory, non-blocking: {rule.rule_id} — "
+                    f"  [{Ink.FAINT}]◇ advisory, non-blocking: {rule.rule_id}, "
                     f"{rule.message} (recorded, not vetoed)[/]"
                 )
         body_widget.update("\n".join(rows) + "\n")
@@ -246,7 +246,7 @@ class VerdictScreen(WolfScreen):
                 continue
             if not fill.filled:
                 lines.append(
-                    f"  [{Ink.RED}]NOT FILLED[/]  [{Ink.DIM}]{fill.symbol} — {fill.note}[/]"
+                    f"  [{Ink.RED}]NOT FILLED[/]  [{Ink.DIM}]{fill.symbol}, {fill.note}[/]"
                 )
                 continue
             # Slippage is always a cost, whichever side we traded: a buy fills

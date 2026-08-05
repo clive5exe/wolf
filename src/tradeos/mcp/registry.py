@@ -1,10 +1,10 @@
-"""MCP tool registry — what WOLF may call, in which mode.
+"""MCP tool registry. What WOLF may call, in which mode.
 
 Robinhood's Agentic Trading server exposes 53 tools, 19 of which place orders,
 cancel them, exercise options, or mutate watchlists and scanners.
 
-**Placing orders is the destination, not a hazard.** WOLF is meant to trade;
-the mode ladder exists so it does so when a human has decided it should, not
+**Placing orders is the destination, not a hazard.** WOLF is meant to trade.
+The mode ladder exists so it does so when a human has decided it should, not
 whenever a token happens to permit it. So the reachable tool set is a function
 of the active trading mode rather than a constant: read tools in every mode,
 order placement only from APPROVAL upward, and nothing at all that WOLF has no
@@ -12,7 +12,7 @@ use for.
 
 The registry is an **allowlist**, not a denylist. A tool absent from the set
 for the current mode is not callable, so a server that grows a new tool
-tomorrow — or renames one — cannot silently become reachable. A denylist fails
+tomorrow, or renames one, cannot silently become reachable. A denylist fails
 the other way: safe by default only for the dangers someone remembered.
 
 Why this matters more here than it usually would: Robinhood advertises a single
@@ -31,7 +31,7 @@ class ToolClass(StrEnum):
     BROKER_READ = "broker_read"
     BROKER_TRADE = "broker_trade"
     MARKET_DATA = "market_data"
-    STATE_WRITE = "state_write"  # watchlists, scanners — mutation without money
+    STATE_WRITE = "state_write"  # watchlists, scanners. Mutation without money
 
 
 class ToolPermissionError(RuntimeError):
@@ -86,7 +86,7 @@ READ_TOOLS: dict[str, ToolClass] = {
     "get_equity_orders": ToolClass.BROKER_READ,
     # Market data
     "get_equity_quotes": ToolClass.MARKET_DATA,
-    # OHLCV — the equity curve, and average daily volume for the liquidity
+    # OHLCV. The equity curve, and average daily volume for the liquidity
     # signal the outbound projection currently reports as unknown.
     "get_equity_historicals": ToolClass.MARKET_DATA,
     # Unblocks the earnings_blackout risk rule, which ships disabled today for
@@ -108,7 +108,7 @@ EXECUTION_TOOLS: dict[str, ToolClass] = {
 EXECUTING_MODES: frozenset[str] = frozenset({"approval", "autopilot"})
 
 #: Backwards-compatible view: what is reachable with no mode context, which is
-#: the safe reading — read tools only.
+#: the safe reading. Read tools only.
 ALLOWED: dict[str, ToolClass] = READ_TOOLS
 
 
@@ -151,8 +151,8 @@ def ensure_callable(name: str, *, mode: str | None = None) -> str:
         if name in EXECUTION_TOOLS:
             raise ToolPermissionError(
                 f"{name!r} places or cancels orders, which requires approval mode "
-                f"or above; the active mode is {mode or 'unset'}. Move up the "
-                f"ladder deliberately — it cannot be skipped."
+                f"or above. The active mode is {mode or 'unset'}. Move up the "
+                f"ladder deliberately, it cannot be skipped."
             )
         raise ToolPermissionError(
             f"{name!r} is an order tool WOLF has no use for (options, exercise, "
@@ -162,7 +162,7 @@ def ensure_callable(name: str, *, mode: str | None = None) -> str:
         raise ToolPermissionError(f"{name!r} mutates broker-side state. WOLF v0.1 reads only.")
     raise ToolPermissionError(
         f"{name!r} is not in the allowlist. Tools must be added deliberately, "
-        f"with a stated reason — an unrecognised tool is refused by default."
+        f"with a stated reason, an unrecognised tool is refused by default."
     )
 
 
