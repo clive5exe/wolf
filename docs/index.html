@@ -153,6 +153,8 @@
                                 aria-selected="false" data-i="4">journal</button>
                             <button class="show-tab" role="tab"
                                 aria-selected="false" data-i="5">kill</button>
+                            <button class="show-tab" role="tab"
+                                aria-selected="false" data-i="6">chart</button>
                         </div>
 
                         <div class="show-stage">
@@ -173,6 +175,9 @@
                                 loading="lazy" />
                             <img class="show-img" data-i="5"
                                 src="./screens/kill.svg" alt="Kill switch screen"
+                                loading="lazy" />
+                            <img class="show-img" data-i="6"
+                                src="./screens/candles.svg" alt="AAPL candlestick chart"
                                 loading="lazy" />
                         </div>
 
@@ -200,7 +205,7 @@
                             <div class="show-desc" id="show-desc">One row answers five questions per holding: how much, how far from plan, what it costs, how fresh the price is. The ◆┼ gauge shows drift spatially, scaled so the end of the track is the point where the strategy trades.</div>
                         </div>
                     </div>
-                    <script id="show-data" type="application/json">[{"title": "Boot", "desc": "The environment checks are the startup sequence. A failing check halts the cascade with its fix hint, so you cannot boot past a broken setup."}, {"title": "The den", "desc": "One row answers five questions per holding: how much, how far from plan, what it costs, how fresh the price is. The \u25c6\u253c gauge shows drift spatially, scaled so the end of the track is the point where the strategy trades."}, {"title": "Decision cycle", "desc": "Watchable as it happens. Stages complete left to right, so you can see the model occupy exactly one box, with deterministic walls on both sides."}, {"title": "Verdict", "desc": "Thesis on top, the rule wall below, receipt at the bottom. Every rule is listed, every time, including on a veto, when it would be easiest to summarise."}, {"title": "Journal", "desc": "Vetoes and no-actions carry the same weight as fills. \u201cWe did not trade\u201d is a result, not an absence."}, {"title": "Kill switch", "desc": "Reachable from anywhere with one key, checked at four separate layers, and deliberately the ugliest thing in the app. Disengaging takes two intentional presses. Safety should not be tasteful."}]</script>
+                    <script id="show-data" type="application/json">[{"title": "Boot", "desc": "The environment checks are the startup sequence. A failing check halts the cascade with its fix hint, so you cannot boot past a broken setup."}, {"title": "The den", "desc": "One row answers five questions per holding: how much, how far from plan, what it costs, how fresh the price is. The \u25c6\u253c gauge shows drift spatially, scaled so the end of the track is the point where the strategy trades."}, {"title": "Decision cycle", "desc": "Watchable as it happens. Stages complete left to right, so you can see the model occupy exactly one box, with deterministic walls on both sides."}, {"title": "Verdict", "desc": "Thesis on top, the rule wall below, receipt at the bottom. Every rule is listed, every time, including on a veto, when it would be easiest to summarise."}, {"title": "Journal", "desc": "Vetoes and no-actions carry the same weight as fills. \u201cWe did not trade\u201d is a result, not an absence."}, {"title": "Kill switch", "desc": "Reachable from anywhere with one key, checked at four separate layers, and deliberately the ugliest thing in the app. Disengaging takes two intentional presses. Safety should not be tasteful."}, {"title": "Charts", "desc": "63 sessions of AAPL, live from Robinhood, drawn in character cells. Thin wicks and thick bodies share a cell, so one column carries a full session at half-cell resolution. No image protocol, so it renders the same in your terminal as it does here."}]</script>
                     </div>
                 </div>
             </section>
