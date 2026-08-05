@@ -1,9 +1,23 @@
 """WOLF terminal palette.
 
-Colour discipline (the whole point of this file): **amber is the wolf**. Brand,
-targets, and keys. **Green and red are money, and only money.** **Cyan is data
-and history.** Nothing else gets colour, so anything coloured on screen means
-something. Adding a new hue here should feel like a decision, not a convenience.
+Colour discipline, which is the whole point of this file. **Infrared is the
+wolf**: brand, targets, and keys. **Green and red are money, and only money.**
+**Cyan is data and history.** Nothing else gets colour, so anything coloured on
+screen means something. Adding a hue here should feel like a decision.
+
+**Infrared never renders a value.** It labels, marks and points. Values are
+BRIGHT when they matter and INK when they do not, and signed money is green or
+red. This rule is load-bearing rather than stylistic: at ``#FF2247`` the brand
+sits at hue 350, which is red, and measurement says no money-down red can be
+told apart from it. Every candidate scored between 1.04 and 1.62 contrast
+against the brand, and shifting the hue far enough to separate them turns the
+loss colour orange. Since the collision cannot be solved with a hex value, it
+is solved with a rule: the two colours never do the same job, so they never
+appear in the same role and the ambiguity has nowhere to arise.
+
+For the same reason every signed number carries an explicit ▲ or ▼. Direction
+then survives greyscale, colour blindness, and a terminal with a mangled
+palette, none of which are rare.
 """
 
 from __future__ import annotations

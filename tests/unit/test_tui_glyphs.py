@@ -133,3 +133,29 @@ class TestMarkup:
 
     def test_escape_protects_literal_brackets(self) -> None:
         assert plain(escape("[watching]")) == "[watching]"
+
+
+class TestDirectionSurvivesWithoutColour:
+    """The brand hue is 350, which is red, and measurement showed no money-down
+    red separates from it (1.04 to 1.62 contrast across every candidate). So
+    direction cannot rest on colour alone."""
+
+    def test_arrows_mark_direction(self) -> None:
+        from tradeos.tui.glyphs import direction
+
+        assert direction(Decimal("1")) == "▲"
+        assert direction(Decimal("-1")) == "▼"
+        assert direction(Decimal("0")) == "·"
+        assert direction(None) == "·"
+
+    def test_signed_values_can_carry_their_arrow(self) -> None:
+        from tradeos.tui.glyphs import fmt_signed, fmt_signed_pct
+
+        assert fmt_signed(Decimal("12.5"), arrow=True).startswith("▲")
+        assert fmt_signed(Decimal("-12.5"), arrow=True).startswith("▼")
+        assert fmt_signed_pct(Decimal("0.075"), arrow=True) == "▲ +7.5%"
+
+    def test_arrows_are_opt_in_so_columns_stay_narrow(self) -> None:
+        from tradeos.tui.glyphs import fmt_signed
+
+        assert fmt_signed(Decimal("12.5")) == "+12.50"

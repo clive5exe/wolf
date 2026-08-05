@@ -59,9 +59,11 @@ opposite stance:
 | Versioned investment policy with mode ladder + kill switch | |
 | Six-screen terminal UI: boot diagnosis, den, live cycle, verdict, journal, kill | |
 | Scheduled cycles (`wolf watch`) with market-hours gating and kill-switch awareness | |
+| SEC EDGAR fundamentals with point-in-time correctness (restatements are visible, not silently applied) | |
+| Daily SEC filing collector (Cloudflare Worker, optional mirror, never a dependency) | |
 | Policy onboarding (`wolf setup`): your goals drafted into a policy you confirm | |
 | Typer CLI (`wolf`), notifications via Notification Center or libnotify | |
-| 448 tests incl. safety/contract/replay suites, mypy clean, CI | |
+| 488 tests incl. safety/contract/replay suites, mypy clean, CI | |
 
 ## Quickstart
 

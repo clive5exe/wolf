@@ -51,7 +51,7 @@ State legend: ☐ ready · ◐ in progress · ☑ done (this scaffold session) �
 ## M5. Intelligence & evaluation
 | ID | Task | Class | State |
 |---|---|---|---|
-| T-023 | SEC EDGAR connector: submissions+companyfacts, rate limiter, raw events | S1 | ◐ (submissions + CIK map + limiter done. Companyfacts/XBRL pending) |
+| T-023 | SEC EDGAR connector: submissions+companyfacts, rate limiter, raw events | S1 | ☑ (companyfacts landed with point-in-time selection; HTTP transport built; limiter done. Companyfacts/XBRL pending) |
 | T-024 | Robinhood Agentic MCP read-only adapter + tool-probe + allowlist registry | **S2** | ◐ (allowlist registry + tool probe done. OAuth client and adapter pending yes 2026-08-05). Fixture-driven dev now, live connect after owner completes RH onboarding |
 | T-025 | Sentiment interface + deterministic aggregation (+ optional Bluesky connector, flag-off) | S1 | ☐ |
 | T-026 | Portfolio statistics module with documented formulas | S1 | ◐ (core stats done. Sharpe/Sortino/beta pending benchmark decision A13) |

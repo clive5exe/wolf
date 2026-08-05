@@ -162,12 +162,30 @@ def fmt_money(value: Decimal | None, *, places: int = 2) -> str:
     return f"${value.quantize(quant):,}"
 
 
-def fmt_signed(value: Decimal | None, *, places: int = 2) -> str:
+#: Direction marks. Carried alongside the sign so that up and down survive a
+#: greyscale terminal, colour blindness, or a mangled palette. Colour is then a
+#: reinforcement rather than the only channel, which matters more here than
+#: usual: the brand hue sits at 350 and cannot be told from a loss red.
+UP: str = "▲"
+DOWN: str = "▼"
+FLAT: str = "·"
+
+
+def direction(value: Decimal | None) -> str:
+    """▲ up · ▼ down · · flat. Never colour alone."""
+    if value is None or value == 0:
+        return FLAT
+    return UP if value > 0 else DOWN
+
+
+def fmt_signed(value: Decimal | None, *, places: int = 2, arrow: bool = False) -> str:
     if value is None:
         return "·"
     quant = Decimal(1).scaleb(-places)
     rounded = value.quantize(quant)
-    return f"{'+' if rounded > 0 else '−' if rounded < 0 else ''}{abs(rounded):,}"
+    sign = "+" if rounded > 0 else "−" if rounded < 0 else ""
+    body = f"{sign}{abs(rounded):,}"
+    return f"{direction(rounded)} {body}" if arrow else body
 
 
 def fmt_pct(value: Decimal | None, *, places: int = 1) -> str:
@@ -178,14 +196,15 @@ def fmt_pct(value: Decimal | None, *, places: int = 1) -> str:
     return f"{(value * 100).quantize(quant)}%"
 
 
-def fmt_signed_pct(value: Decimal | None, *, places: int = 1) -> str:
+def fmt_signed_pct(value: Decimal | None, *, places: int = 1, arrow: bool = False) -> str:
     """A signed percentage using a true minus sign, so columns align."""
     if value is None:
         return "·"
     quant = Decimal(1).scaleb(-places)
     rounded = (value * 100).quantize(quant)
     sign = "+" if rounded > 0 else "−" if rounded < 0 else ""
-    return f"{sign}{abs(rounded)}%"
+    body = f"{sign}{abs(rounded)}%"
+    return f"{direction(rounded)} {body}" if arrow else body
 
 
 def fmt_qty(value: Decimal | None) -> str:
