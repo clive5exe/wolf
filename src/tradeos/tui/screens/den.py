@@ -19,6 +19,7 @@ from textual.widgets import Static
 
 from tradeos.runtime.views import DashboardView, HoldingView
 from tradeos.tui.base import WolfScreen, footer_bar, header_bar
+from tradeos.tui.chart import line, price_axis
 from tradeos.tui.glyphs import (
     fmt_age,
     fmt_money,
@@ -31,6 +32,7 @@ from tradeos.tui.glyphs import (
     paint_gauge,
     sparkline,
 )
+from tradeos.tui.markup import visible_len as _visible
 from tradeos.tui.motion import REFRESH_INTERVAL_S
 from tradeos.tui.theme import Ink, badge, key, money_ink
 
@@ -188,6 +190,12 @@ class DenScreen(WolfScreen):
             f"{day_part}{gap}{dd_part}{gap}{cash_part}\n"
         )
 
+    #: Rows given to the equity chart once there is enough history to shape one.
+    #: Below this the chart is noise pretending to be a trend, so a single-line
+    #: sparkline says the same thing more honestly.
+    CHART_MIN_POINTS = 6
+    CHART_ROWS = 6
+
     def _equity_line(self, view: DashboardView) -> str:
         points = [p.equity for p in view.equity]
         if len(points) < 2:
@@ -195,8 +203,20 @@ class DenScreen(WolfScreen):
                 f"  [{Ink.FAINT}]{'▁' * 24}[/]  "
                 f"[{Ink.FAINT}]equity history builds as cycles run[/]\n"
             )
-        spark = sparkline(points, width=max(24, self.frame - 34))
-        return f"  [{Ink.CYAN}]{spark}[/]  [{Ink.FAINT}]{len(points)} equity snapshots[/]\n"
+        if len(points) < self.CHART_MIN_POINTS:
+            spark = sparkline(points, width=max(24, self.frame - 34))
+            return f"  [{Ink.CYAN}]{spark}[/]  [{Ink.FAINT}]{len(points)} equity snapshots[/]\n"
+
+        width = max(24, self.frame - 22)
+        rows = line(points, width=width, rows=self.CHART_ROWS, ink=Ink.CYAN)
+        low, high = min(points), max(points)
+        axis = price_axis(low, high, self.CHART_ROWS)
+        body = "\n".join(
+            f"  {row}{'' if not label else ' ' * max(1, width - _visible(row) + 1)}"
+            f"[{Ink.FAINT}]{label}[/]"
+            for row, label in zip(rows, axis, strict=True)
+        )
+        return f"{body}\n  [{Ink.FAINT}]equity · {len(points)} snapshots[/]\n"
 
     def _rows(self, view: DashboardView, gauge: int, compact: bool) -> str:
         lines: list[str] = []
