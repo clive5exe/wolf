@@ -20,26 +20,25 @@ from tradeos.tui.app import WolfApp
 
 OUT = pathlib.Path(__file__).resolve().parent.parent / "docs" / "screens"
 
-#: Terminal size per screen. Height is set so nothing clips — the boot splash
-#: plus ten checks needs considerably more room than the journal does.
+#: One terminal size for every capture. Uniform output matters downstream: the
+#: site presents these in a slideshow, and mixed aspect ratios there mean either
+#: letterboxing or the frame resizing between slides. 30 rows is set by the
+#: tallest screen (boot's splash plus ten checks); the shorter ones simply have
+#: empty terminal below, which is what a real terminal looks like anyway.
+SIZE = (100, 30)
+
 SHOTS = (
-    # name, screen, cycles, size, engage_kill
-    ("den", "den", 1, (100, 24), False),
-    ("boot", "boot", 0, (100, 30), False),
-    ("cycle", "cycle", 0, (100, 26), False),
-    ("verdict", "verdict", 1, (100, 30), False),
-    ("journal", "journal", 3, (100, 18), False),
-    ("kill", "kill", 1, (100, 24), True),
+    # name, screen, cycles, engage_kill
+    ("den", "den", 1, False),
+    ("boot", "boot", 0, False),
+    ("cycle", "cycle", 0, False),
+    ("verdict", "verdict", 1, False),
+    ("journal", "journal", 3, False),
+    ("kill", "kill", 1, True),
 )
 
 
-async def capture(
-    name: str,
-    screen: str,
-    cycles: int,
-    size: tuple[int, int],
-    engage_kill: bool,
-) -> None:
+async def capture(name: str, screen: str, cycles: int, engage_kill: bool) -> None:
     runtime = TradeOSRuntime(RuntimeConfig(in_memory=True))
     runtime.ensure_sample_policy()
     for index in range(cycles):
@@ -48,7 +47,7 @@ async def capture(
         runtime.engage_kill_switch("market data storm — engaged by operator")
 
     app = WolfApp(runtime, calm=True, start_screen=screen)
-    async with app.run_test(size=size) as pilot:
+    async with app.run_test(size=SIZE) as pilot:
         # The cycle screen runs a real decision on a worker; give it time to finish.
         for _ in range(30 if screen == "cycle" else 2):
             await pilot.pause()

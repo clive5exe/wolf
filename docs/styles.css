@@ -393,46 +393,126 @@ nav {
     margin: 0 auto 34px;
 }
 
-/* ─── SCREENS ─── */
-.screens {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+/* ─── SCREENS SLIDESHOW ─── */
+.show { width: 100%; }
+
+.show-tabs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 20px;
 }
-@media (max-width: 860px) {
-    .screens { grid-template-columns: 1fr; }
+.show-tab {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 5px 11px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
-.screen-card {
+.show-tab:hover { color: var(--bright); }
+.show-tab.is-on {
+    color: var(--infrared);
+    border-color: var(--border);
+    background: var(--surface);
+}
+.show-tab:focus-visible,
+.show-arrow:focus-visible,
+.show-dot:focus-visible {
+    outline: 2px solid var(--infrared);
+    outline-offset: 2px;
+}
+
+/* Matches the captures exactly (1238x782), so slides fill the frame with no
+   letterboxing and swapping one for another shifts nothing. */
+.show-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1238 / 782;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     overflow: hidden;
-    transition: border-color 0.15s, transform 0.15s;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
 }
-.screen-card:hover {
-    border-color: var(--faint);
-    transform: translateY(-2px);
-}
-.screen-card.wide { grid-column: 1 / -1; }
-.screen-card img {
+.show-img {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: auto;
-    display: block;
-    border-bottom: 1px solid var(--border-soft);
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.32s ease;
+    pointer-events: none;
 }
-.screen-meta { padding: 14px 16px 16px; }
-.screen-name {
+.show-img.is-on { opacity: 1; }
+
+.show-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 16px;
+}
+.show-arrow {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 19px;
+    line-height: 1;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+}
+.show-arrow:hover { color: var(--infrared); border-color: var(--infrared); }
+.show-dots { display: flex; gap: 7px; }
+.show-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    background: var(--border);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+.show-dot.is-on { background: var(--infrared); transform: scale(1.3); }
+
+.show-caption {
+    text-align: center;
+    max-width: 640px;
+    margin: 20px auto 0;
+    /* Reserved height: without it, a shorter description pulls the page up as
+       slides change, which reads as a glitch rather than a transition. */
+    min-height: 96px;
+}
+.show-name {
+    font-family: var(--font-mono);
+    font-size: 14px;
     font-weight: 700;
     color: var(--bright);
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
-.screen-desc {
+.show-desc {
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 13px;
     color: var(--muted);
-    line-height: 1.65;
+    line-height: 1.7;
+}
+.show-caption.is-swapping .show-name,
+.show-caption.is-swapping .show-desc { opacity: 0; }
+.show-name, .show-desc { transition: opacity 0.16s ease; }
+
+@media (max-width: 720px) {
+    .show-caption { min-height: 132px; }
+    .show-tab { font-size: 11px; padding: 4px 8px; }
 }
 
 /* ─── STEPS ─── */

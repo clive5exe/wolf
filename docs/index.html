@@ -131,104 +131,68 @@
                         </p>
                     </div>
 
-                    <div class="screens">
-                        <div class="screen-card wide">
-                            <img
-                                src="./screens/den.svg"
-                                alt="The den — WOLF's dashboard, showing holdings, drift gauges and freshness"
-                                loading="lazy"
-                            />
-                            <div class="screen-meta">
-                                <div class="screen-name">The den</div>
-                                <div class="screen-desc">
-                                    One row answers five questions per holding: how much,
-                                    how far from plan, what it costs, how fresh the price
-                                    is. The ◆┼ gauge shows drift spatially, scaled so the
-                                    end of the track is the point where the strategy
-                                    trades.
-                                </div>
-                            </div>
+                    <div class="show" id="show">
+                        <div class="show-tabs" role="tablist" aria-label="Screens">
+                            <button class="show-tab is-on" role="tab"
+                                aria-selected="true" data-i="0">den</button>
+                            <button class="show-tab" role="tab"
+                                aria-selected="false" data-i="1">cycle</button>
+                            <button class="show-tab" role="tab"
+                                aria-selected="false" data-i="2">verdict</button>
+                            <button class="show-tab" role="tab"
+                                aria-selected="false" data-i="3">boot</button>
+                            <button class="show-tab" role="tab"
+                                aria-selected="false" data-i="4">journal</button>
+                            <button class="show-tab" role="tab"
+                                aria-selected="false" data-i="5">kill</button>
                         </div>
 
-                        <div class="screen-card">
-                            <img
-                                src="./screens/cycle.svg"
-                                alt="Live decision cycle showing pipeline stages"
-                                loading="lazy"
-                            />
-                            <div class="screen-meta">
-                                <div class="screen-name">Decision cycle</div>
-                                <div class="screen-desc">
-                                    Watchable as it happens. Stages complete left to
-                                    right, so you can see the model occupy exactly one
-                                    box — with deterministic walls on both sides.
-                                </div>
-                            </div>
+                        <div class="show-stage">
+                            <img class="show-img is-on" data-i="0"
+                                src="./screens/den.svg" alt="The den screen"
+                                 />
+                            <img class="show-img" data-i="1"
+                                src="./screens/cycle.svg" alt="Decision cycle screen"
+                                loading="lazy" />
+                            <img class="show-img" data-i="2"
+                                src="./screens/verdict.svg" alt="Verdict screen"
+                                loading="lazy" />
+                            <img class="show-img" data-i="3"
+                                src="./screens/boot.svg" alt="Boot screen"
+                                loading="lazy" />
+                            <img class="show-img" data-i="4"
+                                src="./screens/journal.svg" alt="Journal screen"
+                                loading="lazy" />
+                            <img class="show-img" data-i="5"
+                                src="./screens/kill.svg" alt="Kill switch screen"
+                                loading="lazy" />
                         </div>
 
-                        <div class="screen-card">
-                            <img
-                                src="./screens/verdict.svg"
-                                alt="Verdict screen showing thesis, all risk rules, and the fill receipt"
-                                loading="lazy"
-                            />
-                            <div class="screen-meta">
-                                <div class="screen-name">Verdict</div>
-                                <div class="screen-desc">
-                                    Thesis on top, the rule wall below, receipt at the
-                                    bottom. Every rule is listed, every time — including
-                                    on a veto, when it would be easiest to summarise.
-                                </div>
+                        <div class="show-bar">
+                            <button class="show-arrow" id="show-prev" aria-label="Previous screen">‹</button>
+                            <div class="show-dots">
+                            <button class="show-dot is-on" data-i="0"
+                                aria-label="Go to The den"></button>
+                            <button class="show-dot" data-i="1"
+                                aria-label="Go to Decision cycle"></button>
+                            <button class="show-dot" data-i="2"
+                                aria-label="Go to Verdict"></button>
+                            <button class="show-dot" data-i="3"
+                                aria-label="Go to Boot"></button>
+                            <button class="show-dot" data-i="4"
+                                aria-label="Go to Journal"></button>
+                            <button class="show-dot" data-i="5"
+                                aria-label="Go to Kill switch"></button>
                             </div>
+                            <button class="show-arrow" id="show-next" aria-label="Next screen">›</button>
                         </div>
 
-                        <div class="screen-card">
-                            <img
-                                src="./screens/boot.svg"
-                                alt="Boot screen running environment checks"
-                                loading="lazy"
-                            />
-                            <div class="screen-meta">
-                                <div class="screen-name">Boot</div>
-                                <div class="screen-desc">
-                                    The environment checks <em>are</em> the startup
-                                    sequence. A failing check halts the cascade with its
-                                    fix hint, so you cannot boot past a broken setup.
-                                </div>
-                            </div>
+                        <div class="show-caption" aria-live="polite">
+                            <div class="show-name" id="show-name">The den</div>
+                            <div class="show-desc" id="show-desc">One row answers five questions per holding: how much, how far from plan, what it costs, how fresh the price is. The ◆┼ gauge shows drift spatially, scaled so the end of the track is the point where the strategy trades.</div>
                         </div>
-
-                        <div class="screen-card">
-                            <img
-                                src="./screens/journal.svg"
-                                alt="Journal listing past decisions including no-actions"
-                                loading="lazy"
-                            />
-                            <div class="screen-meta">
-                                <div class="screen-name">Journal</div>
-                                <div class="screen-desc">
-                                    Vetoes and no-actions carry the same weight as fills.
-                                    "We did not trade" is a result, not an absence.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="screen-card wide">
-                            <img
-                                src="./screens/kill.svg"
-                                alt="Kill switch takeover screen"
-                                loading="lazy"
-                            />
-                            <div class="screen-meta">
-                                <div class="screen-name">Kill switch</div>
-                                <div class="screen-desc">
-                                    Reachable from anywhere with one key, checked at four
-                                    separate layers, and deliberately the ugliest thing
-                                    in the app. Disengaging takes two intentional presses
-                                    or a typed command — safety should not be tasteful.
-                                </div>
-                            </div>
-                        </div>
+                    </div>
+                    <script id="show-data" type="application/json">[{"title": "The den", "desc": "One row answers five questions per holding: how much, how far from plan, what it costs, how fresh the price is. The ◆┼ gauge shows drift spatially, scaled so the end of the track is the point where the strategy trades."}, {"title": "Decision cycle", "desc": "Watchable as it happens. Stages complete left to right, so you can see the model occupy exactly one box — with deterministic walls on both sides."}, {"title": "Verdict", "desc": "Thesis on top, the rule wall below, receipt at the bottom. Every rule is listed, every time — including on a veto, when it would be easiest to summarise."}, {"title": "Boot", "desc": "The environment checks are the startup sequence. A failing check halts the cascade with its fix hint, so you cannot boot past a broken setup."}, {"title": "Journal", "desc": "Vetoes and no-actions carry the same weight as fills. “We did not trade” is a result, not an absence."}, {"title": "Kill switch", "desc": "Reachable from anywhere with one key, checked at four separate layers, and deliberately the ugliest thing in the app. Disengaging takes two intentional presses — safety should not be tasteful."}]</script>
                     </div>
                 </div>
             </section>
@@ -476,6 +440,85 @@
         </footer>
 
         <script>
+            // ── Screens slideshow ──────────────────────────────────────────
+            (() => {
+                const root = document.getElementById("show");
+                if (!root) return;
+                const slides = JSON.parse(
+                    document.getElementById("show-data").textContent
+                );
+                const tabs = [...root.querySelectorAll(".show-tab")];
+                const imgs = [...root.querySelectorAll(".show-img")];
+                const dots = [...root.querySelectorAll(".show-dot")];
+                const caption = root.querySelector(".show-caption");
+                const nameEl = document.getElementById("show-name");
+                const descEl = document.getElementById("show-desc");
+
+                const reduced = window.matchMedia(
+                    "(prefers-reduced-motion: reduce)"
+                ).matches;
+                let index = 0;
+                let timer = null;
+
+                function show(next) {
+                    index = (next + slides.length) % slides.length;
+                    imgs.forEach((el, i) => el.classList.toggle("is-on", i === index));
+                    dots.forEach((el, i) => el.classList.toggle("is-on", i === index));
+                    tabs.forEach((el, i) => {
+                        el.classList.toggle("is-on", i === index);
+                        el.setAttribute("aria-selected", i === index ? "true" : "false");
+                    });
+                    // Fade the caption out, swap text, fade back — so the words
+                    // do not visibly rewrite themselves mid-transition.
+                    caption.classList.add("is-swapping");
+                    setTimeout(() => {
+                        nameEl.textContent = slides[index].title;
+                        descEl.textContent = slides[index].desc;
+                        caption.classList.remove("is-swapping");
+                    }, reduced ? 0 : 160);
+                }
+
+                function advance() { show(index + 1); }
+
+                function play() {
+                    // Auto-advance is a convenience, not decoration; any manual
+                    // interaction stops it for good rather than fighting the user.
+                    if (reduced) return;
+                    timer = setInterval(advance, 6000);
+                }
+                function stop() {
+                    if (timer) { clearInterval(timer); timer = null; }
+                }
+
+                tabs.forEach((el, i) =>
+                    el.addEventListener("click", () => { stop(); show(i); })
+                );
+                dots.forEach((el, i) =>
+                    el.addEventListener("click", () => { stop(); show(i); })
+                );
+                document
+                    .getElementById("show-prev")
+                    .addEventListener("click", () => { stop(); show(index - 1); });
+                document
+                    .getElementById("show-next")
+                    .addEventListener("click", () => { stop(); show(index + 1); });
+
+                root.addEventListener("mouseenter", stop);
+
+                document.addEventListener("keydown", (e) => {
+                    const tag = document.activeElement?.tagName;
+                    if (tag === "INPUT" || tag === "TEXTAREA") return;
+                    if (e.key === "ArrowLeft") { stop(); show(index - 1); }
+                    if (e.key === "ArrowRight") { stop(); show(index + 1); }
+                });
+
+                // Only run while the section is actually on screen.
+                new IntersectionObserver(
+                    (entries) => entries.forEach((e) => (e.isIntersecting ? play() : stop())),
+                    { threshold: 0.35 }
+                ).observe(root);
+            })();
+
             // Copy the install one-liner.
             const btn = document.getElementById("copy-btn");
             btn.addEventListener("click", async () => {
