@@ -3,12 +3,12 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>WOLF — watches obsessively, lacks feelings</title>
+        <title>WOLF: watches obsessively, lacks feelings</title>
         <meta
             name="description"
             content="A language model wired to a risk engine that cannot be talked out of anything. Twenty-one deterministic checks, an append-only log that replays byte-identically, and no real-money path in v0.1."
         />
-        <meta property="og:title" content="WOLF — watches obsessively, lacks feelings" />
+        <meta property="og:title" content="WOLF: watches obsessively, lacks feelings" />
         <meta
             property="og:description"
             content="An AI portfolio runtime that runs on your machine. The model advises; deterministic code decides."
@@ -30,7 +30,7 @@
                 <a href="#honest">Honesty</a>
                 <a href="./docs/">Docs</a>
                 <a href="https://github.com/clive5exe/wolf" class="nav-icon" aria-label="GitHub">
-                    <svg viewBox="0 0 16 16" width="19" height="19" aria-hidden="true">
+                    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
                         <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
                     </svg>
                 </a>
@@ -60,8 +60,8 @@
 
                     <p class="hero-sub fade-in fade-in-d4">
                         It reads the market and argues for a trade. Then twenty-one
-                        deterministic checks decide whether that trade happens — position
-                        caps, loss limits, quote staleness, cooldowns — and any one of them
+                        deterministic checks decide whether that trade happens. Position
+                        caps, loss limits, quote staleness, cooldowns. Any one of them
                         vetoes. How convincing the model was is not an input to any of them.
                     </p>
                     <p class="hero-sub hero-sub-2 fade-in fade-in-d4">
@@ -111,12 +111,12 @@
                             <span class="terminal-title">macOS &amp; Linux</span>
                         </div>
                         <div class="terminal-body"><span class="comment"># Prints what it will do before doing it. No sudo, no account.</span>
-<span class="prompt">$</span> <span class="cmd" id="install-cmd">curl -fsSL https://raw.githubusercontent.com/clive5exe/wolf/main/install.sh | sh</span>
+<span class="prompt">$</span> <span class="cmd" id="install-cmd">curl -fsSL https://wolf.clive5.com/install.sh | sh</span>
 <span class="prompt">$</span> <span class="cmd">wolf setup</span></div>
                     </div>
                     <p class="install-note">
                         Prefer to read it first? Swap <code>| sh</code> for
-                        <code>| less</code> — it touches two paths and prints them before
+                        <code>| less</code>. It touches two paths and prints them before
                         it starts. Then <code>wolf setup</code> turns your goals into a
                         policy you confirm field by field.
                     </p>
@@ -132,7 +132,7 @@
                         <div class="section-badge">The interface</div>
                         <h2 class="section-title">Six screens, one keystroke apart</h2>
                         <p class="section-sub">
-                            Real captures, produced by running the app — not mockups.
+                            Real captures, produced by running the app, not mockups.
                             Every figure on them is one the code actually computed.
                         </p>
                     </div>
@@ -198,7 +198,7 @@
                             <div class="show-desc" id="show-desc">One row answers five questions per holding: how much, how far from plan, what it costs, how fresh the price is. The ◆┼ gauge shows drift spatially, scaled so the end of the track is the point where the strategy trades.</div>
                         </div>
                     </div>
-                    <script id="show-data" type="application/json">[{"title": "The den", "desc": "One row answers five questions per holding: how much, how far from plan, what it costs, how fresh the price is. The ◆┼ gauge shows drift spatially, scaled so the end of the track is the point where the strategy trades."}, {"title": "Decision cycle", "desc": "Watchable as it happens. Stages complete left to right, so you can see the model occupy exactly one box — with deterministic walls on both sides."}, {"title": "Verdict", "desc": "Thesis on top, the rule wall below, receipt at the bottom. Every rule is listed, every time — including on a veto, when it would be easiest to summarise."}, {"title": "Boot", "desc": "The environment checks are the startup sequence. A failing check halts the cascade with its fix hint, so you cannot boot past a broken setup."}, {"title": "Journal", "desc": "Vetoes and no-actions carry the same weight as fills. “We did not trade” is a result, not an absence."}, {"title": "Kill switch", "desc": "Reachable from anywhere with one key, checked at four separate layers, and deliberately the ugliest thing in the app. Disengaging takes two intentional presses — safety should not be tasteful."}]</script>
+                    <script id="show-data" type="application/json">[{"title": "The den", "desc": "One row answers five questions per holding: how much, how far from plan, what it costs, how fresh the price is. The ◆┼ gauge shows drift spatially, scaled so the end of the track is the point where the strategy trades."}, {"title": "Decision cycle", "desc": "Watchable as it happens. Stages complete left to right, so you can see the model occupy exactly one box, with deterministic walls on both sides."}, {"title": "Verdict", "desc": "Thesis on top, the rule wall below, receipt at the bottom. Every rule is listed, every time, including on a veto, when it would be easiest to summarise."}, {"title": "Boot", "desc": "The environment checks are the startup sequence. A failing check halts the cascade with its fix hint, so you cannot boot past a broken setup."}, {"title": "Journal", "desc": "Vetoes and no-actions carry the same weight as fills. “We did not trade” is a result, not an absence."}, {"title": "Kill switch", "desc": "Reachable from anywhere with one key, checked at four separate layers, and deliberately the ugliest thing in the app. Disengaging takes two intentional presses. Safety should not be tasteful."}]</script>
                     </div>
                 </div>
             </section>
@@ -229,8 +229,8 @@
                                 <div class="step-title">Propose deterministically.</div>
                                 <div class="step-desc">
                                     The strategy computes candidate trades in explicit
-                                    Decimal arithmetic. Sizing is never a model's job —
-                                    it is arithmetic, and arithmetic belongs to code you
+                                    Decimal arithmetic. Sizing is never a model's job.
+                                    It is arithmetic, and arithmetic belongs to code you
                                     can read.
                                 </div>
                             </div>
@@ -240,7 +240,7 @@
                             <div class="step-body">
                                 <div class="step-title">Ask the model for judgement.</div>
                                 <div class="step-desc">
-                                    Optionally. It receives proportions, never amounts —
+                                    Optionally. It receives proportions, never amounts.
                                     "39.9% of the portfolio against a 40% target", never
                                     a dollar figure or a share count. It returns a
                                     structured thesis with citations, or nothing.
@@ -252,7 +252,7 @@
                             <div class="step-body">
                                 <div class="step-title">Run every rule, every time.</div>
                                 <div class="step-desc">
-                                    Twenty-one deterministic checks — position and sector
+                                    Twenty-one deterministic checks. Position and sector
                                     caps, loss limits, cooldowns, trading hours, quote
                                     and context staleness, duplicate orders, the kill
                                     switch. Any blocking failure vetoes the trade. The
@@ -303,8 +303,8 @@
                             <div class="card-title">Freshness is never hidden</div>
                             <div class="card-body">
                                 Nothing enters a decision without an event time, an
-                                ingestion time and a TTL. Live sources pulse on screen;
-                                stale ones go still, so you notice the absence of motion.
+                                ingestion time and a TTL. Live sources pulse on screen.
+                                Stale ones go still, so you notice the absence of motion.
                             </div>
                         </div>
                         <div class="card">
@@ -313,8 +313,8 @@
                             <div class="card-body">
                                 No account with us, no backend, no telemetry. Your
                                 history is a SQLite file you own. It does use the network
-                                — your AI provider, your broker, public filings — always
-                                through your own credentials.
+                                to reach your AI provider, your broker and public
+                                filings, always through your own credentials.
                             </div>
                         </div>
                     </div>
@@ -388,7 +388,7 @@
                                 <div class="plain-q">Windows is untested.</div>
                                 <div class="plain-a">
                                     macOS and Linux are covered by CI. Nothing is known
-                                    to break on Windows, but nobody has run it — and an
+                                    to break on Windows, but nobody has run it, and an
                                     untested claim is one you get called on.
                                 </div>
                             </div>
@@ -424,7 +424,7 @@
                 <p class="disclaimer">
                     WOLF is experimental research software for paper trading. It is not
                     investment advice, it does not predict markets, and it ships with no
-                    real-money execution path. Markets carry risk; you are responsible
+                    real-money execution path. Markets carry risk. You are responsible
                     for your own decisions.
                 </p>
             </section>
@@ -474,7 +474,7 @@
                         el.classList.toggle("is-on", i === index);
                         el.setAttribute("aria-selected", i === index ? "true" : "false");
                     });
-                    // Fade the caption out, swap text, fade back — so the words
+                    // Fade the caption out, swap text, fade back, so the words
                     // do not visibly rewrite themselves mid-transition.
                     caption.classList.add("is-swapping");
                     setTimeout(() => {
@@ -487,7 +487,7 @@
                 function advance() { show(index + 1); }
 
                 function play() {
-                    // Auto-advance is a convenience, not decoration; any manual
+                    // Auto-advance is a convenience, not decoration. Any manual
                     // interaction stops it for good rather than fighting the user.
                     if (reduced) return;
                     timer = setInterval(advance, 6000);

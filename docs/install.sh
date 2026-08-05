@@ -4,8 +4,8 @@
 # Piping a script from the internet into a shell deserves suspicion, so this
 # one is written to be read first and to say what it will do before doing it:
 #
-#     curl -fsSL https://raw.githubusercontent.com/clive5exe/wolf/main/install.sh | less
-#     curl -fsSL https://raw.githubusercontent.com/clive5exe/wolf/main/install.sh | sh
+#     curl -fsSL https://wolf.clive5.com/install.sh | less
+#     curl -fsSL https://wolf.clive5.com/install.sh | sh
 #
 # It touches exactly two paths, both printed below, and installs nothing
 # system-wide. Set WOLF_HOME to relocate it, or WOLF_REF to pin a tag.

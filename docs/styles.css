@@ -90,13 +90,12 @@ nav {
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 50;
-    height: 66px;
+    height: 56px;
     background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-soft);
 }
-/* Centred rather than logo-left: the wordmark is already the hero, so a second
+/* Centred rather than logo-left. The wordmark is already the hero, so a second
    one in the bar is repetition rather than navigation. */
 .nav-inner {
     max-width: 1100px;
@@ -106,11 +105,11 @@ nav {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 30px;
+    gap: 22px;
 }
 .nav-inner a {
     font-family: var(--font-mono);
-    font-size: 14px;
+    font-size: 12.5px;
     color: var(--muted);
     text-decoration: none;
     transition: color 0.15s;
@@ -121,11 +120,10 @@ nav {
     align-items: center;
     color: var(--muted);
 }
-.nav-icon:hover { color: var(--infrared); }
+.nav-icon:hover { color: var(--bright); }
 .nav-icon svg { display: block; }
 @media (max-width: 620px) {
-    .nav-inner { gap: 18px; }
-    .nav-inner a { font-size: 12.5px; }
+    .nav-inner { gap: 16px; }
 }
 
 /* ─── HERO ─── */
@@ -296,13 +294,22 @@ nav {
     font-family: var(--font-mono);
     font-size: 14px;
     line-height: 1.75;
-    /* The block is authored line by line; without this the shell prompts and
+    /* The block is authored line by line. Without this the shell prompts and
        the comment collapse into one wrapped paragraph. */
     white-space: pre;
-    overflow-x: auto;
 }
+/* Narrow screens cannot fit the one-liner at a readable size, so it wraps
+   rather than scrolling sideways. Indenting the wrapped remainder keeps the
+   continuation visually attached to its prompt. */
 @media (max-width: 720px) {
-    .terminal-body { font-size: 12px; }
+    .terminal-body {
+        font-size: 12px;
+        padding: 16px 14px 14px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        text-indent: -1.4em;
+        padding-left: calc(14px + 1.4em);
+    }
 }
 .comment { color: var(--faint); }
 .prompt { color: var(--amber); user-select: none; }

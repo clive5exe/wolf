@@ -66,7 +66,7 @@ opposite stance:
 ## Quickstart
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/clive5exe/wolf/main/install.sh | sh
+curl -fsSL https://wolf.clive5.com/install.sh | sh
 wolf setup                      # your goals -> a draft policy -> you confirm every limit
 ```
 
