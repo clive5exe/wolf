@@ -114,7 +114,7 @@ class KillScreen(WolfScreen):
             keys.append(key("u", "nkill (twice)"))
         else:
             keys.append(key("k", "ill"))
-        return footer_bar("  ".join(keys))
+        return footer_bar("  ".join(keys), width=self.frame)
 
     # -- actions ---------------------------------------------------------------
 

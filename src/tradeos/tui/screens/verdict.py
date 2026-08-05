@@ -19,7 +19,7 @@ from textual.containers import Vertical
 from textual.widgets import Static
 
 from tradeos.runtime.journal import ActionVerdict, CycleRecord
-from tradeos.tui.base import WolfScreen, footer_bar, section
+from tradeos.tui.base import WolfScreen, footer_bar
 from tradeos.tui.glyphs import fmt_completeness, fmt_money, fmt_qty, truncate
 from tradeos.tui.theme import Ink, key
 
@@ -140,16 +140,19 @@ class VerdictScreen(WolfScreen):
         thesis = record.thesis
         if thesis is None:
             widget.update(
-                f"{section('thesis')}\n"
+                f"{self._section('thesis')}\n"
                 f"  [{Ink.DIM}]deterministic cycle — no model was called, so there is "
                 f"no thesis to show.[/]\n"
                 f"  [{Ink.FAINT}]the rebalance rationale below is the whole reasoning.[/]\n"
                 f"  [{Ink.INK}]{truncate(record.verdicts[0].rationale, 70)}[/]\n"
                 if record.verdicts
-                else f"{section('thesis')}\n  [{Ink.DIM}]deterministic cycle — no model call.[/]\n"
+                else (
+                    f"{self._section('thesis')}\n"
+                    f"  [{Ink.DIM}]deterministic cycle — no model call.[/]\n"
+                )
             )
             return
-        head = section(
+        head = self._section(
             f"thesis[/] [{Ink.DIM}]· confidence[/] [{Ink.AMBER}]{thesis.confidence}[/] "
             f"[{Ink.DIM}]· {len(thesis.citations)} citations"
         )
@@ -183,7 +186,7 @@ class VerdictScreen(WolfScreen):
         tint = Ink.GREEN if verdict.approved else Ink.RED
         label = "PASS" if verdict.approved else "VETO"
         head_widget.update(
-            section(f"risk verdict ·[/] [{tint} bold]{passed}/{total} {label}[/][{Ink.DIM}]")
+            self._section(f"risk verdict ·[/] [{tint} bold]{passed}/{total} {label}[/][{Ink.DIM}]")
         )
 
         # Every result is shown, including on a veto. The engine evaluated all of
@@ -237,7 +240,7 @@ class VerdictScreen(WolfScreen):
             return
         verdict = self._current_verdict()
         symbol = verdict.symbol if verdict else ""
-        lines = [section("paper execution")]
+        lines = [self._section("paper execution")]
         for fill in record.fills:
             if symbol and fill.symbol != symbol:
                 continue
@@ -271,7 +274,9 @@ class VerdictScreen(WolfScreen):
             keys.insert(0, key("↑↓", f" orders 1-{count}"))
         keys.append(key("x", " context"))
         keys.append(key("j", "ournal"))
-        self.query_one("#verdict-footer", Static).update(footer_bar("  ".join(keys)))
+        self.query_one("#verdict-footer", Static).update(
+            footer_bar("  ".join(keys), width=self.frame)
+        )
 
     # -- actions ---------------------------------------------------------------
 

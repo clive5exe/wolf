@@ -74,7 +74,10 @@ class JournalScreen(WolfScreen):
             f"[{Ink.RED}]✕[/] [{Ink.DIM}]blocked by risk[/]"
         )
         self.query_one("#journal-footer", Static).update(
-            footer_bar("  ".join((key("⏎", " open"), key("↑↓", " move"), key("esc", " den"))))
+            footer_bar(
+                "  ".join((key("⏎", " open"), key("↑↓", " move"), key("esc", " den"))),
+                width=self.frame,
+            )
         )
 
     def _rows(self) -> str:

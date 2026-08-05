@@ -124,7 +124,7 @@ class CycleScreen(WolfScreen):
         self.query_one("#cycle-outcome", Static).update(self._outcome_block())
         note = key("⏎", " verdict") if self._outcome is not None else ""
         self.query_one("#cycle-footer", Static).update(
-            footer_bar(f"{key('esc', ' den')}  {note}".strip())
+            footer_bar(f"{key('esc', ' den')}  {note}".strip(), width=self.frame)
         )
 
     def _render_pipeline(self) -> None:

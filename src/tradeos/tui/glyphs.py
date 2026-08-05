@@ -61,7 +61,17 @@ _UNDER_EDGE = "◀"
 _OVER_EDGE = "▶"
 
 
-def drift_gauge(drift: Decimal | None, *, full_scale: Decimal = GAUGE_FULL_SCALE) -> str:
+def gauge_target_index(width: int) -> int:
+    """Column the target sits in. Keeps the marker centred as the gauge grows."""
+    return max(1, width // 2 - 1)
+
+
+def drift_gauge(
+    drift: Decimal | None,
+    *,
+    full_scale: Decimal = GAUGE_FULL_SCALE,
+    width: int = GAUGE_WIDTH,
+) -> str:
     """Render drift *spatially*: ``──◆┼────`` is under target, ``───┼◆───`` over.
 
     ``┼`` is always the target and always sits in the same column, so a column
@@ -70,30 +80,41 @@ def drift_gauge(drift: Decimal | None, *, full_scale: Decimal = GAUGE_FULL_SCALE
     gauge mean something specific: reaching the edge is the point at which the
     strategy proposes a trade. Drift past that pins to ◀ / ▶ rather than
     silently clamping, because off-scale must look off-scale.
+
+    ``width`` grows with the terminal. That is the one place extra columns buy
+    something real: a longer track resolves finer drift, where stretching a
+    numeric column would only add whitespace.
     """
+    width = max(4, width)
     if drift is None:
-        return " " * GAUGE_WIDTH
+        return " " * width
     if full_scale <= 0:
         raise ValueError("gauge full_scale must be positive")
 
-    cell = full_scale / GAUGE_TARGET_INDEX
+    target = gauge_target_index(width)
+    cell = full_scale / target
     offset = int((drift / cell).to_integral_value(rounding="ROUND_HALF_UP"))
-    index = GAUGE_TARGET_INDEX + offset
-    cells = [_TRACK] * GAUGE_WIDTH
-    cells[GAUGE_TARGET_INDEX] = _TARGET
+    index = target + offset
+    cells = [_TRACK] * width
+    cells[target] = _TARGET
 
     if index < 0:
         cells[0] = _UNDER_EDGE
-    elif index >= GAUGE_WIDTH:
-        cells[GAUGE_WIDTH - 1] = _OVER_EDGE
+    elif index >= width:
+        cells[width - 1] = _OVER_EDGE
     else:
         cells[index] = _MARKER
     return "".join(cells)
 
 
-def paint_gauge(drift: Decimal | None, *, full_scale: Decimal = GAUGE_FULL_SCALE) -> str:
+def paint_gauge(
+    drift: Decimal | None,
+    *,
+    full_scale: Decimal = GAUGE_FULL_SCALE,
+    width: int = GAUGE_WIDTH,
+) -> str:
     """The gauge as markup: amber marker and target, faint track."""
-    raw = drift_gauge(drift, full_scale=full_scale)
+    raw = drift_gauge(drift, full_scale=full_scale, width=width)
     out: list[str] = []
     for char in raw:
         if char in (_MARKER, _TARGET, _UNDER_EDGE, _OVER_EDGE):

@@ -19,8 +19,21 @@ from tradeos.tui.theme import WORDMARK, Ink
 if TYPE_CHECKING:
     from tradeos.tui.app import WolfApp
 
-#: Chrome is drawn to a fixed width so every screen's frame lines up.
+#: Below this the tables stop fitting and the layout is not worth defending.
+MIN_FRAME_WIDTH = 64
+#: Above this a seven-column table stops being a table: the eye loses the row
+#: as figures drift to opposite edges of an ultrawide terminal. Growing past
+#: this buys whitespace, not information.
+MAX_FRAME_WIDTH = 132
+#: Fallback before a screen knows its own size.
 FRAME_WIDTH = 78
+
+
+def frame_width(available: int) -> int:
+    """Chrome width for a terminal of ``available`` columns."""
+    if available <= 0:
+        return FRAME_WIDTH
+    return max(MIN_FRAME_WIDTH, min(MAX_FRAME_WIDTH, available - 2))
 
 
 class WolfScreen(Screen[None]):
@@ -37,6 +50,22 @@ class WolfScreen(Screen[None]):
     @property
     def motion(self) -> Motion:
         return self.wolf.motion
+
+    @property
+    def frame(self) -> int:
+        """Chrome width for this screen's current size."""
+        return frame_width(self.size.width)
+
+    def _section(self, title: str) -> str:
+        """A labelled divider sized to this screen."""
+        return section(title, width=self.frame)
+
+    def on_resize(self) -> None:
+        """Redraw at the new width. Screens paint into fixed-width strings, so
+        without this a resize leaves the chrome measured for the old terminal."""
+        paint = getattr(self, "_paint", None)
+        if callable(paint):
+            paint()
 
 
 def header_bar(right: str, *, width: int = FRAME_WIDTH) -> str:

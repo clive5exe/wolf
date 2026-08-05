@@ -21,6 +21,7 @@ from textual.widgets import Static
 from tradeos.notifications.base import NullNotifier
 from tradeos.runtime.facade import RuntimeConfig, TradeOSRuntime
 from tradeos.tui.app import WolfApp
+from tradeos.tui.base import MAX_FRAME_WIDTH
 from tradeos.tui.markup import plain
 from tradeos.tui.screens.boot import BootScreen
 from tradeos.tui.screens.cycle import CycleScreen
@@ -375,3 +376,61 @@ class TestInterfaceDiscipline:
                 if f"import {module}" in text or f"from {module}" in text:
                     offenders.append(f"{path.name} imports {module}")
         assert not offenders, offenders
+
+
+class TestResponsiveLayout:
+    """Chrome is drawn into fixed-width strings, so width bugs show up as
+    wrapped rows rather than exceptions — only a measured test catches them."""
+
+    WIDTHS: ClassVar[list[int]] = [66, 72, 80, 96, 120, 160]
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("width", WIDTHS)
+    async def test_no_line_exceeds_the_terminal(self, runtime: TradeOSRuntime, width: int) -> None:
+        runtime.run_cycle(trigger="test")
+        app = WolfApp(runtime, calm=True, start_screen="den")
+        async with app.run_test(size=(width, 30)) as pilot:
+            await pilot.pause()
+            for widget in app.screen.query(Static):
+                for line in plain(str(widget.content)).splitlines():
+                    assert len(line) <= width, (
+                        f"line of {len(line)} cols overflows a {width}-col terminal: {line!r}"
+                    )
+
+    @pytest.mark.asyncio
+    async def test_the_gauge_grows_with_the_terminal(self, runtime: TradeOSRuntime) -> None:
+        """Spare width goes to drift resolution, not to whitespace."""
+        runtime.run_cycle(trigger="test")
+
+        async def gauge_len(width: int) -> int:
+            app = WolfApp(runtime, calm=True, start_screen="den")
+            async with app.run_test(size=(width, 30)) as pilot:
+                await pilot.pause()
+                rows = plain(str(app.screen.query_one("#den-rows", Static).content))
+                vti = next(ln for ln in rows.splitlines() if ln.strip().startswith("VTI"))
+                return sum(ch in "─◆┼◀▶" for ch in vti)
+
+        assert await gauge_len(120) > await gauge_len(70)
+
+    @pytest.mark.asyncio
+    async def test_chrome_is_clamped_on_an_ultrawide_terminal(
+        self, runtime: TradeOSRuntime
+    ) -> None:
+        """Past the clamp a seven-column table stops reading as a table."""
+        app = WolfApp(runtime, calm=True, start_screen="den")
+        async with app.run_test(size=(400, 30)) as pilot:
+            await pilot.pause()
+            header = plain(str(app.screen.query_one("#den-header", Static).content))
+            assert len(header.rstrip()) <= MAX_FRAME_WIDTH
+
+    @pytest.mark.asyncio
+    async def test_resize_repaints_at_the_new_width(self, runtime: TradeOSRuntime) -> None:
+        runtime.run_cycle(trigger="test")
+        app = WolfApp(runtime, calm=True, start_screen="den")
+        async with app.run_test(size=(70, 30)) as pilot:
+            await pilot.pause()
+            narrow = plain(str(app.screen.query_one("#den-header", Static).content))
+            await pilot.resize_terminal(120, 30)
+            await pilot.pause()
+            wide = plain(str(app.screen.query_one("#den-header", Static).content))
+            assert len(wide.rstrip()) > len(narrow.rstrip())
