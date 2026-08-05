@@ -94,7 +94,43 @@ DATA_SOURCES.md, and ADR-0007.
   the Robinhood Trading MCP." Prerequisite is a primary individual investing
   account in good standing. Desktop only — "You can only open an agentic account
   and authenticate your agent on a desktop device."
-- Token lifetimes and scopes: still unpublished; probe at integration time.
+- **OAuth CONFIRMED 2026-08-05** by fetching the discovery documents:
+
+  ```
+  /.well-known/oauth-authorization-server
+    registration_endpoint  https://agent.robinhood.com/oauth/trading/register
+    authorization_endpoint https://robinhood.com/oauth
+    token_endpoint         https://api.robinhood.com/oauth2/token/
+    grant_types            authorization_code, refresh_token
+    code_challenge_methods S256
+    token_endpoint_auth    none
+    scopes_supported       ["internal"]
+  ```
+
+  - **Dynamic client registration (RFC 7591) is supported.** WOLF can register
+    itself; no partner programme, no manual approval, and no privilege specific
+    to any particular agent. An earlier concern that WOLF might be unable to
+    authenticate at all — because it cannot reuse Claude Code's token — was
+    overstated: it simply performs the same standard flow itself.
+  - `token_endpoint_auth_methods_supported: ["none"]` + `S256` means Robinhood
+    expects **public clients using PKCE**, which is the correct shape for a
+    local desktop application that cannot hold a client secret. Loopback
+    redirect; refresh token persisted to the OS credential store.
+  - **`scopes_supported` is `["internal"]` — a single opaque scope. There is no
+    read-only scope to request.** This is the load-bearing finding. A token that
+    can read positions can also place orders as far as the authorization server
+    is concerned, so read-only cannot be proven at the grant layer.
+
+    Consequence: the MCP tool allowlist (`mcp/registry.py`) is not
+    defence-in-depth, it is *the* boundary. Seven of 53 tools reachable,
+    `submit_order` raising unconditionally, and trade tool names asserted absent
+    from source. Weakening any of those removes the only read-only guarantee
+    that exists.
+
+    Consequence: the refresh token is a credential that can trade. It belongs in
+    the OS keychain and nowhere else — which is why `security/store.py` fails
+    closed rather than falling back to a file, and why a headless host needs
+    systemd `LoadCredential=` rather than a dotfile.
 - Tool names/schemas: still unpublished; must be enumerated from a live
   tool-list call. Treated as a read-only source in v0.1 regardless.
 - No official equities REST API for retail exists (crypto REST API only:
