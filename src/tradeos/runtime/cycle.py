@@ -31,6 +31,7 @@ from tradeos.risk.context import RiskContext
 from tradeos.risk.engine import ProposalValidation, RiskEngine
 from tradeos.runtime.killswitch import KillSwitch
 from tradeos.runtime.policy_service import PolicyService
+from tradeos.runtime.progress import CycleProgress, CycleStage, StageState, emit
 from tradeos.strategies.base import Strategy
 
 
@@ -68,21 +69,36 @@ class DecisionCycle:
     def __init__(self, deps: DecisionCycleDeps) -> None:
         self._d = deps
 
-    def run(self, trigger: str) -> CycleOutcome:
+    def run(self, trigger: str, progress: CycleProgress | None = None) -> CycleOutcome:
         d = self._d
         correlation_id = new_ulid()
         now = d.clock.now()
+
+        def stage(step: CycleStage, state: StageState, detail: str = "") -> None:
+            """Display-only notification; never affects what this cycle decides."""
+            emit(
+                progress,
+                correlation_id=correlation_id,
+                stage=step,
+                state=state,
+                detail=detail,
+                at=d.clock.now(),
+            )
+
         d.events.append(
             EventType.CYCLE_TRIGGERED, {"trigger": trigger}, correlation_id=correlation_id
         )
 
         policy = d.policy_service.active_policy()
         if policy is None:
+            stage(CycleStage.OBSERVE, StageState.FAILED, "no active investment policy")
             return self._abort(correlation_id, "no active investment policy — run onboarding")
         if policy.mode == TradingMode.READ_ONLY:
+            stage(CycleStage.OBSERVE, StageState.SKIPPED, "read-only mode")
             return self._no_action(correlation_id, None, "read-only mode: intelligence only")
 
         # -- observe ----------------------------------------------------------
+        stage(CycleStage.OBSERVE, StageState.RUNNING, "reading account and quotes")
         account = d.broker.get_account()
         symbols = sorted(
             {t.symbol for t in policy.target_allocations} | {p.symbol for p in account.positions}
@@ -98,8 +114,14 @@ class DecisionCycle:
             market_open, market_note = True, "simulated session (paper)"
         else:
             market_note = "regular session" if market_open else "market closed"
+        stage(
+            CycleStage.OBSERVE,
+            StageState.DONE,
+            f"quotes {len(quotes)}/{len(symbols)} · {market_note}",
+        )
 
         # -- retrieve ---------------------------------------------------------
+        stage(CycleStage.RETRIEVE, StageState.RUNNING, "assembling context package")
         package = d.assembler.assemble(
             purpose=f"{trigger}:{','.join(symbols)}",
             account=account,
@@ -120,8 +142,15 @@ class DecisionCycle:
             },
             correlation_id=correlation_id,
         )
+        stage(
+            CycleStage.RETRIEVE,
+            StageState.DONE,
+            f"{len(package.items)} items · completeness {package.completeness(now):.0%} · "
+            f"{len(missing)} stale",
+        )
 
         # -- candidates -------------------------------------------------------
+        stage(CycleStage.PROPOSE, StageState.RUNNING, "generating candidates")
         snapshot = PortfolioSnapshot(account=account, quotes=quotes, as_of=now)
         proposal = d.strategy.generate(
             snapshot=snapshot,
@@ -149,11 +178,27 @@ class DecisionCycle:
             },
             correlation_id=correlation_id,
         )
+        stage(
+            CycleStage.PROPOSE,
+            StageState.DONE,
+            f"{proposal.strategy_id}@{proposal.strategy_version} → "
+            f"{len(proposal.actions)} candidates",
+        )
         if proposal.is_no_action:
+            stage(CycleStage.THESIS, StageState.SKIPPED, "no candidates to reason about")
+            stage(CycleStage.RISK, StageState.SKIPPED, "nothing to validate")
+            stage(CycleStage.EXECUTE, StageState.SKIPPED, "no action")
             return self._no_action(correlation_id, proposal, proposal.rationale)
 
         # -- optional AI synthesis -------------------------------------------
-        thesis = self._synthesize(proposal, package, policy_summary=self._policy_summary(policy))
+        if d.provider is None:
+            stage(CycleStage.THESIS, StageState.SKIPPED, "deterministic cycle · $0.00")
+            thesis = None
+        else:
+            stage(CycleStage.THESIS, StageState.RUNNING, f"{d.provider.name} synthesising")
+            thesis = self._synthesize(
+                proposal, package, policy_summary=self._policy_summary(policy)
+            )
         if thesis is not None:
             d.events.append(
                 EventType.THESIS_GENERATED,
@@ -162,14 +207,26 @@ class DecisionCycle:
                     "prompt_version": PROMPT_VERSION,
                     "recommended_action_index": thesis.recommended_action_index,
                     "confidence": str(thesis.confidence),
+                    "bull_case": thesis.bull_case,
+                    "bear_case": thesis.bear_case,
+                    "why_now": thesis.why_now,
+                    "what_changed": thesis.what_changed,
                     "supporting_item_ids": list(thesis.supporting_item_ids),
                     "invalidation_conditions": list(thesis.invalidation_conditions),
                     "data_gaps": list(thesis.data_gaps),
                 },
                 correlation_id=correlation_id,
             )
+            stage(
+                CycleStage.THESIS,
+                StageState.DONE,
+                f"confidence {thesis.confidence} · {len(thesis.supporting_item_ids)} citations",
+            )
+        elif d.provider is not None:
+            stage(CycleStage.THESIS, StageState.FAILED, "no usable thesis — proceeding without")
 
         # -- risk -------------------------------------------------------------
+        stage(CycleStage.RISK, StageState.RUNNING, "every rule runs · any veto stops everything")
         ctx = self._build_risk_context(policy, snapshot, missing, market_open, market_note, now)
         validation = d.engine.validate_proposal(proposal, ctx)
         for verdict in validation.verdicts:
@@ -185,11 +242,23 @@ class DecisionCycle:
                 },
                 correlation_id=correlation_id,
             )
+        vetoed = sum(1 for v in validation.verdicts if not v.approved)
+        rules_run = len(validation.verdicts[0].results) if validation.verdicts else 0
+        stage(
+            CycleStage.RISK,
+            StageState.FAILED if vetoed else StageState.DONE,
+            f"{rules_run} rules · {len(validation.validated_orders)} approved, {vetoed} vetoed",
+        )
 
         # -- mode gate + execution -------------------------------------------
-        fills = self._execute_paper(validation) if policy.mode == TradingMode.PAPER else []
+        if policy.mode == TradingMode.PAPER:
+            stage(CycleStage.EXECUTE, StageState.RUNNING, "paper broker")
+            fills = self._execute_paper(validation)
+            stage(CycleStage.EXECUTE, StageState.DONE, f"{len(fills)} order results")
+        else:
+            fills = []
+            stage(CycleStage.EXECUTE, StageState.SKIPPED, f"mode {policy.mode.value}")
 
-        vetoed = sum(1 for v in validation.verdicts if not v.approved)
         outcome = CycleOutcome(
             correlation_id=correlation_id,
             status="completed",

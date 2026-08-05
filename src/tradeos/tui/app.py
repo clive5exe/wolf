@@ -1,126 +1,100 @@
-"""TradeOS dashboard TUI (Textual).
+"""WOLF — the terminal application.
 
-Interface discipline: everything on screen comes from the TradeOSRuntime
-facade; keys send commands back through it. Freshness/mode are always visible.
+Interface discipline: everything on screen comes from the ``TradeOSRuntime``
+facade, and keys send commands back through it. The dashboard is home; every
+screen is one keystroke away and one ``esc`` back. There are no menus.
+
+``k`` reaches the kill switch from anywhere, on every screen, always.
 """
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import ClassVar
 
-from textual.app import App, ComposeResult
+from textual.app import App
 from textual.binding import Binding, BindingType
-from textual.containers import Vertical
-from textual.widgets import DataTable, Footer, Header, RichLog, Static
+from textual.screen import Screen
 
 from tradeos.runtime.facade import RuntimeConfig, TradeOSRuntime
+from tradeos.tui.motion import Motion
+from tradeos.tui.screens.boot import BootScreen
+from tradeos.tui.screens.cycle import CycleScreen
+from tradeos.tui.screens.den import DenScreen
+from tradeos.tui.screens.journal import JournalScreen
+from tradeos.tui.screens.kill import KillScreen
+from tradeos.tui.screens.verdict import VerdictScreen
+from tradeos.tui.theme import DISCLAIMER, Ink
 
 
-class TradeOSApp(App[None]):
-    TITLE = "TradeOS"
-    SUB_TITLE = "paper portfolio runtime — experimental, not investment advice"
+class WolfApp(App[None]):
+    TITLE = "W◉LF"
+    SUB_TITLE = DISCLAIMER
 
-    CSS = """
-    #mode-banner {
-        dock: top;
-        height: 1;
-        background: $primary-darken-2;
-        color: $text;
-        text-align: center;
-        text-style: bold;
-    }
-    #positions { height: 1fr; }
-    #activity {
-        height: 12;
-        border-top: solid $primary;
-    }
+    CSS = f"""
+    Screen {{
+        background: {Ink.BG};
+        color: {Ink.INK};
+    }}
+    Vertical {{
+        padding: 0 1;
+    }}
+    Static {{
+        background: {Ink.BG};
+    }}
     """
 
+    SCREENS: ClassVar[dict[str, Callable[[], Screen[None]]]] = {
+        "boot": BootScreen,
+        "den": DenScreen,
+        "cycle": CycleScreen,
+        "verdict": VerdictScreen,
+        "journal": JournalScreen,
+        "kill": KillScreen,
+    }
+
+    #: The kill switch is reachable from every screen without exception.
     BINDINGS: ClassVar[list[BindingType]] = [
-        Binding("q", "quit", "Quit"),
-        Binding("r", "refresh", "Refresh"),
-        Binding("c", "run_cycle", "Run paper cycle"),
-        Binding("k", "kill", "Kill switch"),
+        Binding("k", "kill_switch", "kill switch", priority=True),
     ]
 
-    def __init__(self, runtime: TradeOSRuntime | None = None) -> None:
+    def __init__(
+        self,
+        runtime: TradeOSRuntime | None = None,
+        *,
+        calm: bool = False,
+        start_screen: str = "boot",
+    ) -> None:
         super().__init__()
-        self._runtime = runtime or TradeOSRuntime(RuntimeConfig())
-
-    def compose(self) -> ComposeResult:
-        yield Header()
-        yield Static(id="mode-banner")
-        with Vertical():
-            yield DataTable(id="positions")
-            yield RichLog(id="activity", markup=False, wrap=True)
-        yield Footer()
+        self.runtime = runtime or TradeOSRuntime(RuntimeConfig())
+        self.motion = Motion(calm=calm)
+        #: Which decision the verdict screen should open; set by den/journal/cycle.
+        self.focused_cycle_id: str = ""
+        self._start_screen = start_screen
 
     def on_mount(self) -> None:
-        table = self.query_one("#positions", DataTable)
-        table.add_columns("symbol", "value", "weight", "target", "drift", "unreal P&L")
-        self._refresh_all()
+        self.push_screen(self._start_screen)
 
-    # -- actions ---------------------------------------------------------------
+    def action_kill_switch(self) -> None:
+        """``k`` from anywhere. Never a toggle — engaging and disengaging differ.
 
-    def action_refresh(self) -> None:
-        self._refresh_all()
+        This binding is ``priority``, so it would otherwise shadow the kill
+        screen's own ``k``; there we hand the key back to the screen instead of
+        swallowing it.
+        """
+        if isinstance(self.screen, KillScreen):
+            self.screen.action_engage()
+            return
+        self.push_screen("kill")
 
-    def action_run_cycle(self) -> None:
-        self.run_worker(self._run_cycle_worker, thread=True, exclusive=True)
 
-    def action_kill(self) -> None:
-        if self._runtime.kill_switch.is_engaged():
-            self._runtime.disengage_kill_switch()
-        else:
-            self._runtime.engage_kill_switch("engaged from TUI")
-        self._refresh_all()
+#: Kept so `from tradeos.tui.app import TradeOSApp` still resolves post-rename.
+TradeOSApp = WolfApp
 
-    # -- workers / internals ---------------------------------------------------
 
-    def _run_cycle_worker(self) -> None:
-        outcome = self._runtime.run_cycle(trigger="tui")
-        self.call_from_thread(self._after_cycle, outcome.status, outcome.reason)
-
-    def _after_cycle(self, status: str, reason: str) -> None:
-        self.query_one("#activity", RichLog).write(f"cycle finished: [{status}] {reason}")
-        self._refresh_all()
-
-    def _refresh_all(self) -> None:
-        self._refresh_banner()
-        self._refresh_positions()
-        self._refresh_activity()
-
-    def _refresh_banner(self) -> None:
-        policy = self._runtime.active_policy()
-        mode = policy.mode.value.upper() if policy else "NO POLICY — onboarding required"
-        kill = "  ·  KILL SWITCH ENGAGED" if self._runtime.kill_switch.is_engaged() else ""
-        self.query_one("#mode-banner", Static).update(f"mode: {mode}{kill}")
-
-    def _refresh_positions(self) -> None:
-        stats = self._runtime.portfolio_stats()
-        table = self.query_one("#positions", DataTable)
-        table.clear()
-        for row in stats.rows:
-            table.add_row(
-                row.symbol,
-                f"${row.value:,.2f}",
-                f"{row.weight:.2%}",
-                f"{row.target_weight:.0%}" if row.target_weight is not None else "—",
-                f"{row.drift:+.2%}" if row.drift is not None else "—",
-                f"{row.unrealized_pnl:,.2f}" if row.unrealized_pnl is not None else "—",
-            )
-        cash_weight = f"{stats.cash_weight:.2%}" if stats.cash_weight is not None else "n/a"
-        table.add_row("CASH", f"${stats.cash:,.2f}", cash_weight, "—", "—", "—")
-
-    def _refresh_activity(self) -> None:
-        log = self.query_one("#activity", RichLog)
-        log.clear()
-        for event in self._runtime.events_tail(12):
-            log.write(
-                f"{event.occurred_at.strftime('%H:%M:%S')}  {event.event_type.value}"
-                + (f"  [{event.correlation_id[:8]}]" if event.correlation_id else "")
-            )
+def run(calm: bool = False) -> None:
+    WolfApp(calm=calm).run()
 
 
 if __name__ == "__main__":
-    TradeOSApp().run()
+    run()

@@ -33,6 +33,10 @@ dev = [
 ]
 
 [project.scripts]
+# `wolf` is the product's command (free on Homebrew and PATH); `tradeos` stays
+# as an alias because the PyPI distribution name `wolf` is already taken — see
+# specs/decisions/ADR-0012-product-name.md.
+wolf = "tradeos.cli.main:main"
 tradeos = "tradeos.cli.main:main"
 
 [tool.hatch.build.targets.wheel]
@@ -53,6 +57,11 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["DTZ"] # tests may build naive fixtures deliberately
+# TUI tests assert on the same deliberate typography the widgets render.
+"tests/unit/test_tui*.py" = ["DTZ", "RUF001"]
+# The TUI's typography is the product: − (true minus) keeps numeric columns
+# aligned, and ◆ ┼ ● ◐ ○ are the drift/freshness vocabulary.
+"src/tradeos/tui/**" = ["RUF001"]
 
 [tool.mypy]
 python_version = "3.12"

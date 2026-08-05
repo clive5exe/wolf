@@ -42,6 +42,15 @@ class RiskEngine:
     def __init__(self, rules: tuple[RiskRule, ...] = DEFAULT_RULES) -> None:
         self._rules = rules
 
+    @property
+    def rule_ids(self) -> tuple[str, ...]:
+        """Every configured rule id, for interfaces that report what is armed.
+
+        Excludes the per-proposal duplicate rule, which is constructed during
+        validation and so has no identity until a proposal exists.
+        """
+        return tuple(rule.rule_id for rule in self._rules)
+
     def validate_proposal(self, proposal: TradeProposal, ctx: RiskContext) -> ProposalValidation:
         verdicts: list[RiskVerdict] = []
         orders: list[ValidatedOrder] = []

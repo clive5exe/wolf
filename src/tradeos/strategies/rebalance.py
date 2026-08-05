@@ -41,6 +41,15 @@ class TargetAllocationRebalance:
         self._drift_threshold = drift_threshold
         self._min_trade_value = min_trade_value
 
+    @property
+    def drift_threshold(self) -> Decimal:
+        """The band outside which this strategy proposes a trade.
+
+        Public because interfaces scale the drift gauge to it: reaching the end
+        of the track then means "this holding is at the point of action".
+        """
+        return self._drift_threshold
+
     def generate(
         self,
         *,

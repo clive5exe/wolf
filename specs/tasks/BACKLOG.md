@@ -41,6 +41,9 @@ State legend: ☐ ready · ◐ in progress · ☑ done (this scaffold session) �
 | T-020 | TUI shell: dashboard (positions, drift, activity feed, mode badge) | S0 | ☑ |
 | T-021 | macOS notifier (osascript) with message contract | S0 | ☑ |
 | T-022 | Onboarding flow: NL goals → PolicyDraft (provider) → confirm form → active policy | S1 | ☐ |
+| T-031 | TUI visual system (palette, motion, glyphs) + boot cascade & den dashboard | S0 | ☑ |
+| T-032 | Cycle pipeline screen + verdict screen (thesis → full rule wall → receipt) | S1 | ☑ |
+| T-033 | Journal screen + kill-switch takeover (two-press disengage) | S1 | ☑ |
 
 ## M5 — Intelligence & evaluation
 | ID | Task | Class | State |
@@ -55,6 +58,8 @@ State legend: ☐ ready · ◐ in progress · ☑ done (this scaffold session) �
 | T-030 | Threat-model regression suite completion (T1–T7 rows each mapped to a test) | **S2** | ◐ |
 
 Next five (priority order): **T-022, T-023, T-026 finish, T-027 finish, T-028.**
+T-028's journal reducer landed with T-033 (`runtime/journal.py`); what remains is
+per-cycle evaluation metrics and outcome grading (did the thesis hold?).
 T-024 stays blocked on the human answering ASSUMPTIONS Q2.
 
 ## Milestone acceptance

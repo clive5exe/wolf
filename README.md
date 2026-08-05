@@ -1,21 +1,22 @@
-# TradeOS
+# W◉LF
 
-**A local-first, open-source AI portfolio-management runtime for macOS.**
+**Wealth orchestration, local-first.**
+An open-source AI portfolio-management runtime for macOS.
 
-TradeOS orchestrates AI tools you already have (Claude Code under your
+WOLF orchestrates AI tools you already have (Claude Code under your
 existing subscription first; Codex CLI, Ollama, and API providers later), MCP
 services, market context, deterministic risk policies, and notifications to
 continuously monitor a portfolio, generate *sourced* decisions, simulate or
 execute *bounded* actions, and evaluate its own behavior over time.
 
-> ⚠️ **Experimental software. Not investment advice.** TradeOS is a research
+> ⚠️ **Experimental software. Not investment advice.** WOLF is a research
 > runtime. It ships with no real-money execution: v0.1 is read-only
 > intelligence + paper trading, by design. Nothing here predicts markets, and
 > no output should be treated as a recommendation to buy or sell anything.
 
 ## Why this exists
 
-Most "AI trading" projects are a prompt around a chatbot. TradeOS takes the
+Most "AI trading" projects are a prompt around a chatbot. WOLF takes the
 opposite stance:
 
 - **The model proposes; deterministic code disposes.** An LLM may synthesize
@@ -37,33 +38,64 @@ opposite stance:
 
 | Works today | Deliberately absent |
 |---|---|
-| `tradeos doctor` environment diagnosis with fix hints | Real-money execution (v0.2+, human-approved only) |
+| `wolf doctor` environment diagnosis with fix hints | Real-money execution (v0.2+, human-approved only) |
 | Claude Code provider: detection, auth state, native schema-constrained structured output (verified live) | Autopilot (v0.3, restricted envelope, dedicated account) |
 | Deterministic risk engine — 20 rules, fail-closed, absolute veto | Options, multi-broker, consensus, marketplace (see PRODUCT.md §6) |
 | Paper trading with slippage model + event-sourced replay | |
 | Target-allocation rebalance strategy (explicit Decimal math) | |
 | Versioned investment policy with mode ladder + kill switch | |
-| Textual TUI dashboard, Typer CLI, macOS notifications | |
-| 127 tests incl. safety/contract/replay suites; mypy clean; CI | |
+| Six-screen terminal UI: boot diagnosis, den, live cycle, verdict, journal, kill | |
+| Typer CLI (`wolf`), macOS notifications | |
+| 200 tests incl. safety/contract/replay suites; mypy clean; CI | |
 
 ## Quickstart (macOS)
 
 ```bash
-git clone <repo> tradeos && cd tradeos
+git clone <repo> wolf && cd wolf
 ./scripts/dev_setup.sh          # venv, editable install, git hooks
 source .venv/bin/activate
 
-tradeos doctor                  # check platform, store, Claude Code, policy
-tradeos doctor --full           # + one live structured round-trip probe*
-tradeos demo --cycles 2         # paper decision cycles with the sample policy
-tradeos portfolio               # allocations, drift, concentration
-tradeos events                  # the audit trail
-tradeos tui                     # dashboard (q quit · r refresh · c cycle · k kill)
+wolf doctor                     # check platform, store, Claude Code, policy
+wolf doctor --full              # + one live structured round-trip probe*
+wolf demo --cycles 2            # paper decision cycles with the sample policy
+wolf portfolio                  # allocations, drift, concentration
+wolf events                     # the audit trail
+wolf tui                        # enter the den — the full terminal interface
+wolf tui --calm                 # same, with animation disabled
 ```
 
 \* Requires a logged-in Claude Code CLI. Note: headless (`claude -p`) calls
 may draw from your plan's *programmatic* usage allowance and report a real
-cost per call — TradeOS records it per event and never hides it.
+cost per call — WOLF records it per event and never hides it.
+
+## The den (terminal UI)
+
+`wolf tui` opens a six-screen interface. The dashboard is home; every screen is
+one keystroke away and one `esc` back. There are no menus.
+
+| Screen | Key | What it is for |
+|---|---|---|
+| **boot** | — | The doctor checks *are* the startup sequence, so you cannot boot past a broken environment. A failing check halts the cascade with its fix hint. |
+| **den** | home | NAV, equity history, and one row per holding: size, drift against plan, unrealised P&L, and quote freshness. |
+| **cycle** | `c` | A decision running live. Stages complete left to right, making the architecture visible: the model is one box between deterministic walls. |
+| **verdict** | `⏎` | Thesis on top, the rule wall below, receipt at the bottom — the order the system actually works in. Every rule is listed, every time. |
+| **journal** | `j` | Decision history. Vetoes and no-actions carry the same weight as fills, because "we did not trade" is a result. |
+| **kill** | `k` | Full-screen halt. Reachable from anywhere. Deliberately the ugliest thing in the app. |
+
+Three conventions carry most of the meaning:
+
+- **Colour is rationed.** Amber is the wolf (brand, targets, keys). Green and red
+  are money, and only money. Cyan is data and history. Anything coloured means
+  something.
+- **Drift is spatial.** The `◆┼` gauge places each holding against its target on
+  a track scaled to the rebalance threshold — reaching the end means the strategy
+  is at the point of trading. Off-scale drift is marked `◀`/`▶`, never clamped.
+- **Freshness is never hidden.** `●` fresh · `◐` aging · `○` stale · `✕` no data.
+  Live sources pulse; stale ones go still, so you notice the *absence* of motion.
+
+Animation always encodes a system state — alive, working, arriving, confirmed,
+or dead — and never carries information on its own. `wolf tui --calm` turns it
+all off with nothing lost.
 
 ## Architecture (short version)
 
@@ -82,7 +114,8 @@ TUI / CLI  ──►  Runtime facade  ──►  decision cycle
 - `ValidatedOrder` — the only object a broker adapter accepts — can only be
   issued by the risk engine, is idempotent by construction, and expires.
 - Kill switch is checked at the scheduler, cycle, engine, and execution
-  layers; engaging it is one command (`tradeos kill "reason"`).
+  layers; engaging it is one command (`wolf kill "reason"`), and disengaging is
+  deliberately awkward (`wolf unkill`, or two separate presses in the TUI).
 
 Full detail: [ARCHITECTURE.md](ARCHITECTURE.md) · [RISK_POLICY_SPEC.md](RISK_POLICY_SPEC.md) ·
 [MARKET_CONTEXT_SPEC.md](MARKET_CONTEXT_SPEC.md) · [PROVIDER_SPEC.md](PROVIDER_SPEC.md) ·
@@ -122,6 +155,11 @@ everything, and hostile context text cannot change a proposal or verdict.
   fills, no market impact (documented in every fill event).
 - Earnings-blackout rule exists but defaults to disabled: no reliable free
   earnings-calendar source has been verified yet.
+- The dashboard shows no per-symbol price sparkline, because no price history
+  is stored yet — drawing one would be fabricated data. The equity strip fills
+  in as cycles record portfolio snapshots.
+- Max drawdown is computed from recorded equity snapshots only, so it reflects
+  observed history, not intraday extremes the runtime never sampled.
 
 ## Contributing
 

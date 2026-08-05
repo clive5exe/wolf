@@ -1,4 +1,8 @@
-"""TradeOS CLI. Interfaces display state and send commands — nothing else."""
+"""WOLF CLI. Interfaces display state and send commands — nothing else.
+
+The command is ``wolf``; the Python distribution stays ``tradeos`` because
+the PyPI name ``wolf`` is already taken (see ADR-0012).
+"""
 
 from __future__ import annotations
 
@@ -7,12 +11,12 @@ from rich.console import Console
 from rich.table import Table
 
 import tradeos
-from tradeos.cli.doctor import CheckStatus, run_checks
+from tradeos.runtime.diagnostics import CheckStatus
 from tradeos.runtime.facade import RuntimeConfig, TradeOSRuntime
 
 app = typer.Typer(
-    name="tradeos",
-    help="Local-first AI portfolio runtime. Experimental — not investment advice.",
+    name="wolf",
+    help="WOLF — wealth orchestration, local-first. Experimental — not investment advice.",
     no_args_is_help=True,
 )
 console = Console()
@@ -35,8 +39,12 @@ def _runtime(*, notify: bool = False) -> TradeOSRuntime:
 
 @app.command()
 def version() -> None:
-    """Print the TradeOS version."""
-    console.print(f"tradeos {tradeos.__version__} — experimental, not investment advice")
+    """Print the WOLF version."""
+    console.print(
+        f"[bold]W[/][#F0B45C]◉[/][bold]LF[/] {tradeos.__version__} — "
+        "wealth orchestration, local-first\n"
+        "experimental · paper trading · not investment advice"
+    )
 
 
 @app.command()
@@ -45,8 +53,8 @@ def doctor(
 ) -> None:
     """Check the environment: platform, store, provider, policy, kill switch."""
     runtime = _runtime()
-    checks = run_checks(runtime, full=full)
-    table = Table(title="tradeos doctor", show_lines=False)
+    checks = runtime.diagnostics(full=full)
+    table = Table(title="wolf doctor", show_lines=False)
     table.add_column("")
     table.add_column("Check", style="bold")
     table.add_column("Detail")
@@ -111,7 +119,7 @@ def policy_show() -> None:
     """Show the active investment policy (the enforceable struct, not prose)."""
     policy = _runtime().active_policy()
     if policy is None:
-        console.print("[yellow]no active policy — run `tradeos policy-init-sample`[/]")
+        console.print("[yellow]no active policy — run `wolf policy-init-sample`[/]")
         raise typer.Exit(code=1)
     console.print_json(policy.model_dump_json(indent=2))
 
@@ -126,7 +134,7 @@ def policy_init_sample() -> None:
 
 @app.command()
 def kill(reason: str = typer.Argument(..., help="Why you are stopping everything")) -> None:
-    """Engage the kill switch: all execution refused until `tradeos unkill`."""
+    """Engage the kill switch: all execution refused until `wolf unkill`."""
     _runtime().engage_kill_switch(reason)
     console.print("[red]kill switch ENGAGED[/] — execution refused everywhere")
 
@@ -139,11 +147,22 @@ def unkill() -> None:
 
 
 @app.command()
-def tui() -> None:
-    """Launch the terminal dashboard."""
-    from tradeos.tui.app import TradeOSApp
+def tui(
+    calm: bool = typer.Option(
+        False, "--calm", help="Disable animation (reduced motion); no information is lost"
+    ),
+    skip_boot: bool = typer.Option(
+        False, "--skip-boot", help="Go straight to the den, past the check cascade"
+    ),
+) -> None:
+    """Enter the den — the full terminal interface."""
+    from tradeos.tui.app import WolfApp
 
-    TradeOSApp(_runtime()).run()
+    WolfApp(
+        _runtime(),
+        calm=calm,
+        start_screen="den" if skip_boot else "boot",
+    ).run()
 
 
 def _print_portfolio(runtime: TradeOSRuntime) -> None:
