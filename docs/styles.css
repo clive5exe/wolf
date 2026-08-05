@@ -174,15 +174,21 @@ nav {
 }
 .eyebrow:hover { opacity: 0.75; }
 
-/* Wordmark — an SVG of block cells rather than text.
-   Block-drawing glyphs render hollow in most web fonts and cannot be made to
-   tessellate with CSS, so the lockup is drawn rather than typeset. */
+/* Wordmark — the app's exact boot lockup, same characters, same font.
+   Fira Code is what Textual's own SVG export embeds, and one of the few
+   monospaces whose U+2588 FULL BLOCK is genuinely filled: Menlo and Geist Mono
+   draw it as an outline, which is why this rendered hollow before.
+   line-height 1 with zero tracking so rows and columns touch and tessellate. */
 .wordmark {
-    display: block;
-    width: clamp(200px, 34vw, 330px);
-    height: auto;
+    font-family: "Fira Code", "DejaVu Sans Mono", monospace;
+    font-weight: 700;
+    color: var(--infrared);
+    font-size: clamp(7px, 1.75vw, 16px);
+    line-height: 1;
+    letter-spacing: 0;
+    white-space: pre;
     margin-bottom: 28px;
-    filter: drop-shadow(0 0 30px rgba(234, 85, 59, 0.28));
+    text-shadow: 0 0 32px rgba(234, 85, 59, 0.35);
 }
 
 .acronym {
