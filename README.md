@@ -1,7 +1,7 @@
 # W◉LF
 
 **Watches obsessively, lacks feelings.**
-An open-source AI portfolio-management runtime for macOS. The model advises; deterministic code decides.
+An open-source AI portfolio-management runtime for macOS and Linux. The model advises; deterministic code decides.
 
 WOLF orchestrates AI tools you already have (Claude Code under your
 existing subscription first; Codex CLI, Ollama, and API providers later), MCP
@@ -30,6 +30,7 @@ opposite stance:
 - **Stale data is a stop sign.** Nothing enters a decision without an event
   time, ingestion time, TTL, and credibility score. "Insufficient or stale
   data; no action" is a successful outcome, not an error.
+- **Runs where you do.** macOS and Linux are supported and tested in CI. Windows is not claimed — nothing is known to break there, but nobody has run it, and an untested claim is one you get called on.
 - **No service behind it.** There is no account to create with us, no backend, and no telemetry. Your history lives in a SQLite file you own. WOLF *does* talk to the network — your AI provider, your broker, SEC EDGAR — but always through your own credentials, and it sends the model proportions rather than amounts.
 - **Bring your own AI.** Subscription-backed local clients via their
   documented interfaces only — no browser scraping, no cookie theft, no
@@ -39,17 +40,17 @@ opposite stance:
 
 | Works today | Deliberately absent |
 |---|---|
-| `wolf doctor` environment diagnosis with fix hints | Real-money execution (v0.2+, human-approved only) |
+| `wolf doctor` environment diagnosis with fix hints (macOS + Linux) | Real-money execution (v0.2+, human-approved only) |
 | Claude Code provider: detection, auth state, native schema-constrained structured output (verified live) | Autopilot (v0.3, restricted envelope, dedicated account) |
 | Deterministic risk engine — 20 rules, fail-closed, absolute veto | Options, multi-broker, consensus, marketplace (see PRODUCT.md §6) |
 | Paper trading with slippage model + event-sourced replay | |
 | Target-allocation rebalance strategy (explicit Decimal math) | |
 | Versioned investment policy with mode ladder + kill switch | |
 | Six-screen terminal UI: boot diagnosis, den, live cycle, verdict, journal, kill | |
-| Typer CLI (`wolf`), macOS notifications | |
+| Typer CLI (`wolf`); notifications via Notification Center or libnotify | |
 | 200 tests incl. safety/contract/replay suites; mypy clean; CI | |
 
-## Quickstart (macOS)
+## Quickstart
 
 ```bash
 git clone <repo> wolf && cd wolf
@@ -124,8 +125,15 @@ Full detail: [ARCHITECTURE.md](ARCHITECTURE.md) · [RISK_POLICY_SPEC.md](RISK_PO
 
 ## Security model (summary — see [SECURITY.md](SECURITY.md))
 
-- Secrets live in the macOS Keychain only; repo, SQLite, logs, and prompts
-  are scanned for credential shapes on every commit and in CI.
+- Secrets live only in an OS credential store — macOS Keychain or libsecret
+  on Linux. There is deliberately **no file fallback**: if no keystore is
+  available WOLF refuses rather than writing credentials to disk, because a
+  silent downgrade would leave a machine unprotected with nothing on screen
+  to say so. Repo, SQLite, logs, and prompts are scanned for credential
+  shapes on every commit and in CI.
+- Prompts carry **proportions, never amounts**: the model is told a holding is
+  39.9% of the portfolio against a 40% target, never that it is $39,914 or 140
+  shares. Enforced by type rather than by a filter, so it cannot rot.
 - Model output and ingested market content are treated as hostile input:
   schema validation, citation integrity checks, and — decisively — the
   deterministic risk boundary between any text and any order.

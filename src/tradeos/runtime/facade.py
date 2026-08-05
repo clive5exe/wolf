@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
@@ -20,7 +19,10 @@ from tradeos.events.store import EventStore, InMemoryEventStore
 from tradeos.events.types import EventType
 from tradeos.execution.executor import Executor
 from tradeos.market_data.quotes import QuoteSource, StaticQuoteSource
-from tradeos.notifications.base import Notifier, NullNotifier
+from tradeos.notifications.base import Notifier
+from tradeos.notifications.factory import default_notifier
+from tradeos.platform_paths import DB_FILENAME
+from tradeos.platform_paths import default_data_dir as _platform_data_dir
 from tradeos.portfolio.stats import PortfolioStats, compute_stats
 from tradeos.providers.base import ModelProvider, ProviderStatus
 from tradeos.providers.claude_code import ClaudeCodeProvider
@@ -60,10 +62,8 @@ DEMO_SECTORS: dict[str, str] = {
 
 
 def default_data_dir() -> Path:
-    override = os.environ.get("TRADEOS_DATA_DIR")
-    if override:
-        return Path(override)
-    return Path.home() / "Library" / "Application Support" / "TradeOS"
+    """Re-exported from :mod:`tradeos.platform_paths` for existing callers."""
+    return _platform_data_dir()
 
 
 @dataclass
@@ -85,7 +85,7 @@ class TradeOSRuntime:
             self.events = InMemoryEventStore()
         else:
             data_dir = cfg.data_dir or default_data_dir()
-            self.events = SQLiteEventStore(data_dir / "tradeos.db")
+            self.events = SQLiteEventStore(data_dir / DB_FILENAME)
         self.kill_switch = KillSwitch(self.events)
         self.policy_service = PolicyService(self.events, self._clock)
         self.provider: ModelProvider = ClaudeCodeProvider(event_store=self.events)
@@ -97,7 +97,7 @@ class TradeOSRuntime:
             initial_cash=cfg.initial_cash,
             sector_map=DEMO_SECTORS,
         )
-        self.notifier: Notifier = cfg.notifier if cfg.notifier is not None else NullNotifier()
+        self.notifier: Notifier = cfg.notifier if cfg.notifier is not None else default_notifier()
         self._engine = RiskEngine()
         self._strategy = TargetAllocationRebalance()
         self._executor = Executor(

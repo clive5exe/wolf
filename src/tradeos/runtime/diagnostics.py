@@ -14,6 +14,10 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
+from tradeos.notifications.factory import notifier_status
+from tradeos.platform_paths import is_supported_platform, platform_label
+from tradeos.security.store import default_secret_store
+
 if TYPE_CHECKING:  # avoids a cycle: the facade imports this module lazily
     from tradeos.runtime.facade import TradeOSRuntime
 
@@ -35,15 +39,19 @@ class DoctorCheck:
 def run_checks(runtime: TradeOSRuntime, *, full: bool = False) -> list[DoctorCheck]:
     checks: list[DoctorCheck] = []
 
+    label = platform_label()
     if sys.platform == "darwin":
-        checks.append(DoctorCheck("macOS", CheckStatus.OK, platform.mac_ver()[0]))
+        checks.append(DoctorCheck("Platform", CheckStatus.OK, f"{label} {platform.mac_ver()[0]}"))
+    elif is_supported_platform():
+        checks.append(DoctorCheck("Platform", CheckStatus.OK, f"{label} {platform.release()}"))
     else:
         checks.append(
             DoctorCheck(
-                "macOS",
+                "Platform",
                 CheckStatus.WARN,
-                f"platform is {sys.platform}",
-                "WOLF targets macOS; notifications and Keychain need it",
+                f"{label} is untested",
+                "macOS and Linux are tested in CI; nothing is known to break here, "
+                "but no one has run it",
             )
         )
 
@@ -157,13 +165,37 @@ def run_checks(runtime: TradeOSRuntime, *, full: bool = False) -> list[DoctorChe
     else:
         checks.append(DoctorCheck("Kill switch", CheckStatus.OK, "disengaged"))
 
-    for binary, name, hint in (
-        ("osascript", "Notifications", "part of macOS; non-mac platforms lack banners"),
-        ("git", "git", "install Xcode command line tools"),
-    ):
-        if shutil.which(binary):
-            checks.append(DoctorCheck(name, CheckStatus.OK, f"{binary} available"))
-        else:
-            checks.append(DoctorCheck(name, CheckStatus.WARN, f"{binary} missing", hint))
+    # Secrets are load-bearing: no secure store means credentials cannot be
+    # held at all, because WOLF refuses to write them to disk as a fallback.
+    store = default_secret_store()
+    if store.available():
+        checks.append(DoctorCheck("Secret store", CheckStatus.OK, store.name))
+    else:
+        checks.append(
+            DoctorCheck(
+                "Secret store",
+                CheckStatus.WARN,
+                getattr(store, "reason", "unavailable"),
+                "paper mode needs no secrets; a live broker will refuse to start "
+                "without an OS credential store",
+            )
+        )
+
+    ok, detail = notifier_status()
+    checks.append(
+        DoctorCheck(
+            "Notifications",
+            CheckStatus.OK if ok else CheckStatus.WARN,
+            detail,
+            "" if ok else "cycles still run and record; you just lose the banner",
+        )
+    )
+
+    if shutil.which("git"):
+        checks.append(DoctorCheck("git", CheckStatus.OK, "available"))
+    else:
+        checks.append(
+            DoctorCheck("git", CheckStatus.WARN, "missing", "needed only for development")
+        )
 
     return checks
