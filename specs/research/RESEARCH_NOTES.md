@@ -84,9 +84,19 @@ DATA_SOURCES.md, and ADR-0007.
   calendar, order books, index data); trade simulation; equity + options
   order placement/cancel.
   https://robinhood.com/us/en/support/articles/trading-with-your-agent/
-- Transport details (streamable-HTTP vs SSE), token lifetimes, scopes:
-  **NOT CONFIRMED** (unpublished). MCP adapter must probe at integration
-  time; treated as read-only source in v0.1 regardless.
+- **Transport CONFIRMED 2026-08-05** (docs updated since first research):
+  streamable **HTTP**. Robinhood documents the Claude Code connect verbatim as
+  `claude mcp add robinhood-trading --transport http https://agent.robinhood.com/mcp/trading`,
+  then `/mcp` -> select `robinhood-trading` -> authenticate.
+  https://robinhood.com/us/en/support/articles/agentic-trading-overview/#ConnectyourAIagent
+- **Account flow is the reverse of what we assumed.** The agentic account is not
+  opened first: "Complete the onboarding that auto-opens **after** you connect to
+  the Robinhood Trading MCP." Prerequisite is a primary individual investing
+  account in good standing. Desktop only — "You can only open an agentic account
+  and authenticate your agent on a desktop device."
+- Token lifetimes and scopes: still unpublished; probe at integration time.
+- Tool names/schemas: still unpublished; must be enumerated from a live
+  tool-list call. Treated as a read-only source in v0.1 regardless.
 - No official equities REST API for retail exists (crypto REST API only:
   API-key + Ed25519 signing, https://docs.robinhood.com/crypto/trading/).
   Unofficial private-API wrappers (`robin_stocks`, community MCP servers such
