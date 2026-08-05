@@ -9,6 +9,8 @@ services, market context, deterministic risk policies, and notifications to
 continuously monitor a portfolio, generate *sourced* decisions, simulate or
 execute *bounded* actions, and evaluate its own behavior over time.
 
+![The den — WOLF's dashboard](https://raw.githubusercontent.com/clive5exe/wolf/main/docs/screens/den.svg)
+
 > ⚠️ **Experimental software. Not investment advice.** WOLF is a research
 > runtime. It ships with no real-money execution: v0.1 is read-only
 > intelligence + paper trading, by design. Nothing here predicts markets, and
@@ -83,6 +85,23 @@ one keystroke away and one `esc` back. There are no menus.
 | **verdict** | `⏎` | Thesis on top, the rule wall below, receipt at the bottom — the order the system actually works in. Every rule is listed, every time. |
 | **journal** | `j` | Decision history. Vetoes and no-actions carry the same weight as fills, because "we did not trade" is a result. |
 | **kill** | `k` | Full-screen halt. Reachable from anywhere. Deliberately the ugliest thing in the app. |
+
+
+### The screens
+
+<table>
+<tr>
+<td width="50%"><b>Boot</b> — the doctor checks <i>are</i> the startup sequence, so a broken environment can't be booted past.<br><img src="https://raw.githubusercontent.com/clive5exe/wolf/main/docs/screens/boot.svg" alt="Boot check cascade"></td>
+<td width="50%"><b>Cycle</b> — a decision running live. The model is provably one box between deterministic walls.<br><img src="https://raw.githubusercontent.com/clive5exe/wolf/main/docs/screens/cycle.svg" alt="Live decision cycle"></td>
+</tr>
+<tr>
+<td><b>Verdict</b> — thesis, then every rule, then the receipt. Nothing summarised away.<br><img src="https://raw.githubusercontent.com/clive5exe/wolf/main/docs/screens/verdict.svg" alt="Verdict screen"></td>
+<td><b>Journal</b> — vetoes and no-actions carry the same weight as fills.<br><img src="https://raw.githubusercontent.com/clive5exe/wolf/main/docs/screens/journal.svg" alt="Decision journal"></td>
+</tr>
+<tr>
+<td colspan="2"><b>Kill switch</b> — reachable from anywhere, and deliberately the ugliest thing in the app.<br><img src="https://raw.githubusercontent.com/clive5exe/wolf/main/docs/screens/kill.svg" alt="Kill switch takeover"></td>
+</tr>
+</table>
 
 Three conventions carry most of the meaning:
 
