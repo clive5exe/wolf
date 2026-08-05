@@ -21,9 +21,10 @@ completeness check, whereas a half-parsed document silently becomes evidence.
 from __future__ import annotations
 
 import json
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, time
+from datetime import date as dt_date
 from decimal import Decimal
 from typing import Any, Protocol
 
@@ -33,6 +34,7 @@ from tradeos.domain.context import ContextItem, Provenance, SourceType
 from tradeos.events.store import EventStore
 from tradeos.events.types import EventType
 from tradeos.ingestion.ratelimit import RateLimiter
+from tradeos.ingestion.xbrl import FactSet, XbrlError, parse_company_facts
 from tradeos.telemetry.logging import get_logger
 
 _log = get_logger("ingestion.edgar")
@@ -50,10 +52,16 @@ MAX_REQUESTS_PER_SECOND = 5.0
 FILING_TTL_S = DEFAULT_TTLS["filing"]
 EDGAR_CREDIBILITY = Decimal("0.95")
 
-#: Identifies the project and gives SEC a real contact channel, so onboarding
-#: never has to ask a stranger for their email. Overridable for anyone who
-#: wants their own contact declared instead.
-DEFAULT_USER_AGENT = "WOLF/0.1 (+https://github.com/clive5exe/wolf)"
+#: SEC fair access requires a contact *address*, not just a name or a URL.
+#: Verified empirically: a User-Agent carrying only a project URL is refused
+#: with HTTP 403, and so is a missing one. This gives them a real channel
+#: without asking a stranger for their personal email during onboarding.
+#: Override via ``WOLF_SEC_CONTACT`` to declare your own contact instead.
+DEFAULT_USER_AGENT = "WOLF/0.1 (wolf@clive5.com)"
+
+#: Environment override, so an operator running WOLF at any volume can be
+#: reachable under their own address rather than the project's.
+CONTACT_ENV_VAR = "WOLF_SEC_CONTACT"
 
 
 class EdgarError(RuntimeError):
@@ -85,6 +93,22 @@ class EdgarConfig:
             raise ValueError(
                 "a User-Agent is required: SEC fair access refuses unidentified clients"
             )
+        if "@" not in self.user_agent:
+            # Caught the hard way: SEC answers 403 to a User-Agent that names
+            # the project but offers no way to reach whoever is running it.
+            raise ValueError(
+                "the SEC User-Agent must contain a contact email address, "
+                f"or requests are refused with HTTP 403. Set {CONTACT_ENV_VAR} "
+                "to declare your own."
+            )
+
+    @classmethod
+    def from_env(cls, environ: Mapping[str, str], **kwargs: Any) -> EdgarConfig:
+        """Build a config, honouring an operator-supplied contact address."""
+        contact = (environ.get(CONTACT_ENV_VAR) or "").strip()
+        if contact:
+            kwargs.setdefault("user_agent", f"WOLF/0.1 ({contact})")
+        return cls(**kwargs)
 
 
 def normalize_cik(raw: str | int) -> str:
@@ -321,6 +345,71 @@ class EdgarConnector:
                 },
             )
             for filing in filings
+        )
+
+    def company_facts(self, ticker: str) -> FactSet | None:
+        """Every XBRL fact the company has reported, restatements included.
+
+        Returns the whole history rather than a snapshot on purpose. Callers ask
+        it for a value *as of a date*, and that question cannot be answered from
+        a document that has already thrown the superseded values away.
+        """
+        if not self._config.enabled:
+            return None
+        cik = self.resolve_cik(ticker)
+        if cik is None:
+            self._quarantine(TICKERS_URL, f"no CIK for ticker {ticker!r}")
+            return None
+        url = COMPANY_FACTS_URL.format(cik=cik)
+        try:
+            return parse_company_facts(self._get_json(url))
+        except XbrlError as exc:
+            self._quarantine(url, f"unparseable companyfacts: {exc}")
+            return None
+
+    def facts_to_context_items(
+        self,
+        facts: FactSet,
+        ticker: str,
+        *,
+        as_of: dt_date,
+        now: datetime | None = None,
+    ) -> tuple[ContextItem, ...]:
+        """One item per concept, carrying the filing date as its event time.
+
+        The event time is when the number became *knowable*, not the period it
+        describes. A figure filed two years ago is stale regardless of how
+        cleanly it closed its fiscal year, and freshness has to reflect that.
+        """
+        ingested_at = now or utc_now()
+        snapshot = facts.as_of(as_of)
+        return tuple(
+            ContextItem(
+                item_id=new_ulid(),
+                source_name=self.name,
+                source_url=COMPANY_FACTS_URL.format(cik=facts.cik),
+                source_type=SourceType.FILING,
+                entities=(ticker.upper(),),
+                event_time=datetime.combine(fact.filed, time.min, tzinfo=UTC),
+                ingested_at=ingested_at,
+                ttl_s=FILING_TTL_S,
+                credibility=EDGAR_CREDIBILITY,
+                retrieval_reason=f"{concept} for {ticker.upper()}",
+                provenance=Provenance.NORMALIZED,
+                payload={
+                    "kind": "fundamental",
+                    "ticker": ticker.upper(),
+                    "concept": concept,
+                    "tag": fact.tag,
+                    "unit": fact.unit,
+                    "value": str(fact.value),
+                    "period_end": fact.period_end.isoformat(),
+                    "filed": fact.filed.isoformat(),
+                    "form": fact.form,
+                    "accession": fact.accession,
+                },
+            )
+            for concept, fact in sorted(snapshot.items())
         )
 
     def latest_known_filing(self, ticker: str) -> Filing | None:

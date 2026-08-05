@@ -266,3 +266,36 @@ class TestFailuresAreQuarantined:
         )
         assert connector.recent_filings("NOSUCH") == []
         assert list(store.iter_events(event_types=(EventType.INGEST_ERROR,)))
+
+
+class TestUserAgentContract:
+    """SEC answers 403 to a User-Agent with no contact address.
+
+    Found by running the shipped default against the live API, where it was
+    refused. These pin the requirement so it cannot regress into a connector
+    that fails for every user at the same moment.
+    """
+
+    def test_default_carries_a_contact_address(self) -> None:
+        from tradeos.ingestion.edgar import DEFAULT_USER_AGENT
+
+        assert "@" in DEFAULT_USER_AGENT
+
+    def test_user_agent_without_an_address_is_rejected(self) -> None:
+        import pytest as _pytest
+
+        from tradeos.ingestion.edgar import EdgarConfig
+
+        with _pytest.raises(ValueError, match="contact email"):
+            EdgarConfig(user_agent="WOLF/0.1 (+https://example.com)")
+
+    def test_env_override_declares_the_operators_own_contact(self) -> None:
+        from tradeos.ingestion.edgar import CONTACT_ENV_VAR, EdgarConfig
+
+        config = EdgarConfig.from_env({CONTACT_ENV_VAR: "ops@example.com"})
+        assert "ops@example.com" in config.user_agent
+
+    def test_env_override_absent_falls_back_to_the_default(self) -> None:
+        from tradeos.ingestion.edgar import DEFAULT_USER_AGENT, EdgarConfig
+
+        assert EdgarConfig.from_env({}).user_agent == DEFAULT_USER_AGENT
