@@ -77,3 +77,34 @@ retrofitted.
 
 The `cloudflare/` scaffold directories hold no files and are untracked; nothing
 in `src/` or `tests/` references any of this.
+
+### Correction — same day: reinstated
+
+The supersession above was based on a misreading of ADR-0002's placement rule
+(corrected there). The rule prevents centralising *per-user* work; it does not
+reject hosting genuinely shared work, and it says nothing against Cloudflare.
+
+**Status returns to: accepted (design), deferred (build).**
+
+Two arguments survive the corrected rule, and the first is stronger than this
+ADR originally credited:
+
+- **Third-party citizenship, not our convenience.** SEC EDGAR enforces fair
+  access. Five hundred users each polling it directly is five hundred clients
+  that must independently behave — rate limits, User-Agent rules, backoff. One
+  cached fetch shared out is better for EDGAR *and* removes a compliance burden
+  from every user. The earlier dismissal of this as "aggregate efficiency" was
+  wrong: it is about not being a bad neighbour to a public service.
+- **Community aggregates**, unchanged — uncomputable by one user by definition.
+
+The hosting target is explicitly **Cloudflare, not a maintainer's homelab**. A
+homelab runs its owner's `wolf watch`; it does not serve strangers.
+
+Unchanged: every primitive keeps a documented local fallback, pointing at any
+instance stays opt-in, and nothing in the client hard-depends on it. A user who
+wants to fetch EDGAR themselves always can.
+
+The stale free-tier figures recorded above still stand as corrections — D1 is
+5 GB, and Cron Triggers appear to need the paid plan. The latter matters less
+now: scheduled *personal* cycles are `wolf watch` on the user's own machine,
+so any Cron use would be for shared ingestion only.

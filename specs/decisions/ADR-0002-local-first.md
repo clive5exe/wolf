@@ -73,3 +73,28 @@ provider call leaves the machine — which is precisely why the outbound
 projection carries proportions rather than amounts (Q3, ADR-0012), and why
 PROVIDER_SPEC plans an Ollama adapter. Local inference is this rule applied to
 the last component that currently violates it.
+
+### Correction — same day: the rule is about *whose* machine, not *no cloud*
+
+The amendment above misread the owner's principle and drew too strong a
+conclusion from it. Recording the correction rather than editing the text,
+because the distinction is the useful part.
+
+"Anything a user can run on their own system should happen on their system"
+means **each user's own work belongs on that user's machine**. It rules out
+centralising per-user workload onto someone else's box — including, especially,
+the maintainer's. It does not rule out hosting things that are genuinely shared.
+
+The operative pair of questions is therefore:
+
+1. *Is this work the user's own?* → it runs on the user's machine.
+2. *Is it genuinely shared, or must it be publicly reachable?* → it is hosted at
+   the edge. **Never on a maintainer's homelab.**
+
+Serving other people's traffic from a home connection is rejected outright:
+residential IPs are not built for it, most ISP terms forbid it, there is no
+abuse absorption, and one person's router becomes everyone's single point of
+failure. A homelab is an excellent place to run *your own* WOLF. It is the
+wrong place to run *everyone's*.
+
+This leaves ADR-0007 live rather than superseded — see its own correction.
