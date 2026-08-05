@@ -151,3 +151,42 @@ class TestProjectionRefusesAbsolutes:
         snapshot = PortfolioSnapshot(account=account, quotes=quotes, as_of=now)
         context = project_context(package, snapshot=snapshot, targets=targets, now=now)
         assert context.citations == package.citations
+
+
+class TestLabelsAreNotMistakenForAmounts:
+    """Regression: the ratio rule once rejected its own trigger labels.
+
+    `schedule/15m` and `cli-demo-1` contain digits that are part of a *name*,
+    not a measurement. Scanning them as quantities raised on every scheduled
+    AI cycle — the guard taking down the thing it was guarding.
+    """
+
+    @pytest.mark.parametrize(
+        "purpose",
+        ["schedule/15m:VTI,AAPL", "schedule/1h:VTI", "cli-demo-1:VTI", "tui:VTI"],
+    )
+    def test_trigger_labels_survive_the_projection(self, purpose: str) -> None:
+        from decimal import Decimal as D
+
+        from tradeos.context.projection import PromptContext
+
+        context = PromptContext(
+            package_id="p1",
+            created_at=__import__("datetime").datetime.now(__import__("datetime").UTC),
+            purpose=purpose,
+            completeness=D("1"),
+        )
+        assert context.purpose == purpose
+
+    def test_a_ticker_containing_digits_is_allowed(self) -> None:
+        from decimal import Decimal as D
+
+        from tradeos.context.projection import HoldingLine
+
+        assert HoldingLine(symbol="BRK.B", weight=D("0.1")).symbol == "BRK.B"
+
+    def test_but_prose_amounts_are_still_refused(self) -> None:
+        from tradeos.context.projection import CandidateLine
+
+        with pytest.raises(ValidationError, match="absolute quantity"):
+            CandidateLine(index=0, side="buy", symbol="VTI", rationale="buy 140 shares")

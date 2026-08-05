@@ -83,8 +83,25 @@ class _NoAbsolutes(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    #: Field names holding opaque ids rather than quantities.
-    OPAQUE_FIELDS: ClassVar[frozenset[str]] = frozenset({"item_id", "package_id"})
+    #: Fields holding identifiers and labels rather than quantities. Digits in
+    #: these are part of a name, not a measurement: a ULID, a trigger label like
+    #: ``schedule/15m``, a ticker that legitimately contains numerals. Scanning
+    #: them for "absolute amounts" rejects ordinary text and takes the whole
+    #: prompt down with it — which is exactly what happened to the scheduler.
+    #: The scan still applies by default to every field not listed here, so a
+    #: newly added prose field is protected without anyone remembering to opt in.
+    OPAQUE_FIELDS: ClassVar[frozenset[str]] = frozenset(
+        {
+            "item_id",
+            "package_id",
+            "purpose",  # "<trigger>:<symbols>", e.g. "schedule/15m:VTI,AAPL"
+            "kind",  # "quote:VTI"
+            "missing_kinds",
+            "symbol",  # tickers may contain digits
+            "side",
+            "source_name",
+        }
+    )
 
     #: Fields carrying third-party content — a news headline, a filing extract.
     #: These are exempt from the ratio rule, and the exemption is safe for a

@@ -56,7 +56,7 @@ State legend: ☐ ready · ◐ in progress · ☑ done (this scaffold session) �
 | T-027 | Golden scenarios (6) + replay hash-equality gate | S1 | ◐ (replay equality done; goldens 5/6) |
 | T-028 | Journal + evaluation.recorded metrics per cycle | S1 | ☐ |
 | T-029 | Provider structured-output live smoke doc (manual, logged-in machine) | S0 | ☐ |
-| T-030 | Threat-model regression suite completion (T1–T7 rows each mapped to a test) | **S2** | ◐ |
+| T-030 | Threat-model regression suite completion (T1–T7 rows each mapped to a test) | **S2** | ☑ |
 
 Next five (priority order): **T-022, T-023, T-026 finish, T-027 finish, T-028.**
 T-028's journal reducer landed with T-033 (`runtime/journal.py`); what remains is
