@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>WOLF — Docs</title>
+        <title>WOLF Docs</title>
         <meta name="description" content="Documentation for WOLF: install, policy setup, how a decision is made, the risk engine, the event log, and the safety model." />
         <meta name="theme-color" content="#000000" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -68,13 +68,13 @@
                     <div class="docs-eyebrow">Documentation</div>
                     <h1>WOLF</h1>
                     <p class="docs-lede">
-                        An AI portfolio runtime. The model advises; deterministic code decides.
+                        An AI portfolio runtime. The model advises, deterministic code decides.
                         This covers installing it, giving it a policy, and understanding what
                         happens on every cycle.
                     </p>
                     <div class="docs-callout warn">
                         <strong>v0.1 is paper trading only.</strong> There is no real-money
-                        execution path in this build — not disabled, absent. Experimental
+                        execution path in this build. Not disabled, absent. Experimental
                         research software, not investment advice.
                     </div>
                 </header>
@@ -95,7 +95,7 @@ curl -fsSL https://wolf.clive5.com/install.sh | sh</pre>
                     <pre class="code">wolf doctor</pre>
                     <p>
                         It reports platform, Python, event store, provider, policy, risk rules,
-                        kill switch, secret store, and notifications — each with a fix hint
+                        kill switch, secret store, and notifications, each with a fix hint
                         rather than a stack trace.
                     </p>
                 </section>
@@ -116,14 +116,14 @@ curl -fsSL https://wolf.clive5.com/install.sh | sh</pre>
                         </li>
                         <li>
                             <strong>A draft can narrow a limit, never widen one.</strong> A model
-                            suggesting a 90% position cap is held at 25% — and the clamp is shown
+                            suggesting a 90% position cap is held at 25%, and the clamp is shown
                             to you, because quietly discarding a suggestion is its own dishonesty.
                             You can still type something wider yourself.
                         </li>
                         <li>
                             <strong>Loss limits are beyond its reach entirely.</strong> Daily
                             loss, drawdown, order rate, and staleness thresholds cannot be
-                            suggested at all — only set by you or left at defaults.
+                            suggested at all. They are set by you or left at defaults.
                         </li>
                     </ul>
                     <p>Setup always produces <code>paper</code> mode. Moving up is separate and deliberate.</p>
@@ -135,7 +135,7 @@ curl -fsSL https://wolf.clive5.com/install.sh | sh</pre>
 wolf demo --cycles 2   <span class="c"># run cycles from the CLI</span></pre>
                     <p>
                         In the TUI, <kbd>c</kbd> runs a decision cycle and shows it happening
-                        stage by stage. <kbd>⏎</kbd> opens the verdict for the last decision —
+                        stage by stage. <kbd>⏎</kbd> opens the verdict for the last decision,
                         thesis, every risk rule, and the execution receipt.
                     </p>
                 </section>
@@ -146,7 +146,7 @@ wolf demo --cycles 2   <span class="c"># run cycles from the CLI</span></pre>
                     <p>
                         Runs cycles on an interval, gated to regular market hours by default
                         (<code>--any-hours</code> to override). The scheduler only decides
-                        <em>when</em> to ask for a cycle — every rule, the mode gate, and the kill
+                        <em>when</em> to ask for a cycle. Every rule, the mode gate, and the kill
                         switch apply exactly as they do for a manual run.
                     </p>
                     <p>On an always-on machine, as a service:</p>
@@ -160,12 +160,12 @@ Restart=always</pre>
                     <h2>The decision cycle</h2>
                     <p>Every decision runs the same six stages, and each is recorded.</p>
                     <ol class="docs-steps">
-                        <li><strong>Observe</strong> — read account and quotes.</li>
-                        <li><strong>Retrieve</strong> — assemble a context package; every item carries a source, event time, TTL, and credibility.</li>
-                        <li><strong>Propose</strong> — the strategy computes candidates in explicit Decimal arithmetic.</li>
-                        <li><strong>Thesis</strong> — optional. A model returns a structured argument with citations, or nothing. Skipped entirely on deterministic cycles, which cost $0.00.</li>
-                        <li><strong>Risk</strong> — every rule runs on every action. Any blocking failure vetoes.</li>
-                        <li><strong>Execute</strong> — paper fills in v0.1, through the same path live execution will use.</li>
+                        <li><strong>Observe.</strong> Read account and quotes.</li>
+                        <li><strong>Retrieve.</strong> Assemble a context package. Every item carries a source, event time, TTL, and credibility.</li>
+                        <li><strong>Propose.</strong> The strategy computes candidates in explicit Decimal arithmetic.</li>
+                        <li><strong>Thesis.</strong> Optional. A model returns a structured argument with citations, or nothing. Skipped entirely on deterministic cycles, which cost $0.00.</li>
+                        <li><strong>Risk.</strong> Every rule runs on every action. Any blocking failure vetoes.</li>
+                        <li><strong>Execute.</strong> Paper fills in v0.1, through the same path live execution will use.</li>
                     </ol>
                     <p>
                         Stopping early with a reason is a success, not a failure. "Insufficient or
@@ -178,7 +178,7 @@ Restart=always</pre>
                     <h2>The risk engine</h2>
                     <p>
                         Twenty-one deterministic checks, run on every proposed action, every time.
-                        The engine is pure — no I/O, no clock reads — so a verdict is a function
+                        The engine is pure, with no I/O and no clock reads, so a verdict is a function
                         of its inputs and replays identically.
                     </p>
                     <div class="rule-grid">
@@ -191,9 +191,9 @@ Restart=always</pre>
                         <span>earnings_blackout</span><span>concentration_advisory</span><span>duplicate_order</span>
                     </div>
                     <p>
-                        Twenty are configured policy rules; the twenty-first is a per-proposal
+                        Twenty are configured policy rules. The twenty-first is a per-proposal
                         idempotency check that only exists once a proposal does.
-                        <code>concentration_advisory</code> is non-blocking — it records without
+                        <code>concentration_advisory</code> is non-blocking. It records without
                         vetoing, and the verdict screen marks it <code>◇</code> rather than hiding it.
                     </p>
                     <div class="docs-callout">
@@ -207,14 +207,14 @@ Restart=always</pre>
                     <h2>Context &amp; freshness</h2>
                     <p>
                         Nothing enters a decision without an event time, an ingestion time, and a
-                        TTL. Freshness is computed from age and TTL at read time — never stored —
+                        TTL. Freshness is computed from age and TTL at read time, never stored,
                         so a persisted item cannot lie about being fresh.
                     </p>
                     <table class="docs-table">
                         <tr><th>Glyph</th><th>State</th><th>Meaning</th></tr>
                         <tr><td><span class="ok">●</span></td><td>fresh</td><td>age ≤ half its TTL</td></tr>
                         <tr><td><span class="warn-i">◐</span></td><td>aging</td><td>past half TTL, still usable</td></tr>
-                        <tr><td><span class="bad">○</span></td><td>stale</td><td>past TTL — not decision-bearing</td></tr>
+                        <tr><td><span class="bad">○</span></td><td>stale</td><td>past TTL, not decision-bearing</td></tr>
                         <tr><td><span class="bad">✕</span></td><td>absent</td><td>no data at all</td></tr>
                     </table>
                     <p>
@@ -227,7 +227,7 @@ Restart=always</pre>
                     <h2>The event log</h2>
                     <p>
                         Everything is event-sourced into append-only SQLite. The database refuses
-                        <code>UPDATE</code> and <code>DELETE</code> outright — enforced by
+                        <code>UPDATE</code> and <code>DELETE</code> outright, enforced by
                         triggers, not by application code being careful.
                     </p>
                     <pre class="code">wolf events --limit 20</pre>
@@ -248,7 +248,7 @@ Restart=always</pre>
                         <tr><td><code>autopilot</code></td><td>Bounded envelope, dedicated account</td><td class="warn-i">planned</td></tr>
                     </table>
                     <p>
-                        No mode may be skipped on the way up; any number may be skipped on the way
+                        No mode may be skipped on the way up. Any number may be skipped on the way
                         down. Transitions are policy-version changes, recorded as events.
                     </p>
                 </section>
@@ -257,7 +257,7 @@ Restart=always</pre>
                     <h2>CLI commands</h2>
                     <table class="docs-table">
                         <tr><th>Command</th><th>What it does</th></tr>
-                        <tr><td><code>wolf setup</code></td><td>Create your policy — goals, then confirm every field</td></tr>
+                        <tr><td><code>wolf setup</code></td><td>Create your policy from goals, then confirm every field</td></tr>
                         <tr><td><code>wolf tui</code></td><td>Enter the den. <code>--calm</code> disables animation</td></tr>
                         <tr><td><code>wolf watch</code></td><td>Run cycles on a schedule until stopped</td></tr>
                         <tr><td><code>wolf demo</code></td><td>Run paper cycles from the CLI</td></tr>
@@ -278,7 +278,7 @@ Restart=always</pre>
                         <tr><td><kbd>⏎</kbd></td><td>Open the verdict for the last decision</td></tr>
                         <tr><td><kbd>j</kbd></td><td>Journal</td></tr>
                         <tr><td><kbd>p</kbd></td><td>Policy summary</td></tr>
-                        <tr><td><kbd>k</kbd></td><td>Kill switch — works from any screen</td></tr>
+                        <tr><td><kbd>k</kbd></td><td>Kill switch, works from any screen</td></tr>
                         <tr><td><kbd>esc</kbd></td><td>Back to the den</td></tr>
                         <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Move between orders or journal rows</td></tr>
                     </table>
@@ -286,10 +286,10 @@ Restart=always</pre>
 
                 <section id="policy">
                     <h2>Policy fields</h2>
-                    <p>These are enforced by the risk engine — the numbers it reads, not your intent.</p>
+                    <p>These are enforced by the risk engine. It reads the numbers, not your intent.</p>
                     <table class="docs-table">
                         <tr><th>Field</th><th>Default</th><th>Enforced by</th></tr>
-                        <tr><td><code>target_allocations</code></td><td>—</td><td>rebalance strategy</td></tr>
+                        <tr><td><code>target_allocations</code></td><td>none</td><td>rebalance strategy</td></tr>
                         <tr><td><code>max_position_pct</code></td><td>10%</td><td><code>max_position_pct</code></td></tr>
                         <tr><td><code>max_sector_pct</code></td><td>30%</td><td><code>max_sector_pct</code></td></tr>
                         <tr><td><code>min_cash_pct</code></td><td>2%</td><td><code>min_cash</code></td></tr>
@@ -312,7 +312,7 @@ Restart=always</pre>
                     <p>
                         Override with <code>WOLF_DATA_DIR</code>. An existing pre-rename directory
                         is adopted in place rather than migrated, so no upgrade can orphan an
-                        audit log. The database is <code>tradeos.db</code> — deliberately not
+                        audit log. The database is <code>tradeos.db</code>, deliberately not
                         renamed with the product, because that filename addresses state that
                         already exists on disk.
                     </p>
@@ -325,7 +325,7 @@ Restart=always</pre>
                         it with <kbd>k</kbd> from any screen, or <code>wolf kill "reason"</code>.
                     </p>
                     <p>
-                        Disengaging is deliberately awkward — two separate presses in the TUI, or
+                        Disengaging is deliberately awkward. Two separate presses in the TUI, or
                         a typed <code>wolf unkill</code>. Never one accidental key. Both paths are
                         recorded with who and when, and the state survives restarts because it is
                         derived from the event log rather than held in memory.
@@ -335,7 +335,7 @@ Restart=always</pre>
                 <section id="secrets">
                     <h2>Secrets</h2>
                     <p>
-                        Credentials live only in an OS credential store — macOS Keychain or
+                        Credentials live only in an OS credential store, either macOS Keychain or
                         libsecret on Linux. <strong>There is deliberately no file fallback.</strong>
                         If no keystore is available, WOLF refuses rather than writing credentials
                         to disk, because a silent downgrade would leave a machine unprotected with
@@ -356,7 +356,7 @@ Restart=always</pre>
                     </p>
                     <p>
                         This is not primarily a privacy setting. Every use of an absolute figure is
-                        arithmetic, and arithmetic belongs to the strategy and the risk engine — a
+                        arithmetic, and arithmetic belongs to the strategy and the risk engine, not a
                         component supplying judgement has no need of the units. It is enforced by
                         type: the outbound projection has no field capable of holding an amount, so
                         it cannot rot the way a filter would.
@@ -372,18 +372,18 @@ Restart=always</pre>
                     <h2>Threat model</h2>
                     <p>
                         Every documented threat maps to an executable test, and a meta-test fails
-                        if a threat is added to the document without one — so the model cannot get
+                        if a threat is added to the document without one, so the model cannot get
                         ahead of the code.
                     </p>
                     <table class="docs-table">
                         <tr><th>Threat</th><th>Mitigation</th></tr>
-                        <tr><td>T1 — model argues a limit-violating trade</td><td>Deterministic veto; thesis schema cannot express an order</td></tr>
-                        <tr><td>T2 — prompt injection via ingested content</td><td>Untrusted-data frame, citation integrity, and the T1 chain</td></tr>
-                        <tr><td>T3 — credential theft from disk</td><td>OS keystore only, no file fallback, redacted logs</td></tr>
-                        <tr><td>T4 — duplicate or replayed orders</td><td>Content-addressed order ids, TTL, idempotent executor</td></tr>
-                        <tr><td>T5 — stale-data trading</td><td>Mandatory TTLs, blocking staleness rules, fail closed</td></tr>
-                        <tr><td>T6 — event-log tampering</td><td>SQLite triggers refuse UPDATE and DELETE; ULID ordering</td></tr>
-                        <tr><td>T7 — malicious data source</td><td>Allowlisted tools; a source cannot raise its own credibility</td></tr>
+                        <tr><td>T1: model argues a limit-violating trade</td><td>Deterministic veto. The thesis schema cannot express an order</td></tr>
+                        <tr><td>T2: prompt injection via ingested content</td><td>Untrusted-data frame, citation integrity, and the T1 chain</td></tr>
+                        <tr><td>T3: credential theft from disk</td><td>OS keystore only, no file fallback, redacted logs</td></tr>
+                        <tr><td>T4: duplicate or replayed orders</td><td>Content-addressed order ids, TTL, idempotent executor</td></tr>
+                        <tr><td>T5: stale-data trading</td><td>Mandatory TTLs, blocking staleness rules, fail closed</td></tr>
+                        <tr><td>T6: event-log tampering</td><td>SQLite triggers refuse UPDATE and DELETE. ULID ordering</td></tr>
+                        <tr><td>T7: malicious data source</td><td>Allowlisted tools. A source cannot raise its own credibility</td></tr>
                     </table>
                     <p>
                         <a href="https://github.com/clive5exe/wolf/blob/main/THREAT_MODEL.md">Full threat model →</a>
@@ -414,7 +414,7 @@ Restart=always</pre>
                     <p>
                         WOLF is experimental research software for paper trading. Not investment
                         advice. It does not predict markets and ships with no real-money execution
-                        path. Markets carry risk; your decisions are your own.
+                        path. Markets carry risk. Your decisions are your own.
                     </p>
                     <p class="docs-foot-links">
                         <a href="../">Home</a>
