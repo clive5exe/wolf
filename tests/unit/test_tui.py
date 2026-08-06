@@ -55,9 +55,7 @@ def screen_text(app: WolfApp) -> str:
 
 class TestBootScreen:
     @pytest.mark.asyncio
-    async def test_shows_every_check_up_to_the_first_failure(
-        self, runtime: TradeOSRuntime
-    ) -> None:
+    async def test_shows_every_check_up_to_the_first_failure(self, runtime: TradeOSRuntime) -> None:
         """The cascade halts at a failure, deliberately, so you cannot boot
         past a broken environment.
 
