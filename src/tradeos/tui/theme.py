@@ -55,9 +55,10 @@ class Ink:
     ON_RED: Final = "#2A0D0D"
 
 
-#: Inline brand mark, for headers where there is no room for the full lockup.
-WORDMARK: Final = f"[{Ink.BRIGHT}]W[/][{Ink.INFRARED}]◉[/][{Ink.BRIGHT}]LF[/]"
-WORDMARK_PLAIN: Final = "W◉LF"
+#: Inline wordmark. Plain letters: the eye glyph was a brand mark inside a
+#: word and it read as a typo at terminal sizes.
+WORDMARK: Final = f"[{Ink.BRIGHT}]WOLF[/]"
+WORDMARK_PLAIN: Final = "WOLF"
 
 #: Splash lockup. Block lettering rather than art: a hand-drawn wolf reads as
 #: hobbyist next to an interface whose whole argument is precision.

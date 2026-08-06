@@ -110,7 +110,11 @@ class TrackScreen(WolfScreen):
         view = self._view
         q = self.query_one
         q("#track-header", Static).update(
-            header_bar(f"[{Ink.DIM}]{view.exchange} · {view.source}[/]", width=self.frame)
+            header_bar(
+                f"[{Ink.DIM}]{view.exchange} · {view.source}[/]",
+                width=self.frame,
+                title=view.symbol,
+            )
         )
         q("#track-headline", Static).update(self._headline())
         q("#track-chart", Static).update(self._chart())

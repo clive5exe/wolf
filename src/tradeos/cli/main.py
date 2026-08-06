@@ -51,7 +51,7 @@ def _runtime(*, notify: bool = False) -> TradeOSRuntime:
 def version() -> None:
     """Print the WOLF version."""
     console.print(
-        f"[bold]W[/][#FF2247]◉[/][bold]LF[/] {tradeos.__version__}, "
+        f"[bold]WOLF[/] {tradeos.__version__}, "
         "watches obsessively, lacks feelings\n"
         "experimental · paper trading · not investment advice"
     )

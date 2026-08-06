@@ -14,7 +14,7 @@ from textual.screen import Screen
 from tradeos.runtime.facade import TradeOSRuntime
 from tradeos.tui.markup import visible_len
 from tradeos.tui.motion import Motion
-from tradeos.tui.theme import WORDMARK, Ink
+from tradeos.tui.theme import Ink
 
 if TYPE_CHECKING:
     from tradeos.tui.app import WolfApp
@@ -68,9 +68,15 @@ class WolfScreen(Screen[None]):
             paint()
 
 
-def header_bar(right: str, *, width: int = FRAME_WIDTH) -> str:
-    """``┌─ W◉LF ────────── <status> ─┐``: the brand and the truth on one line."""
-    lead = f"[{Ink.DIM}]┌─[/] {WORDMARK} "
+def header_bar(right: str, *, width: int = FRAME_WIDTH, title: str = "") -> str:
+    """``┌─ <title> ────────── <status> ─┐``.
+
+    The title names the *subject*, not the product. You know which app you are
+    in, and repeating the wordmark on every screen spends the most valuable
+    line on the least informative thing. Screens that pass nothing get a bare
+    rule, which is quieter and still frames the box.
+    """
+    lead = f"[{Ink.DIM}]┌─[/] [{Ink.BRIGHT}]{title}[/] " if title else f"[{Ink.DIM}]┌─[/] "
     fill = max(1, width - visible_len(lead) - visible_len(right) - 3)
     return f"{lead}[{Ink.DIM}]{'─' * fill}[/] {right} [{Ink.DIM}]┐[/]"
 

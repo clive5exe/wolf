@@ -134,7 +134,9 @@ class DenScreen(WolfScreen):
             f"{mode} [{Ink.DIM}]·[/] {risk} [{Ink.DIM}]·[/] {self._dot(live=not view.any_stale)} "
             f"[{Ink.DIM}]{view.as_of.strftime('%H:%MZ')}[/]"
         )
-        self.query_one("#den-header", Static).update(header_bar(status, width=self.frame))
+        self.query_one("#den-header", Static).update(
+            header_bar(status, width=self.frame, title="DEN")
+        )
         gauge = _gauge_width(self.frame)
         compact = _is_compact(self.frame)
         self.query_one("#den-columns", Static).update(

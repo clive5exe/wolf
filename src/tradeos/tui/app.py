@@ -29,7 +29,7 @@ from tradeos.tui.theme import DISCLAIMER, Ink
 
 
 class WolfApp(App[None]):
-    TITLE = "W◉LF"
+    TITLE = "WOLF"
     SUB_TITLE = DISCLAIMER
 
     CSS = f"""
