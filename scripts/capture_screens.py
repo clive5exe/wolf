@@ -12,6 +12,7 @@ Run after any UI change:  ./scripts/capture_screens.py
 from __future__ import annotations
 
 import asyncio
+import json
 import math
 import pathlib
 import sys
@@ -21,6 +22,9 @@ from decimal import Decimal
 from tradeos.domain.market import Quote
 from tradeos.runtime.facade import DEMO_PRICES, RuntimeConfig, TradeOSRuntime
 from tradeos.tui.app import WolfApp
+from tradeos.tui.chart import Bar
+from tradeos.tui.screens.track import RiskHeadroom, TrackScreen, TrackView
+from tradeos.tui.theme import Ink
 
 OUT = pathlib.Path(__file__).resolve().parent.parent / "docs" / "screens"
 
@@ -85,6 +89,58 @@ SHOTS = (
 )
 
 
+def _track_view() -> TrackView:
+    """Real AAPL sessions, captured from Robinhood and frozen into a fixture.
+
+    Frozen rather than fetched: a capture must produce the same image twice,
+    and a live call would redraw the chart every run. The bars are genuine,
+    which is the part that matters.
+    """
+    raw = json.loads((pathlib.Path(__file__).parent / "fixtures" / "aapl_3mo.json").read_text())
+    bars = tuple(
+        Bar(Decimal(b["o"]), Decimal(b["h"]), Decimal(b["l"]), Decimal(b["c"])) for b in raw
+    )
+    return TrackView(
+        symbol="AAPL",
+        name="Apple Inc",
+        exchange="NASDAQ",
+        bars=bars,
+        source="robinhood",
+        sessions_label=f"{len(bars)} sessions, daily",
+        held_qty=Decimal("48"),
+        verdict="top decile, trend intact, nothing near a veto",
+        momentum=(
+            f"[{Ink.DIM}]slope[/] [{Ink.INK}]+22.1%[/] [{Ink.FAINT}]annualised[/]"
+            f"   [{Ink.FAINT}]x[/] [{Ink.DIM}]R\u00b2[/] [{Ink.INK}]0.83[/]"
+            f"   [{Ink.FAINT}]=[/] [{Ink.DIM}]score[/] [{Ink.BRIGHT}]+18.4%[/]"
+            f"     [{Ink.FAINT}]smooth climb, not one gap[/]"
+        ),
+        rank="12/500",
+        risk=(
+            RiskHeadroom("position_cap", "14.9% of 25.0%", Decimal("0.60")),
+            RiskHeadroom("above 100d MA", "$291.40, +6.2% above"),
+            RiskHeadroom("largest 90d gap", "8.1%, limit 15.0%"),
+        ),
+        thesis="Services margin expansion continues to offset hardware softness.",
+        invalidated_if="services growth prints under 8% next quarter",
+        thesis_meta="cycle 01KZ9MHT \u00b7 4 citations \u00b7 $0.031",
+    )
+
+
+async def capture_track() -> None:
+    runtime = TradeOSRuntime(RuntimeConfig(in_memory=True))
+    runtime.ensure_sample_policy()
+    app = WolfApp(runtime, calm=True, start_screen="den")
+    async with app.run_test(size=SIZE) as pilot:
+        await app.push_screen(TrackScreen(_track_view()))
+        for _ in range(3):
+            await pilot.pause()
+        svg = app.export_screenshot(title="wolf \u00b7 track")
+    target = OUT / "track.svg"
+    target.write_text(svg)
+    print(f"  {target.relative_to(OUT.parent.parent)}  ({len(svg) // 1024}KB)")
+
+
 async def capture(name: str, screen: str, cycles: int, engage_kill: bool) -> None:
     quotes = WalkingQuoteSource(DEMO_PRICES)
     runtime = TradeOSRuntime(RuntimeConfig(in_memory=True, quote_source=quotes))
@@ -112,6 +168,7 @@ async def main() -> int:
     print(f"capturing {len(SHOTS)} screens →")
     for shot in SHOTS:
         await capture(*shot)
+    await capture_track()
 
     # An in-memory runtime should never surface a real path, but the captures
     # are published, so the check is cheap insurance against that changing.
