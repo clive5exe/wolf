@@ -13,6 +13,7 @@ from rich.table import Table
 import tradeos
 from tradeos.notifications.factory import default_notifier
 from tradeos.runtime.connect import (
+    BrowserPrompt,
     ConnectError,
     alpaca_status,
     alpaca_steps,
@@ -20,6 +21,16 @@ from tradeos.runtime.connect import (
     save_alpaca,
 )
 from tradeos.runtime.diagnostics import CheckStatus
+from tradeos.notifications.telegram import (
+    BOTFATHER,
+    CHAT_KEY,
+    TOKEN_KEY,
+    TelegramError,
+    TelegramNotifier,
+    pairing_steps,
+    verify_token,
+    wait_for_chat,
+)
 from tradeos.runtime.facade import RuntimeConfig, TradeOSRuntime
 from tradeos.security.store import default_secret_store
 
@@ -191,6 +202,61 @@ def connect(
 
     console.print(f"\n[green]stored in your OS keystore[/] {alpaca_status(store)}")
     console.print("[dim]never written to disk, and not in the event log[/]")
+
+
+@app.command("connect-telegram")
+def connect_telegram(
+    forget: bool = typer.Option(False, "--forget", help="Remove the stored bot"),
+) -> None:
+    """Pair a Telegram bot so WOLF can reach you.
+
+    You create your own bot rather than using a shared one. A shared bot would
+    route every message through a server somebody runs and pays for, and that
+    operator would hold everyone's chat ids and every alert ever sent.
+    """
+    store = default_secret_store()
+
+    if forget:
+        removed = store.delete_secret(TOKEN_KEY) | store.delete_secret(CHAT_KEY)
+        console.print("[green]disconnected[/]" if removed else "[dim]nothing stored[/]")
+        return
+
+    if not store.available():
+        console.print("[red]no OS keystore available[/], and a bot token is a credential")
+        raise typer.Exit(code=1)
+
+    first, _ = pairing_steps()
+    console.print(BrowserPrompt(BOTFATHER, first).show())
+
+    token = typer.prompt("\nBot token", hide_input=True).strip()
+    try:
+        username = verify_token(token)
+    except TelegramError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(code=1) from exc
+    console.print(f"[green]verified[/] @{username}")
+
+    _, second = pairing_steps(username)
+    console.print(BrowserPrompt(f"https://t.me/{username}", second).show())
+    console.print("[dim]waiting for your message…[/]")
+
+    try:
+        chat_id = wait_for_chat(token)
+    except TelegramError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(code=1) from exc
+
+    store.set_secret(TOKEN_KEY, token)
+    store.set_secret(CHAT_KEY, str(chat_id))
+
+    # Prove it end to end rather than claiming success. A pairing that only
+    # appears to work is worse than one that visibly failed.
+    if TelegramNotifier(token=token, chat_id=chat_id).notify(
+        "WOLF connected", "You will hear from me when something actually happens."
+    ):
+        console.print("[green]connected[/] check Telegram for a test message")
+    else:
+        console.print("[yellow]paired, but the test message did not send[/]")
 
 
 @app.command()

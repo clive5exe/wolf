@@ -19,6 +19,7 @@ from textual.screen import Screen
 from textual.widgets import Static
 
 from tradeos.notifications.base import NullNotifier
+from tradeos.runtime.diagnostics import CheckStatus
 from tradeos.runtime.facade import RuntimeConfig, TradeOSRuntime
 from tradeos.tui.app import WolfApp
 from tradeos.tui.base import MAX_FRAME_WIDTH
@@ -54,13 +55,34 @@ def screen_text(app: WolfApp) -> str:
 
 class TestBootScreen:
     @pytest.mark.asyncio
-    async def test_shows_every_check(self, runtime: TradeOSRuntime) -> None:
+    async def test_shows_every_check_up_to_the_first_failure(
+        self, runtime: TradeOSRuntime
+    ) -> None:
+        """The cascade halts at a failure, deliberately, so you cannot boot
+        past a broken environment.
+
+        The test therefore asserts up to that point rather than over the whole
+        list. Asserting all of them passes on a developer machine where every
+        check succeeds and fails in CI, where there is no `claude` CLI and no
+        Keychain, which is exactly what it did.
+        """
         app = WolfApp(runtime, calm=True, start_screen="boot")
         async with app.run_test(size=(96, 40)) as pilot:
             await pilot.pause()
             text = screen_text(app)
-            for check in runtime.diagnostics():
-                assert check.name in text
+
+            checks = runtime.diagnostics()
+            assert checks, "the doctor must report something"
+            shown = 0
+            for check in checks:
+                if check.status is CheckStatus.FAIL:
+                    # The failing check itself is shown, with its fix hint.
+                    assert check.name in text
+                    shown += 1
+                    break
+                assert check.name in text, f"{check.name} passed but was not rendered"
+                shown += 1
+            assert shown, "no checks rendered at all"
 
     @pytest.mark.asyncio
     async def test_enter_opens_the_den(self, runtime: TradeOSRuntime) -> None:
