@@ -18,6 +18,7 @@ import shutil
 import subprocess
 import time
 from decimal import Decimal
+from pathlib import Path
 from typing import Any, TypeVar
 
 from pydantic import BaseModel, ValidationError
@@ -51,10 +52,21 @@ class ClaudeCodeProvider:
         executable: str | None = None,
         event_store: EventStore | None = None,
         default_model: str | None = None,
+        tool_dir: Path | None = None,
+        allowed_tools: tuple[str, ...] = (),
     ) -> None:
         self._executable_override = executable
         self._events = event_store
         self._default_model = default_model
+        #: Directory the CLI runs in, which is what decidesic
+        #: MCP servers it can see. Required for tool use, because MCP
+        #: registration is project-scoped, and that scoping is the safety
+        #: boundary rather than an inconvenience to route around.
+        self._tool_dir = tool_dir
+        #: The only tools that may ever be passed. Anything absent is
+        #: unreachable even if the prompt asks for it by name, because the CLI
+        #: refuses what was not granted.
+        self._allowed_tools = allowed_tools
 
     # -- protocol --------------------------------------------------------------
 
@@ -107,6 +119,7 @@ class ClaudeCodeProvider:
         timeout_s: int = 120,
         max_turns: int = 1,
         model: str | None = None,
+        tools: tuple[str, ...] = (),
     ) -> ProviderResult[T]:
         exe = self._find_executable()
         if exe is None:
@@ -115,6 +128,20 @@ class ClaudeCodeProvider:
                 error=ProviderErrorKind.NOT_INSTALLED,
                 error_detail="claude CLI not found on PATH",
             )
+        # Intersection, never the caller's list. A caller asking for a tool
+        # outside the allowlist gets silence rather than the tool, and the gap
+        # between what was asked for and what was granted is recorded.
+        granted = tuple(t for t in tools if t in self._allowed_tools)
+        if tools and len(granted) != len(tools):
+            self._record(
+                EventType.PROVIDER_ERROR,
+                {
+                    "provider": self.name,
+                    "reason": "tools requested outside the allowlist were dropped",
+                    "refused": sorted(set(tools) - set(granted)),
+                },
+            )
+
         schema_json = json.dumps(schema.model_json_schema())
         self._record(
             EventType.PROVIDER_QUERY,
@@ -124,6 +151,10 @@ class ClaudeCodeProvider:
                 "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
                 "prompt_chars": len(prompt),
                 "max_turns": max_turns,
+                # Recorded by name. Which instruments a decision had access to
+                # is part of the decision, and a verdict cannot be judged
+                # without knowing what the model could see.
+                "tools": sorted(granted),
             },
         )
 
@@ -138,6 +169,7 @@ class ClaudeCodeProvider:
                 timeout_s=timeout_s,
                 max_turns=max_turns,
                 model=model or self._default_model,
+                tools=granted,
             )
             if isinstance(outcome, ProviderResult):
                 self._record_error(outcome)
@@ -231,6 +263,7 @@ class ClaudeCodeProvider:
         timeout_s: int,
         max_turns: int,
         model: str | None,
+        tools: tuple[str, ...] = (),
     ) -> dict[str, Any] | ProviderResult[Any]:
         argv = [
             exe,
@@ -245,8 +278,19 @@ class ClaudeCodeProvider:
         ]
         if model:
             argv += ["--model", model]
+        if tools:
+            argv += ["--allowedTools", ",".join(tools)]
         try:
-            proc = subprocess.run(argv, capture_output=True, text=True, timeout=timeout_s)
+            proc = subprocess.run(
+                argv,
+                capture_output=True,
+                text=True,
+                timeout=timeout_s,
+                # Only when tools are granted. Running elsewhere by default
+                # keeps a toolless synthesis from inheriting an MCP connection
+                # it was never meant to reach.
+                cwd=self._tool_dir if tools else None,
+            )
         except subprocess.TimeoutExpired:
             return ProviderResult(
                 ok=False,

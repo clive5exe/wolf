@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import ClassVar
 
 import pytest
+from pydantic import BaseModel
 
 from tradeos.domain.context import (
     MAX_MODEL_GENERATED_CREDIBILITY,
@@ -37,6 +38,7 @@ from tradeos.domain.risk import ValidatedOrder, client_order_id_for
 from tradeos.domain.thesis import StructuredThesis
 from tradeos.events.types import EventType
 from tradeos.notifications.base import NullNotifier
+from tradeos.providers.claude_code import ClaudeCodeProvider
 from tradeos.runtime.facade import RuntimeConfig, TradeOSRuntime
 from tradeos.storage.sqlite_store import SQLiteEventStore
 from tradeos.telemetry.logging import redact
@@ -316,13 +318,48 @@ class TestT7MaliciousDataSource:
         assert item.usable_for_decision(NOW)
         assert not item.usable_for_decision(NOW + timedelta(seconds=600))
 
-    def test_v0_1_grants_providers_no_tools(self) -> None:
-        """A compromised source cannot be reached by the model directly:
-        context is assembled by the core and handed over as data."""
-        provider = (
-            Path(__file__).resolve().parents[2] / "src/tradeos/providers/claude_code.py"
-        ).read_text()
-        assert "--allowedTools" not in provider or "disallowed" in provider.lower()
+    def test_the_model_reaches_only_allowlisted_read_tools(self) -> None:
+        """The model now has tools, so the invariant is narrower and stronger.
+
+        It used to be "the provider grants nothing", which held while context
+        was assembled by the core and handed over as inert data. Tool access
+        changes that, so the guarantee moves: the provider passes the
+        *intersection* of what was requested with its own allowlist, and
+        nothing that trades or writes state may appear on that list.
+
+        This matters more than it did before, because Robinhood issues a single
+        `internal` scope with no read-only variant. An authorised token can
+        place orders, so the credential guarantees nothing and the allowlist is
+        the whole defence.
+        """
+        from tradeos.mcp.registry import EXECUTION_TOOLS, STATE_WRITE_CLASS, TRADE_CLASS
+
+        forbidden = set(EXECUTION_TOOLS) | set(TRADE_CLASS) | set(STATE_WRITE_CLASS)
+
+        recorded: list[tuple[str, ...]] = []
+
+        class Spy(ClaudeCodeProvider):
+            def _find_executable(self) -> str | None:
+                return "claude"
+
+            def _invoke(self, exe, prompt, schema_json, *, timeout_s, max_turns, model, tools=()):  # type: ignore[no-untyped-def]
+                recorded.append(tools)
+                return {"text": "ok"}
+
+        class Answer(BaseModel):
+            text: str
+
+        read_tool = "mcp__robinhood-trading__get_equity_quotes"
+        spy = Spy(allowed_tools=(read_tool,))
+        # Ask for every dangerous tool alongside the legitimate one.
+        spy.query_structured(
+            prompt="x",
+            schema=Answer,
+            tools=(read_tool, *sorted(forbidden)),
+        )
+        granted = set(recorded[0])
+        assert granted == {read_tool}
+        assert not (granted & forbidden), f"execution tools leaked: {granted & forbidden}"
 
 
 class TestTheMappingIsComplete:
