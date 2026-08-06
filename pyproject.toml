@@ -23,6 +23,14 @@ dependencies = [
   "pydantic>=2.7",
   "typer>=0.12",
   "textual>=1.0",
+  # The quant layer. Boring, BSD-licensed, and what people who crunch these
+  # numbers for a living actually use. All ship prebuilt wheels, including for
+  # 3.14, so the no-sudo installer does not have to compile anything.
+  "numpy>=2.1",
+  "pandas>=2.2",
+  "scipy>=1.14",
+  "statsmodels>=0.14",
+  "arch>=7.0",
 ]
 
 [project.optional-dependencies]
