@@ -12,15 +12,6 @@ from rich.table import Table
 
 import tradeos
 from tradeos.notifications.factory import default_notifier
-from tradeos.runtime.connect import (
-    BrowserPrompt,
-    ConnectError,
-    alpaca_status,
-    alpaca_steps,
-    forget_alpaca,
-    save_alpaca,
-)
-from tradeos.runtime.diagnostics import CheckStatus
 from tradeos.notifications.telegram import (
     BOTFATHER,
     CHAT_KEY,
@@ -31,6 +22,15 @@ from tradeos.notifications.telegram import (
     verify_token,
     wait_for_chat,
 )
+from tradeos.runtime.connect import (
+    BrowserPrompt,
+    ConnectError,
+    alpaca_status,
+    alpaca_steps,
+    forget_alpaca,
+    save_alpaca,
+)
+from tradeos.runtime.diagnostics import CheckStatus
 from tradeos.runtime.facade import RuntimeConfig, TradeOSRuntime
 from tradeos.security.store import default_secret_store
 
