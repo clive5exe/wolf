@@ -222,11 +222,11 @@
                             <div class="step-body">
                                 <div class="step-title">Observe, then retrieve.</div>
                                 <div class="step-desc">
-                                    Positions and quotes are read, then assembled into a
-                                    context package where every item carries a source, a
-                                    timestamp, a TTL and a credibility score. Stale data
-                                    is a stop sign: "insufficient or stale data, no
-                                    action" is a successful outcome.
+                                    Live positions and quotes come from your own broker,
+                                    fundamentals from SEC filings. Every item carries a
+                                    source, a timestamp, a TTL and a credibility score.
+                                    Stale data is a stop sign: "insufficient or stale
+                                    data, no action" is a successful outcome.
                                 </div>
                             </div>
                         </li>
@@ -312,6 +312,18 @@
                                 Nothing enters a decision without an event time, an
                                 ingestion time and a TTL. Live sources pulse on screen.
                                 Stale ones go still, so you notice the absence of motion.
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-glyph" style="color: var(--infrared)">⊘</div>
+                            <div class="card-title">It cannot reach what it was not given</div>
+                            <div class="card-body">
+                                The model gets tools, but only ones on an allowlist it
+                                cannot widen. Ask for an order-placing tool by name and it
+                                is dropped, and the refusal is recorded. This matters
+                                because the broker issues a single scope with no read-only
+                                variant, so the credential guarantees nothing and the
+                                allowlist is the whole defence.
                             </div>
                         </div>
                         <div class="card">

@@ -45,6 +45,7 @@
                 </div>
                 <div class="side-group">
                     <div class="side-label">Reference</div>
+                    <a href="#data">Where data comes from</a>
                     <a href="#cli">CLI commands</a>
                     <a href="#keys">Keyboard</a>
                     <a href="#policy">Policy fields</a>
@@ -253,6 +254,34 @@ Restart=always</pre>
                     </p>
                 </section>
 
+                <section id="data">
+                    <h2>Where the data comes from</h2>
+                    <p>
+                        Three sources, each with its own credential, none of them ours.
+                        WOLF has no account for you to create and no backend holding your
+                        keys.
+                    </p>
+                    <table class="docs-table">
+                        <tr><th>Source</th><th>Gives</th><th>How it authenticates</th></tr>
+                        <tr><td>Robinhood Agentic MCP</td><td>Live quotes, daily bars, technical indicators</td><td>Your existing broker login, over OAuth. Nothing to paste</td></tr>
+                        <tr><td>SEC EDGAR</td><td>Filings, fundamentals with restatement history, insider transactions</td><td>None. Free, unlimited, public domain</td></tr>
+                        <tr><td>Your AI provider</td><td>Synthesis and judgement</td><td>Your own Claude Code login</td></tr>
+                    </table>
+                    <div class="docs-callout warn">
+                        <strong>The broker scope is not read-only.</strong> Robinhood issues
+                        a single <code>internal</code> scope with no read-only variant, so
+                        an authorised token <em>can</em> place orders. The guarantee comes
+                        from the tool allowlist instead: the provider passes only tools on
+                        that list, drops anything else even when asked for by name, and
+                        records the refusal. No order-placing tool can appear on it.
+                    </div>
+                    <p>
+                        Without a broker connection, quotes fall back to static demo
+                        fixtures. Everything on screen is then shaped rather than real, and
+                        the source column on the dashboard says so.
+                    </p>
+                </section>
+
                 <section id="cli">
                     <h2>CLI commands</h2>
                     <table class="docs-table">
@@ -262,6 +291,8 @@ Restart=always</pre>
                         <tr><td><code>wolf watch</code></td><td>Run cycles on a schedule until stopped</td></tr>
                         <tr><td><code>wolf demo</code></td><td>Run paper cycles from the CLI</td></tr>
                         <tr><td><code>wolf doctor</code></td><td>Environment checks with fix hints</td></tr>
+                        <tr><td><code>wolf connect-telegram</code></td><td>Pair your own Telegram bot so WOLF can reach you</td></tr>
+                        <tr><td><code>wolf connect alpaca</code></td><td>Store a market data key in the OS keystore</td></tr>
                         <tr><td><code>wolf portfolio</code></td><td>Allocations, drift, concentration</td></tr>
                         <tr><td><code>wolf events</code></td><td>Tail the audit log</td></tr>
                         <tr><td><code>wolf policy-show</code></td><td>The active policy as enforced JSON</td></tr>
@@ -279,6 +310,7 @@ Restart=always</pre>
                         <tr><td><kbd>j</kbd></td><td>Journal</td></tr>
                         <tr><td><kbd>p</kbd></td><td>Policy summary</td></tr>
                         <tr><td><kbd>k</kbd></td><td>Kill switch, works from any screen</td></tr>
+                        <tr><td><kbd>⏎</kbd> on a holding</td><td>Track: one symbol in full, with candlesticks</td></tr>
                         <tr><td><kbd>esc</kbd></td><td>Back to the den</td></tr>
                         <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Move between orders or journal rows</td></tr>
                     </table>

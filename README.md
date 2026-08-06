@@ -57,13 +57,17 @@ opposite stance:
 | Paper trading with slippage model + event-sourced replay | |
 | Target-allocation rebalance strategy (explicit Decimal math) | |
 | Versioned investment policy with mode ladder + kill switch | |
-| Six-screen terminal UI: boot diagnosis, den, live cycle, verdict, journal, kill | |
+| Seven-screen terminal UI: boot, den, live cycle, verdict, journal, kill, and track for one symbol in full | |
 | Scheduled cycles (`wolf watch`) with market-hours gating and kill-switch awareness | |
 | SEC EDGAR fundamentals with point-in-time correctness (restatements are visible, not silently applied) | |
 | Daily SEC filing collector (Cloudflare Worker, optional mirror, never a dependency) | |
 | Policy onboarding (`wolf setup`): your goals drafted into a policy you confirm | |
 | Typer CLI (`wolf`), notifications via Notification Center or libnotify | |
-| 488 tests incl. safety/contract/replay suites, mypy clean, CI | |
+| Live Robinhood quotes and daily bars through the Agentic MCP, no key to paste | |
+| Model tool access behind an allowlist it cannot widen: no trade tool can ever be granted | |
+| Quant layer: momentum, volatility, drawdown, Sharpe, Sortino, correlation, ATR sizing | |
+| Telegram alerts, your own bot, paired in one command | |
+| 589 tests incl. safety/contract/replay suites, mypy clean, CI on macOS and Linux across Python 3.12 to 3.14 | |
 
 ## Quickstart
 
@@ -184,7 +188,10 @@ Full detail: [ARCHITECTURE.md](ARCHITECTURE.md) · [RISK_POLICY_SPEC.md](RISK_PO
 - Model output and ingested market content are treated as hostile input:
   schema validation, citation integrity checks, and decisively the
   deterministic risk boundary between any text and any order.
-- Broker access is read-only in v0.1. The Robinhood integration targets only
+- Broker access is read-only in v0.1, enforced by the tool allowlist rather
+  than by the credential: Robinhood issues one `internal` scope with no
+  read-only variant, so an authorised token *can* place orders and the
+  allowlist is the entire defence. The integration targets only
   the official Agentic Trading MCP, never private APIs.
 
 ## Verification
@@ -201,8 +208,9 @@ everything, and hostile context text cannot change a proposal or verdict.
 
 ## Known limitations (honest list)
 
-- Quotes in the demo are static fixtures. Live market data lands with the
-  Robinhood MCP read-only adapter (T-024, requires an Agentic account).
+- Live quotes and bars come from Robinhood and need an Agentic Trading
+  account. Without one, quotes fall back to static demo fixtures and every
+  figure on screen is shaped rather than real.
 - The market clock knows regular NYSE hours but not exchange holidays (paper
   mode simulates sessions, and live modes in v0.2 require a holiday source).
 - Sharpe/Sortino/beta report "unavailable" until a licensed benchmark series
