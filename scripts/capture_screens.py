@@ -16,7 +16,7 @@ import json
 import math
 import pathlib
 import sys
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 from tradeos.domain.market import Quote
@@ -98,7 +98,14 @@ def _track_view() -> TrackView:
     """
     raw = json.loads((pathlib.Path(__file__).parent / "fixtures" / "aapl_3mo.json").read_text())
     bars = tuple(
-        Bar(Decimal(b["o"]), Decimal(b["h"]), Decimal(b["l"]), Decimal(b["c"])) for b in raw
+        Bar(
+            Decimal(str(b["o"])),
+            Decimal(str(b["h"])),
+            Decimal(str(b["l"])),
+            Decimal(str(b["c"])),
+            date.fromisoformat(b["d"]),
+        )
+        for b in raw
     )
     return TrackView(
         symbol="AAPL",
@@ -106,7 +113,7 @@ def _track_view() -> TrackView:
         exchange="NASDAQ",
         bars=bars,
         source="robinhood",
-        sessions_label=f"{len(bars)} sessions, daily",
+        interval="1D",
         held_qty=Decimal("48"),
         verdict="top decile, trend intact, nothing near a veto",
         momentum=(
@@ -130,8 +137,10 @@ def _track_view() -> TrackView:
 async def capture_track() -> None:
     runtime = TradeOSRuntime(RuntimeConfig(in_memory=True))
     runtime.ensure_sample_policy()
+    # Track carries a chart plus three sections beneath it, so it needs more
+    # rows than the shared size. Capturing it at SIZE clipped the thesis.
     app = WolfApp(runtime, calm=True, start_screen="den")
-    async with app.run_test(size=SIZE) as pilot:
+    async with app.run_test(size=(SIZE[0], 42)) as pilot:
         await app.push_screen(TrackScreen(_track_view()))
         for _ in range(3):
             await pilot.pause()

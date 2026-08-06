@@ -20,7 +20,7 @@ from textual.containers import Vertical
 from textual.widgets import Static
 
 from tradeos.tui.base import WolfScreen, footer_bar, header_bar, section
-from tradeos.tui.chart import Bar, candles, price_axis
+from tradeos.tui.chart import Bar, candles, price_axis, span_label, time_axis
 from tradeos.tui.glyphs import fmt_money, fmt_signed_pct
 from tradeos.tui.theme import Ink, key
 
@@ -49,7 +49,9 @@ class TrackView:
     exchange: str
     bars: tuple[Bar, ...]
     source: str = "robinhood"
-    sessions_label: str = ""
+    #: Stated explicitly. A candle could be a minute or a month and the
+    #: chart looks identical either way.
+    interval: str = "1D"
     held_qty: Decimal | None = None
     verdict: str = ""
     momentum: str = ""
@@ -140,6 +142,7 @@ class TrackScreen(WolfScreen):
             bits.append(f"[{Ink.DIM}]held[/] [{Ink.BRIGHT}]{view.held_qty:,g}[/]")
 
         head = "\n" + "     ".join(bits) + "\n"
+        head += f"  [{Ink.FAINT}]{span_label(view.bars, view.interval)}[/]\n"
         if self._view.verdict:
             head += f"  [{Ink.INFRARED}]{self._view.verdict}[/]\n"
         return head
@@ -166,10 +169,16 @@ class TrackScreen(WolfScreen):
                 line += f"  [{Ink.FAINT}]─[/] [{Ink.DIM}]{label}[/]"
             lines.append(line)
         lines.append(f"  [{Ink.FAINT}]└{'─' * len(bars)}[/]")
-        legend = f"[{Ink.GREEN}]┃[/][{Ink.FAINT}] up[/]   [{Ink.RED}]┃[/][{Ink.FAINT}] down[/]"
-        label = view.sessions_label or f"{len(bars)} sessions"
-        lines.append(f"   [{Ink.FAINT}]{label}[/]        {legend}\n")
-        return "\n".join(lines)
+
+        # A dated axis, not a legend. Anyone reading a candlestick chart knows
+        # green is up; what they cannot know without labels is whether a candle
+        # is a minute or a month, or where in the window they are looking.
+        axis_text = time_axis(bars)
+        if axis_text:
+            ticks, months = axis_text.split("\n")
+            lines.append(f"   [{Ink.FAINT}]{ticks}[/]")
+            lines.append(f"   [{Ink.DIM}]{months}[/]")
+        return "\n".join(lines) + "\n"
 
     def _why(self) -> str:
         if not self._view.momentum:

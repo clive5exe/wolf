@@ -26,6 +26,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import date
 from decimal import Decimal
 
 from tradeos.tui.theme import Ink
@@ -50,12 +51,18 @@ _WICK, _BODY = 1, 2
 
 @dataclass(frozen=True, slots=True)
 class Bar:
-    """One session. Decimal throughout: these are prices."""
+    """One session. Decimal throughout: these are prices.
+
+    ``day`` is optional only so tests can build a bar without one. Any chart
+    shown to a user needs it: a candlestick is a time series, and one without
+    dates cannot say whether it covers a week or a decade.
+    """
 
     open: Decimal
     high: Decimal
     low: Decimal
     close: Decimal
+    day: date | None = None
 
     @property
     def rising(self) -> bool:
@@ -174,3 +181,44 @@ def price_axis(low: Decimal, high: Decimal, rows: int) -> list[str]:
     if rows >= 5:
         labels[rows // 2] = f"${(high + low) / 2:,.2f}"
     return labels
+
+
+def time_axis(bars: Sequence[Bar], *, width: int | None = None) -> str:
+    """A dated x-axis, labelled where the month changes.
+
+    Ticks are placed at month boundaries rather than at even intervals, because
+    a reader locates themselves by "that is July", not by counting columns. A
+    label is dropped if it would collide with its neighbour, which is what
+    happens on short windows.
+    """
+    if not bars or not any(b.day for b in bars):
+        return ""
+    width = width or len(bars)
+    row = [" "] * width
+    marks = [" "] * width
+
+    last_month: int | None = None
+    for i, bar in enumerate(bars[:width]):
+        if bar.day is None:
+            continue
+        if last_month is not None and bar.day.month != last_month:
+            label = bar.day.strftime("%b")
+            # Only if it fits without overwriting the previous label.
+            if all(ch == " " for ch in row[max(0, i - 1) : i + len(label) + 1]):
+                row[i : i + len(label)] = list(label)
+                marks[i] = "┬"
+        last_month = bar.day.month
+    return "".join(marks).rstrip() + "\n" + "".join(row).rstrip()
+
+
+def span_label(bars: Sequence[Bar], interval: str = "1D") -> str:
+    """``1D · 05 May to 04 Aug 2026 · 63 sessions``.
+
+    States the interval explicitly. Without it a candle could be a minute or a
+    month and the chart looks identical either way.
+    """
+    dated = [b.day for b in bars if b.day]
+    if not dated:
+        return f"{interval} · {len(bars)} sessions"
+    first, last = min(dated), max(dated)
+    return f"{interval} · {first:%d %b} to {last:%d %b %Y} · {len(bars)} sessions"

@@ -100,7 +100,7 @@ cost per call. WOLF records it per event and never hides it.
 
 ## The den (terminal UI)
 
-`wolf tui` opens a six-screen interface. The dashboard is home, and every screen is
+`wolf tui` opens a seven-screen interface. The dashboard is home, and every screen is
 one keystroke away and one `esc` back. There are no menus.
 
 | Screen | Key | What it is for |
@@ -111,6 +111,7 @@ one keystroke away and one `esc` back. There are no menus.
 | **verdict** | `⏎` | Thesis on top, the rule wall below, receipt at the bottom, the order the system actually works in. Every rule is listed, every time. |
 | **journal** | `j` | Decision history. Vetoes and no-actions carry the same weight as fills, because "we did not trade" is a result. |
 | **kill** | `k` | Full-screen halt. Reachable from anywhere. Deliberately the ugliest thing in the app. |
+| **track** | `⏎` on a row | One symbol in full: verdict first, candlesticks as evidence, then what would stop a trade and the last thesis. |
 
 
 ### The screens
@@ -125,7 +126,8 @@ one keystroke away and one `esc` back. There are no menus.
 <td><b>Journal.</b> Vetoes and no-actions carry the same weight as fills.<br><img src="https://raw.githubusercontent.com/clive5exe/wolf/main/docs/screens/journal.svg" alt="Decision journal"></td>
 </tr>
 <tr>
-<td colspan="2"><b>Kill switch.</b> Reachable from anywhere, and deliberately the ugliest thing in the app.<br><img src="https://raw.githubusercontent.com/clive5exe/wolf/main/docs/screens/kill.svg" alt="Kill switch takeover"></td>
+<td><b>Kill switch.</b> Reachable from anywhere, and deliberately the ugliest thing in the app.<br><img src="https://raw.githubusercontent.com/clive5exe/wolf/main/docs/screens/kill.svg" alt="Kill switch takeover"></td>
+<td><b>Track.</b> One symbol in full. Real candlesticks from live broker data, dated and labelled with their interval.<br><img src="https://raw.githubusercontent.com/clive5exe/wolf/main/docs/screens/track.svg" alt="Track screen"></td>
 </tr>
 </table>
 

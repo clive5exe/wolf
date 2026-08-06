@@ -159,3 +159,42 @@ class TestDirectionSurvivesWithoutColour:
         from tradeos.tui.glyphs import fmt_signed
 
         assert fmt_signed(Decimal("12.5")) == "+12.50"
+
+
+class TestTimeAxis:
+    """A candlestick chart is a time series. Without dates and a stated
+    interval it cannot say whether a candle is a minute or a month, and the
+    picture looks identical either way."""
+
+    def _bars(self, days):
+        from datetime import date
+        from decimal import Decimal as D
+
+        from tradeos.tui.chart import Bar
+
+        return [Bar(D("10"), D("11"), D("9"), D("10"), date.fromisoformat(d)) for d in days]
+
+    def test_span_label_states_the_interval_and_range(self) -> None:
+        from tradeos.tui.chart import span_label
+
+        label = span_label(self._bars(["2026-05-05", "2026-08-04"]), "1D")
+        assert label.startswith("1D · ")
+        assert "05 May" in label and "04 Aug 2026" in label
+        assert "2 sessions" in label
+
+    def test_axis_marks_month_changes(self) -> None:
+        from tradeos.tui.chart import time_axis
+
+        days = [f"2026-05-{d:02d}" for d in range(25, 32)] + [
+            f"2026-06-{d:02d}" for d in range(1, 8)
+        ]
+        ticks, labels = time_axis(self._bars(days)).split("\n")
+        assert "Jun" in labels
+        assert "┬" in ticks
+
+    def test_undated_bars_produce_no_axis_rather_than_a_wrong_one(self) -> None:
+        from decimal import Decimal as D
+
+        from tradeos.tui.chart import Bar, time_axis
+
+        assert time_axis([Bar(D("1"), D("2"), D("0"), D("1"))]) == ""
